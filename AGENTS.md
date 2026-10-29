@@ -137,8 +137,6 @@
 
 ---
 
----
-
 ## Part C — This repository
 
 ### C1. Public monorepo (`gate-keeper`) only
