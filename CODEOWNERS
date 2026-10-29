@@ -1,0 +1,15 @@
+# Every change in this repository is reviewed by the owner: agents propose,
+# the owner decides (rule 15 of AGENTS.md). A narrower split, for example
+# engine code against rule packs, arrives with the CI guard-rails in P0-12.
+
+*                                  @bolorundurowb
+
+# The rules themselves, and the ownership file itself, change only with the
+# owner's approval; see the "Human-only" section of AGENTS.md. These entries
+# stay explicit so that narrowing the default rule above cannot quietly
+# remove the review requirement.
+
+AGENTS.md                          @bolorundurowb
+CLAUDE.md                          @bolorundurowb
+CODEOWNERS                         @bolorundurowb
+.github/pull_request_template.md   @bolorundurowb
