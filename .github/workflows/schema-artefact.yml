@@ -1,0 +1,33 @@
+name: Schema artefact
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    name: Pack schemas and fail on drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Fail if the packed manifest has drifted
+        shell: pwsh
+        run: ./ci/schema-artefact/Test-SchemaArtefact.ps1
+
+      - name: Pack the artefact for review
+        shell: pwsh
+        run: ./ci/schema-artefact/Pack-SchemaArtefact.ps1 -Output artifacts/gate-keeper-schemas.zip
+
+      - name: Upload the artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-keeper-schemas
+          path: artifacts/gate-keeper-schemas.zip
+          if-no-files-found: error
