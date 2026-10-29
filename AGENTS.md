@@ -1,6 +1,6 @@
 # AGENTS.md — Rules for Implementing Agents
 
-> Approved by the owner on 27 October 2026. Parts A and B are identical in every Gate-Keeper repository; Part C applies to this repository only. Changes need owner approval.
+> Approved by the owner on 27 October 2026; Parts B2 and B4 runtime floors amended by the owner on 29 October 2026 (IQ-79). Parts A and B are identical in every Gate-Keeper repository; Part C applies to this repository only. Changes need owner approval.
 > Rules 1–18 keep the numbers used in the engineering plan; never renumber — retire a rule by marking it "Withdrawn".
 
 **How to read the rules.** "Must" and "must not" are absolute: breaking one fails review. "Should" means do it unless the card or the owner says otherwise, and explain any deviation in the pull request. When two rules seem to conflict, stop and ask (rule 1).
@@ -114,7 +114,7 @@
 
 ### B2. TypeScript / Node.js (middleware, GitHub Action)
 
-- Node 26 or later; TypeScript `strict`; no `any` (use `unknown` and narrow); ESM first with a CommonJS build for the middleware.
+- Runtime floor: the middleware supports every Node LTS line under upstream support when each middleware major is released (IQ-79; at the time of writing Node 22, 24 and 26); other Node code, such as the GitHub Action, uses Node 26 or later. TypeScript `strict`; no `any` (use `unknown` and narrow); ESM first with a CommonJS build for the middleware.
 - Zero runtime dependencies in the middleware unless approved (rule 8); Ed25519 via the built-in `crypto` module.
 - Errors are typed `Error` subclasses; never throw strings.
 
@@ -126,7 +126,7 @@
 
 ### B4. Python (middleware)
 
-- Python 3.15 or later; full type hints with `py.typed`; type checker in strict mode; linter and formatter as configured in the repository.
+- Runtime floor: every Python version under upstream support when each middleware major is released (IQ-79; at the time of writing 3.11 to 3.15); use no syntax newer than the oldest supported version. Full type hints with `py.typed`; type checker in strict mode; linter and formatter as configured in the repository.
 - No mutable default arguments; no bare `except:`; no `print` for diagnostics — use `logging`.
 
 ### B5. Angular (dashboard)
