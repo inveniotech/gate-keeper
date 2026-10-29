@@ -5,7 +5,7 @@
 - **Size:** S
 - **Branch:** `wp/p3-01-01-middleware-api-contract`
 - **Pull request title:** `docs(p3-01): add the middleware API contract specification`
-- **Traces:** R-1 (middleware is thin helpers only), F-005 and UC-003 (consent helper), IQ-09 (decided), IQ-31 (owner direction), IQ-32 (decided, 29 October 2026), IQ-33 (decided, 29 October 2026), IQ-76, IQ-78 and IQ-79 (decided, 29 October 2026), IQ-54 (open), NFR-031 (version stamps), NFR-028 (glossary), rules 5, 6, 8, 9, 10, 17, 18, 22, 24
+- **Traces:** R-1 (middleware is thin helpers only), F-005 and UC-003 (consent helper), IQ-09 (decided), IQ-31 (owner direction), IQ-32 (decided, 29 October 2026), IQ-33 (decided, 29 October 2026), IQ-76, IQ-78 and IQ-79 (decided, 29 October 2026), IQ-54 (decided, 29 October 2026), NFR-031 (version stamps), NFR-028 (glossary), rules 5, 6, 8, 9, 10, 17, 18, 22, 24
 - **Spec produced:** `docs/specs/middleware-api-v1.md`
 - **Context pack:** `AGENTS.md` and this card. Doc 15 vocabulary applies to the specification. The launch set, the decided fail-closed rule, and the IQ-32, IQ-33, IQ-76, IQ-78 and IQ-79 decisions are restated below.
 
@@ -38,7 +38,7 @@ Decision status at the time of writing:
 | IQ-76 | **Decided** by the owner on 29 October 2026 | Redaction applies every rule in the pack; only rules the pack marks `redaction.optional` may be switched off. |
 | IQ-78 | **Decided** by the owner on 29 October 2026 | The Spring Boot module targets Spring Boot 3 and 4 at Java 17 bytecode; other JVM modules stay at Java 15 bytecode. |
 | IQ-79 | **Decided** by the owner on 29 October 2026 | Middleware supports every runtime line under upstream support at each major's release. |
-| IQ-54 | **Open** | The Maven coordinates. Write the JVM package name as "to be confirmed (IQ-54)". |
+| IQ-54 | **Decided** by the owner on 29 October 2026 | The Maven namespace is `africa.gatekeeper` (reverse of the product domain `gatekeeper.africa`). Artefacts are `africa.gatekeeper:gate-keeper-*`; the Kotlin package root is `africa.gatekeeper`. |
 | IQ-33 | **Decided** by the owner on 29 October 2026 | Free packs are embedded in the free installation. Paid packs are embedded in the paid installation media. A path may load a newer pack. The adapter verifies the signature and does not verify a licence. |
 
 ## 3. Decisions the specification must state
@@ -154,7 +154,7 @@ Fifteen sections. Each entry gives the purpose, the normative content to write, 
 |---|---|---|---|---|
 | .NET | `InvenioTech.GateKeeper.*` | .NET 10 | ASP.NET Core: one middleware, an endpoint filter for minimal APIs, and a result filter for MVC controllers | `Microsoft.Extensions.Logging` through the `Microsoft.Extensions.Compliance.Redaction` abstractions, and Serilog (an enricher or destructuring policy) |
 | Node/TypeScript | `@inveniotech/gate-keeper-*` | Every Node LTS line under upstream support when the middleware major is released (IQ-79); at the time of writing Node 22, 24 and 26 | Express middleware and a NestJS interceptor | pino and winston |
-| Kotlin/JVM | To be confirmed (IQ-54) | Java 15 bytecode for the core and logging modules, tested on Java 17, 21 and 25; the Spring Boot module targets Java 17 (IQ-78) | Spring Boot 3 and 4 auto-configuration (a servlet filter and `ResponseBodyAdvice`, using `jakarta.servlet`). The public API must be usable from Java. | Logback and Log4j2 |
+| Kotlin/JVM | `africa.gatekeeper:gate-keeper-*` | Java 15 bytecode for the core and logging modules, tested on Java 17, 21 and 25; the Spring Boot module targets Java 17 (IQ-78) | Spring Boot 3 and 4 auto-configuration (a servlet filter and `ResponseBodyAdvice`, using `jakarta.servlet`). The public API must be usable from Java. | Logback and Log4j2 |
 | Python | `inveniotech-gate-keeper` | Every Python version under upstream support when the middleware major is released (IQ-79); at the time of writing 3.11 to 3.15 | Django middleware and FastAPI (Starlette) middleware | the standard-library `logging` filter |
 
 *Done when* each subsection names only the row above, and each example is under fifteen lines and uses synthetic data.
@@ -163,7 +163,7 @@ Fifteen sections. Each entry gives the purpose, the normative content to write, 
 
 **§14 Compatibility and versions.** Specification version 1, adapter semantic versioning, the pack version pinned per release, and the deprecation policy.
 
-**§15 Open questions and deferred items.** Every deferral written down with its identifier and the decision that closed it. IQ-33 is recorded here as decided on 29 October 2026, with the text in section 3.2. IQ-32, question 10 and IQ-76 are recorded as decided on 29 October 2026. IQ-54 (Maven coordinates) is recorded as open.
+**§15 Open questions and deferred items.** Every deferral written down with its identifier and the decision that closed it. IQ-33 is recorded here as decided on 29 October 2026, with the text in section 3.2. IQ-32, question 10 and IQ-76 are recorded as decided on 29 October 2026. IQ-54 (Maven coordinates) is recorded as decided on 29 October 2026.
 
 ## 5. Execution steps
 
@@ -171,14 +171,14 @@ Each step is one commit, all on one branch, all in one pull request.
 
 | Step | Work | Commit message | Gate |
 |---|---|---|---|
-| 0 | Read section 3; no questions are outstanding except IQ-54 (Maven coordinates) | — | Questions 1 to 10 are closed |
+| 0 | Read section 3; no questions are outstanding | — | Questions 1 to 10 and IQ-54 are closed |
 | 1 | Branch, create `docs/specs/`, write §0 to §2 | `docs(p3-01): add the middleware API contract skeleton` | Status banner is honest |
 | 2 | §3 and §4, the common model and encoding rules | `docs(p3-01): define the common classification model` | No type carries matched text |
 | 3 | §5 to §7, the three text operations, with `redact(text) → text` | `docs(p3-01): specify redaction, classification and response filtering` | Mask format is assertable, redaction has no context argument, and only `redaction.optional` rules can be switched off |
 | 4 | §9 to §11, pack loading from section 3.2, cross-cutting rules and the fail-closed table | `docs(p3-01): add pack loading and fail-closed policy` | Free and paid embedding are both stated, the path loads a newer pack only, eleven fail-closed rows, and the verification row redacts more, never less |
 | 5 | §12 for .NET | `docs(p3-01): add the .NET adapter shape` | ASP.NET Core, `Microsoft.Extensions.Logging` and Serilog only; example under fifteen lines |
 | 6 | §12 for Node/TypeScript | `docs(p3-01): add the Node adapter shape` | Express, NestJS, pino and winston only; example under fifteen lines |
-| 7 | §12 for Kotlin/JVM | `docs(p3-01): add the JVM adapter shape` | Spring Boot 3 and 4, Logback and Log4j2 only; Maven coordinates marked as to be confirmed (IQ-54); example under fifteen lines |
+| 7 | §12 for Kotlin/JVM | `docs(p3-01): add the JVM adapter shape` | Spring Boot 3 and 4, Logback and Log4j2 only; Maven coordinates `africa.gatekeeper:gate-keeper-*` (IQ-54); example under fifteen lines |
 | 8 | §12 for Python | `docs(p3-01): add the Python adapter shape` | Django, FastAPI and standard-library logging only; example under fifteen lines |
 | 9 | §13 to §15, conformance, versions, open questions | `docs(p3-01): add conformance obligations and versioning` | Every MUST has a vector family |
 | 10 | Self-review against the checklist in section 6; open the pull request as draft | — | Checklist complete |
@@ -189,7 +189,7 @@ Expect two review rounds, not one: one for the document as a whole, and one for 
 ## 6. Acceptance checklist
 
 - [ ] The file is at `docs/specs/middleware-api-v1.md`.
-- [ ] The document says it is a draft, names IQ-54 as the only open question, and claims no approval.
+- [ ] The document says it is a draft, states that no questions are open, and claims no approval.
 - [ ] Each of the five operations has a signature in the common model, normative behaviour, failure modes, and at least one idiomatic example per stack.
 - [ ] Redaction is specified as `redact(text) → text`, illustrated by `[REDACTED:pii.bvn]`, with no context argument; every rule applies, and only rules the pack marks `redaction.optional` may be switched off (IQ-76).
 - [ ] The fail-closed table covers all eleven rows in §11 of this plan, and the pack-verification row states: fail closed for redaction, redact more, never less, with no fallback that redacts less than a pack that has already passed verification.
@@ -247,7 +247,7 @@ The lints do not exist yet, so a human read of the whole document is still the r
 
 ## 10. Handoff notes
 
-- The card is startable today and nothing in it is blocked. IQ-32, IQ-33, IQ-76, IQ-78 and IQ-79 were decided on 29 October 2026. Only the Maven coordinates (IQ-54) remain open; write them as "to be confirmed".
+- The card is startable today and nothing in it is blocked. IQ-32, IQ-33, IQ-54, IQ-76, IQ-78 and IQ-79 were decided on 29 October 2026.
 - Callers treat `unknown` as not granted, and "no record found" is `denied` (section 3.1). `redact` takes no context argument (question 10).
 - Write the fail-closed sentence as the work package states it: redact more, never less. Do not add an option that loads a weaker pack.
 - Write pack loading exactly as section 3.2. Free packs are embedded in the free installation. Paid packs are embedded in the paid installation media. The path loads a newer pack. Do not add a licence check, and do not require the newer pack to be the same kind as the embedded pack.
