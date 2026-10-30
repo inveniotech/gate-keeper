@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/cli/">
+    <Project Path="cli/InvenioTech.GateKeeper.Cli.csproj" />
+  </Folder>
+  <Folder Name="/src/Engine/">
+    <Project Path="src/Engine/InvenioTech.GateKeeper.Engine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/InvenioTech.GateKeeper.Tests/InvenioTech.GateKeeper.Tests.csproj" />
+  </Folder>
+</Solution>

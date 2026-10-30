@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>InvenioTech.GateKeeper.Engine</RootNamespace>
+    <AssemblyName>InvenioTech.GateKeeper.Engine</AssemblyName>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+</Project>
