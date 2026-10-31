@@ -19,49 +19,56 @@ jobs:
   publish:
     name: ${{ matrix.rid }}
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - rid: win-x64
             os: windows-latest
-            container: ""
+            musl: false
           - rid: win-arm64
             os: windows-11-arm
-            container: ""
+            musl: false
           - rid: linux-x64
             os: ubuntu-latest
-            container: ""
+            musl: false
           - rid: linux-arm64
             os: ubuntu-24.04-arm
-            container: ""
-          # The musl variants build inside an Alpine container on the matching
-          # native-architecture runner, as NativeAOT does not cross-compile
-          # between C libraries in practice (IQ-59).
+            musl: false
+          # The musl variants build inside an Alpine container, because NativeAOT
+          # does not cross-compile between C libraries in practice (IQ-59). The
+          # build runs through `docker run` rather than the job's `container:`
+          # directive, because GitHub Actions does not run JavaScript actions
+          # (checkout, setup-dotnet) inside Alpine containers on arm64 runners.
           - rid: linux-musl-x64
             os: ubuntu-latest
-            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+            musl: true
           - rid: linux-musl-arm64
             os: ubuntu-24.04-arm
-            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+            musl: true
 
     steps:
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Install NativeAOT toolchain (Alpine only)
-        if: startsWith(matrix.rid, 'linux-musl')
-        run: apk add --no-cache clang build-base zlib-static git
-
       - name: Set up .NET SDK
-        if: matrix.container == ''
+        if: matrix.musl == false
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.302"
 
-      - name: Publish with NativeAOT
+      - name: Publish with NativeAOT (glibc and Windows)
+        if: matrix.musl == false
         run: dotnet publish spikes/aot/EverythingSpike/EverythingSpike.csproj -c Release -r ${{ matrix.rid }} -p:PublishAot=true
+
+      - name: Publish with NativeAOT (musl, inside Alpine)
+        if: matrix.musl == true
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src \
+            mcr.microsoft.com/dotnet/sdk:10.0-alpine \
+            sh -c "apk add --no-cache clang build-base zlib-static && dotnet publish spikes/aot/EverythingSpike/EverythingSpike.csproj -c Release -r ${{ matrix.rid }} -p:PublishAot=true"
 
       - name: Report binary size (Linux)
         if: runner.os == 'Linux'
