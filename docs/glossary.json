@@ -1,0 +1,94 @@
+{
+  "name": "gate-keeper-glossary",
+  "version": "1.0.0",
+  "source": "The Gate-Keeper product glossary (Doc 15) and the name-form convention decided by the owner on 28 October 2026.",
+  "terms": [
+    {
+      "term": "rule pack",
+      "definition": "A signed bundle of detection rules that the scanner loads as data rather than as engine code. Each rule carries a citation to the law or directive it enforces and the corpus cases that exercise it.",
+      "banned": [ "ruleset" ],
+      "appliesTo": "both"
+    },
+    {
+      "term": "posture",
+      "definition": "The measured state of a repository's handling of personal data, reported as open findings by severity over time, exception counts and ages, and rule-pack freshness.",
+      "banned": [ "compliance score" ],
+      "appliesTo": "both"
+    },
+    {
+      "term": "updates plan",
+      "definition": "The annual plan that adds new rule packs and new major versions while it is active.",
+      "banned": [ "subscription" ],
+      "appliesTo": "both"
+    }
+  ],
+  "nameForms": [
+    {
+      "form": "Gate-Keeper",
+      "usedFor": "The product and trademark in prose, user-interface copy and titles.",
+      "appliesTo": "prose",
+      "examples": [ "Gate-Keeper scans your repository" ]
+    },
+    {
+      "form": "gate-keeper",
+      "usedFor": "GitHub repositories, package names, Docker images and folder names. This covers the Maven Central artefacts and any Composer package names for the PHP middleware on the roadmap.",
+      "appliesTo": "identifiers",
+      "examples": [
+        "inveniotech/gate-keeper",
+        "gate-keeper-commercial",
+        "gate-keeper-website",
+        "gate-keeper-action",
+        "@inveniotech/gate-keeper-*",
+        "africa.gatekeeper:gate-keeper-*",
+        "inveniotech-gate-keeper",
+        "inveniotech/gate-keeper-dashboard"
+      ]
+    },
+    {
+      "form": "GateKeeper",
+      "usedFor": ".NET namespaces and NuGet package identifiers, and C# and Kotlin type names.",
+      "appliesTo": "identifiers",
+      "examples": [ "InvenioTech.GateKeeper.*", "GateKeeperOptions" ]
+    },
+    {
+      "form": "gatekeeper",
+      "usedFor": "Domains, the command-line binary, the licence product claim, and environment variables (written in upper case).",
+      "appliesTo": "identifiers",
+      "examples": [ "gatekeeper.africa", "gatekeeper-ndpa-check", "product: gatekeeper", "GATEKEEPER_LICENCE" ]
+    },
+    {
+      "form": "ndpa-check",
+      "usedFor": "The configuration folder and file.",
+      "appliesTo": "identifiers",
+      "examples": [ ".ndpa-check/", "ndpa-check.toml" ]
+    }
+  ],
+  "bannedVariants": [
+    {
+      "variant": "Gatekeeper",
+      "appliesTo": "both",
+      "caseSensitive": true
+    },
+    {
+      "variant": "Gate Keeper",
+      "appliesTo": "both",
+      "caseSensitive": false
+    },
+    {
+      "variant": "gate_keeper",
+      "appliesTo": "both",
+      "caseSensitive": true
+    },
+    {
+      "variant": "GateKeeper",
+      "appliesTo": "prose",
+      "caseSensitive": true
+    },
+    {
+      "variant": "gatekeeper-ndpa",
+      "appliesTo": "both",
+      "caseSensitive": true,
+      "allowedSuffixes": [ "-check" ]
+    }
+  ]
+}
