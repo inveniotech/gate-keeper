@@ -1,0 +1,78 @@
+name: AOT matrix (spike)
+
+# NativeAOT feasibility spike (P0-16), question 5: prove the runtime-identifier
+# matrix builds on GitHub-hosted runners and record the size per identifier.
+# This workflow is throwaway and is deleted together with spikes/aot/ after
+# Phase 1.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "spikes/aot/**"
+      - "Directory.Packages.props"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+            container: ""
+          - rid: win-arm64
+            os: windows-11-arm
+            container: ""
+          - rid: linux-x64
+            os: ubuntu-latest
+            container: ""
+          - rid: linux-arm64
+            os: ubuntu-24.04-arm
+            container: ""
+          # The musl variants build inside an Alpine container on the matching
+          # native-architecture runner, as NativeAOT does not cross-compile
+          # between C libraries in practice (IQ-59).
+          - rid: linux-musl-x64
+            os: ubuntu-latest
+            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+          - rid: linux-musl-arm64
+            os: ubuntu-24.04-arm
+            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install NativeAOT toolchain (Alpine only)
+        if: startsWith(matrix.rid, 'linux-musl')
+        run: apk add --no-cache clang build-base zlib-static git
+
+      - name: Set up .NET SDK
+        if: matrix.container == ''
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.302"
+
+      - name: Publish with NativeAOT
+        run: dotnet publish spikes/aot/EverythingSpike/EverythingSpike.csproj -c Release -r ${{ matrix.rid }} -p:PublishAot=true
+
+      - name: Report binary size (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          binary=$(find spikes/aot/EverythingSpike/bin/Release -type f -name EverythingSpike -o -type f -name EverythingSpike.exe | head -n 1)
+          size=$(stat -c %s "$binary")
+          echo "RID=${{ matrix.rid }} SIZE=$size"
+
+      - name: Report binary size (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $binary = Get-ChildItem -Recurse -File spikes/aot/EverythingSpike/bin/Release -Filter EverythingSpike.exe | Select-Object -First 1
+          Write-Output "RID=${{ matrix.rid }} SIZE=$($binary.Length)"
