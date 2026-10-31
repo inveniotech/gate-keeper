@@ -1,0 +1,22 @@
+# Sample .ndpa-check/ndpa-check.toml for the spike.
+#
+# The spike parses this exact text from an embedded string in Program.cs, so the
+# run does not depend on the working directory. This file documents the sample
+# for humans. The real schema is defined by work package P0-05.
+
+repository = "acme/payments"
+
+[scan]
+profile = "default"
+max-file-size-kb = 1024
+include-submodules = false
+exclusions = [ ".git", "node_modules", "vendor" ]
+
+[fail-on]
+level = "error"
+
+[severity-overrides]
+"pii.bvn" = "warning"
+
+[packs]
+local = [ "local/rules.toml" ]
