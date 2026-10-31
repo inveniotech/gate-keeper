@@ -4,4 +4,18 @@
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
+
+  <!--
+    Packages evaluated by the NativeAOT feasibility spike (P0-16). They are
+    referenced only by the throwaway projects under spikes/aot/ and will be
+    removed together with that folder after Phase 1. BouncyCastle.Cryptography,
+    Tomlyn and SarifKit are already approved in AGENTS.md rule 8; Rebex is the
+    pre-approved fallback recorded against IQ-11.
+  -->
+  <ItemGroup>
+    <PackageVersion Include="BouncyCastle.Cryptography" Version="2.7.0" />
+    <PackageVersion Include="Rebex.Elliptic.Ed25519" Version="1.2.2" />
+    <PackageVersion Include="SarifKit" Version="1.0.0" />
+    <PackageVersion Include="Tomlyn" Version="2.10.1" />
+  </ItemGroup>
 </Project>
