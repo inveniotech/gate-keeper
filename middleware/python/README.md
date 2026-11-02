@@ -1,6 +1,6 @@
 # Python middleware
 
-**Status: not started.** The Python adapter arrives in Phase 3 (P3-05).
+**Status: not in the first release.** The contract still describes the Python shape, so the adapter does not drift. The package is built after the .NET, Node and JVM adapters.
 
 ## Toolchain
 
