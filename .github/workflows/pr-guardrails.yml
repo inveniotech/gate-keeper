@@ -1,0 +1,143 @@
+name: PR guard-rails
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  trace-id:
+    name: Trace-ID lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Verify pull request cites a trace identifier
+        shell: pwsh
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: ./ci/guardrails/Invoke-TraceIdLint.ps1 -Title $env:PR_TITLE -Body $env:PR_BODY
+
+  build-and-test:
+    name: Build and test (${{ matrix.os }} ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: windows-latest
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+          - os: macos-latest
+            arch: arm64
+          - os: macos-26-intel
+            arch: x64
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage"
+
+  aot:
+    name: AOT and trim warnings as errors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish CLI with NativeAOT
+        run: dotnet publish cli/InvenioTech.GateKeeper.Cli.csproj -c Release -r linux-x64 -p:PublishAot=true --self-contained
+
+  banned-api:
+    name: Zero-egress banned-API check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build projects
+        run: dotnet build --configuration Release
+
+      - name: Check for banned System.Net references
+        run: dotnet run --project ci/guardrails/BannedApiCheck/BannedApiCheck.csproj -- src cli tests --exclude "Microsoft.TestPlatform.*.dll" --exclude "xunit.*.dll" --exclude "testhost*.dll" --exclude "JsonPointer.Net.dll"
+
+  pack-schema:
+    name: Pack-schema lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Validate rule packs
+        shell: pwsh
+        run: ./ci/guardrails/Invoke-PackSchemaLint.ps1
+
+  banned-terms:
+    name: Banned-terms lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Check glossary conformance
+        shell: pwsh
+        run: ./ci/glossary/Invoke-GlossaryLint.ps1 -Path . -Exclude 'docs/glossary.json','ci/glossary/fixtures/'
+
+  spelling:
+    name: en-GB spelling lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check spelling
+        shell: pwsh
+        run: ./ci/guardrails/Invoke-SpellingLint.ps1
+
+  dependency-licence:
+    name: Dependency licence check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Check declared dependencies against allow-list
+        shell: pwsh
+        run: ./ci/guardrails/Invoke-DependencyLicenceCheck.ps1

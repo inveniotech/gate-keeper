@@ -1,0 +1,6 @@
+<Project>
+  <!-- This throwaway CI tool has no NuGet dependencies; do not generate a lock file. -->
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>
