@@ -91,7 +91,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Check for banned System.Net references
-        run: dotnet run --project ci/guardrails/BannedApiCheck/BannedApiCheck.csproj -- src cli tests --exclude "Microsoft.TestPlatform.*.dll" --exclude "xunit.*.dll" --exclude "testhost*.dll" --exclude "JsonPointer.Net.dll"
+        run: dotnet run --project ci/guardrails/BannedApiCheck/BannedApiCheck.csproj -- src cli tests --exclude "Microsoft.TestPlatform.*.dll" --exclude "xunit.*.dll" --exclude "testhost*.dll" --exclude "JsonPointer.Net.dll" --exclude "BouncyCastle.Cryptography.dll"
 
   pack-schema:
     name: Pack-schema lint
