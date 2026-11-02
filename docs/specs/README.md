@@ -7,6 +7,7 @@ This folder holds the specifications for the open formats. Each is a written con
 | Rule pack | [rule-pack-v1.md](rule-pack-v1.md) | [../../schemas/rulepack.schema.json](../../schemas/rulepack.schema.json) | Draft — not accepted (P0-03) |
 | Results (evidence JSON and SARIF profile) | [results-format-v1.md](results-format-v1.md) | [../../schemas/gk-results.schema.json](../../schemas/gk-results.schema.json) and [../../schemas/sarif-profile.schema.json](../../schemas/sarif-profile.schema.json) | Draft — not accepted (P0-04) |
 | Configuration, exceptions and baseline | [config-v1.md](config-v1.md) | None in this draft. Settings and exceptions are TOML; the baseline document is specified in the text. | Draft — not accepted (P0-05) |
+| Licence token | [licence-token-v1.md](licence-token-v1.md) | None in this draft. The token is armoured text. The signed line is JSON, and it is verified before it is parsed. | Draft — not accepted (P0-06) |
 | Evidence sink | [evidence-sink-v1.md](evidence-sink-v1.md) | None in this draft. The contract is a path, a sidecar and a pipeline step. | Draft — not accepted (P0-07) |
 
 Still to arrive in their own cards: the licence token (P0-06) and the middleware API contract (P3-01).

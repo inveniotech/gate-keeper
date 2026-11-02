@@ -1,0 +1,7 @@
+{
+  "keyId": "gklic-dev-1",
+  "label": "development-only",
+  "purpose": "licence-signing",
+  "seedHex": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+  "publicKeyHex": "3ccd241cffc9b3618044b97d036d8614593d8b017c340f1dee8773385517654b"
+}
