@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "evaluatedOn": "2026-11-02",
+  "engine": {
+    "product": "gatekeeper",
+    "version": "1.0.0"
+  },
+  "repository": {
+    "id": "github.com/acme/payments",
+    "revision": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "profile": "default",
+  "historyScanned": false,
+  "failOn": "error",
+  "exitCode": 1,
+  "packs": [],
+  "rules": {
+    "overrides": [],
+    "disabled": []
+  },
+  "findings": [
+    {
+      "ruleId": "pii.bvn",
+      "severity": "error",
+      "category": "bvn",
+      "path": "src/a.cs",
+      "line": 1,
+      "column": 1,
+      "locationKind": "source",
+      "baselineState": "new",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      },
+      "match": "12345678901"
+    }
+  ],
+  "history": [],
+  "exceptions": [],
+  "baseline": {
+    "matchedCount": 0,
+    "oldestAgeDays": 0
+  },
+  "inventory": [],
+  "warnings": []
+}

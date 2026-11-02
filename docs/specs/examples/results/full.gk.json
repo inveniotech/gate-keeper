@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "evaluatedOn": "2026-11-02",
+  "engine": {
+    "product": "gatekeeper",
+    "version": "1.0.0"
+  },
+  "repository": {
+    "id": "github.com/acme/payments",
+    "revision": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "profile": "deep",
+  "historyScanned": true,
+  "failOn": "error",
+  "exitCode": 1,
+  "packs": [
+    {
+      "packId": "acme.customer-id",
+      "version": "1",
+      "provenance": "local",
+      "contentDigest": "275e8263ccaa07748300ecf2bfa87ac9f47a26b1d4aded99f8f938c12ca4011f"
+    },
+    {
+      "packId": "invenio.ng.example",
+      "version": "2026.11.0",
+      "provenance": "bundled",
+      "coverageDate": "2026-11-01",
+      "contentDigest": "c7a7e424f5fd6150798e7a33b6f035c97dbd38252f8e5ebfdfdedfad24c9fcb5"
+    }
+  ],
+  "rules": {
+    "overrides": [
+      {
+        "id": "pii.phone",
+        "severity": "warning"
+      }
+    ],
+    "disabled": [
+      {
+        "id": "pii.email",
+        "reason": "Fixture addresses are synthetic and are reviewed each quarter."
+      }
+    ]
+  },
+  "findings": [
+    {
+      "ruleId": "pii.bvn",
+      "severity": "error",
+      "category": "bvn",
+      "path": "src/a.cs",
+      "line": 10,
+      "column": 4,
+      "locationKind": "source",
+      "fingerprint": "00cca3a4746d65803db2fa8f18dfa1d9f05ca1c3c382ca92b2078b31a0e9c3a7",
+      "baselineState": "new",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      }
+    },
+    {
+      "ruleId": "pii.phone",
+      "severity": "warning",
+      "category": "phone",
+      "path": "src/b.cs",
+      "line": 2,
+      "column": 1,
+      "locationKind": "source",
+      "fingerprint": "79d1fade04a4d84a7c7b361aeee52791d6fbd3f1545e286bac9f8255816db879",
+      "baselineState": "unchanged",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      }
+    }
+  ],
+  "history": [
+    {
+      "commitId": "abcdef0123456789abcdef0123456789abcdef01",
+      "ruleId": "pii.bvn",
+      "severity": "error",
+      "category": "bvn",
+      "path": "old/removed.cs",
+      "line": 3,
+      "column": 1,
+      "locationKind": "source",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      }
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "exc-fixture-bvn",
+      "entryHash": "f9de64c03afa66c3d6def1cb5d697dcb9e8f0f7c14824717ed5e1e31cbe6d8b0",
+      "ruleId": "pii.bvn",
+      "path": "tests/fixtures/customer.cs",
+      "line": 4,
+      "column": 1,
+      "outcome": "suppressed"
+    }
+  ],
+  "baseline": {
+    "matchedCount": 1,
+    "oldestAgeDays": 14
+  },
+  "inventory": [
+    {
+      "category": "bvn",
+      "locationKind": "source",
+      "count": 1
+    },
+    {
+      "category": "phone",
+      "locationKind": "source",
+      "count": 1
+    }
+  ],
+  "warnings": [
+    {
+      "code": "scan.shallow-history",
+      "message": "History scanning covered only the commits in this shallow clone."
+    }
+  ]
+}

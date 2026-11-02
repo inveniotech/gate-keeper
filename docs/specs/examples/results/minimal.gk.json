@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "evaluatedOn": "2026-11-02",
+  "engine": {
+    "product": "gatekeeper",
+    "version": "1.0.0"
+  },
+  "repository": {
+    "id": "github.com/acme/payments",
+    "revision": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "profile": "default",
+  "historyScanned": false,
+  "failOn": "error",
+  "exitCode": 0,
+  "packs": [
+    {
+      "packId": "invenio.ng.example",
+      "version": "2026.11.0",
+      "provenance": "bundled",
+      "coverageDate": "2026-11-01",
+      "contentDigest": "c7a7e424f5fd6150798e7a33b6f035c97dbd38252f8e5ebfdfdedfad24c9fcb5"
+    }
+  ],
+  "rules": {
+    "overrides": [],
+    "disabled": []
+  },
+  "findings": [],
+  "history": [],
+  "exceptions": [],
+  "baseline": {
+    "matchedCount": 0,
+    "oldestAgeDays": 0
+  },
+  "inventory": [],
+  "warnings": []
+}
