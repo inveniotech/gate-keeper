@@ -1,6 +1,6 @@
 # Gate-Keeper
 
-Gate-Keeper scans source code for personal data that the Nigeria Data Protection Act 2023 protects, and proves that a repository is safe to build. This repository is the public monorepo: everything free ships here under the Apache-2.0 licence, including the command-line interface, the rule engine, the bundled rule packs, the schemas, the middleware for four stacks and the CI integrations.
+Gate-Keeper scans source code for personal data that the Nigeria Data Protection Act 2023 protects, and proves that a repository is safe to build. This repository is the public monorepo: everything free ships here under the Apache-2.0 licence, including the command-line interface, the rule engine, the bundled rule packs, the schemas, the middleware and the CI integrations. The first release ships middleware for .NET, Node and the JVM. The Python adapter follows that release. The command-line interface ships for Windows, Linux and macOS.
 
 This is the scaffold. The scan command does not exist yet; the placeholder projects build and pass their tests.
 

@@ -1,0 +1,23 @@
+{
+  "dotnet": {
+    "Microsoft.NET.Test.Sdk": "MIT",
+    "xunit": "Apache-2.0",
+    "xunit.runner.visualstudio": "Apache-2.0",
+    "JsonSchema.Net": "MIT",
+    "BouncyCastle.Cryptography": "MIT",
+    "Rebex.Elliptic.Ed25519": "Public domain",
+    "SarifKit": "MIT",
+    "Tomlyn": "MIT"
+  },
+  "deniedLicences": [
+    "AGPL-1.0",
+    "AGPL-3.0",
+    "GPL-1.0",
+    "GPL-2.0",
+    "GPL-3.0",
+    "LGPL-2.0",
+    "LGPL-2.1",
+    "LGPL-3.0",
+    "SSPL-1.0"
+  ]
+}

@@ -1,6 +1,6 @@
 # AGENTS.md — Rules for Implementing Agents
 
-> Approved by the owner on 27 October 2026; Parts B2 and B4 runtime floors amended by the owner on 29 October 2026 (IQ-79). Parts A and B are identical in every Gate-Keeper repository; Part C applies to this repository only. Changes need owner approval.
+> Approved by the owner on 27 October 2026; Parts B2 and B4 runtime floors amended by the owner on 29 October 2026 (IQ-79); rule 30 and the first-release adapter set amended by the owner on 31 October 2026. Parts A and B are identical in every Gate-Keeper repository; Part C applies to this repository only. Changes need owner approval.
 > Rules 1–18 keep the numbers used in the engineering plan; never renumber — retire a rule by marking it "Withdrawn".
 
 **How to read the rules.** "Must" and "must not" are absolute: breaking one fails review. "Should" means do it unless the card or the owner says otherwise, and explain any deviation in the pull request. When two rules seem to conflict, stop and ask (rule 1).
@@ -65,7 +65,7 @@
 
 23. **Errors are for humans.** Every user-facing error says what happened, why it matters, and what to do next, in plain en-GB, naming the file and line where relevant. Tool errors exit with code 2. Never swallow an exception silently; never show a stack trace unless `--verbose` is set. A missing, invalid or expired licence is never an error — it degrades with a message.
 
-30. **Platform scope.** Supported: Windows and Linux, x64 and arm64 only. Code must work on both operating systems: no hard-coded path separators, no reliance on case-sensitive or case-insensitive file systems, no OS-specific API without implementations and tests for both. Do not add macOS-specific code or build targets.
+30. **Platform scope.** The command-line interface ships for Windows, Linux and macOS, on x64 and arm64 (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64` and `osx-x64`). macOS binaries are not notarised. The dashboard image is Linux only. Code must work on every operating system that component ships for: no hard-coded path separators, no reliance on a case-sensitive or a case-insensitive file system, and no operating-system-specific API without an implementation and tests for each of those operating systems.
 
 ### A5. Security and dependencies
 
@@ -126,6 +126,7 @@
 
 ### B4. Python (middleware)
 
+- The Python adapter is not in the first release (owner, 31 October 2026). The rules below apply when that adapter is built.
 - Runtime floor: every Python version under upstream support when each middleware major is released (IQ-79; at the time of writing 3.11 to 3.15); use no syntax newer than the oldest supported version. Full type hints with `py.typed`; type checker in strict mode; linter and formatter as configured in the repository.
 - No mutable default arguments; no bare `except:`; no `print` for diagnostics — use `logging`.
 
@@ -143,7 +144,7 @@
 
 - Everything here is public. Write as if a customer, a competitor and the regulator will read it.
 - Rule-pack changes: corpus cases first, citation from the approved citation register only (never invent or paraphrase a legal citation), false-positive harness green (≤ 5 %, NFR-013).
-- Detection rules and middleware must behave identically: any change to a named validator or matcher capability regenerates the cross-stack conformance vectors and passes in all four languages.
+- Detection rules and the adapters that ship in the first release (.NET, Node and JVM) must behave identically: any change to a named validator or matcher capability regenerates the cross-stack conformance vectors and passes in the command-line interface and in those three adapters. Python joins that set when its adapter is built.
 - The zero-egress container test (deny-all network, byte-identical output) must pass on every pull request.
 
 ---
