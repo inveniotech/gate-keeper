@@ -49,7 +49,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 'global.json'
+          dotnet-version: '10.0.302'
 
       - name: Restore
         run: dotnet restore --locked-mode
@@ -70,7 +70,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 'global.json'
+          dotnet-version: '10.0.302'
 
       - name: Publish CLI with NativeAOT
         run: dotnet publish cli/InvenioTech.GateKeeper.Cli.csproj -c Release -r linux-x64 -p:PublishAot=true --self-contained
@@ -85,7 +85,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 'global.json'
+          dotnet-version: '10.0.302'
 
       - name: Build projects
         run: dotnet build --configuration Release
