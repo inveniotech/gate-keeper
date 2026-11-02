@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gatekeeper.africa/schemas/gk-results/v1.json",
+  "title": "Gate-Keeper evidence file v1",
+  "description": "The evidence document written by one Gate-Keeper scan, version 1. The identifier is a name only; it does not need to resolve. The document carries no matched value and no wall-clock time.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "evaluatedOn": { "$ref": "#/$defs/civilDate" },
+    "engine": { "$ref": "#/$defs/engine" },
+    "repository": { "$ref": "#/$defs/repository" },
+    "profile": { "enum": ["default", "deep"] },
+    "historyScanned": { "type": "boolean" },
+    "failOn": { "$ref": "#/$defs/severity" },
+    "exitCode": { "enum": [0, 1] },
+    "packs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pack" }
+    },
+    "rules": { "$ref": "#/$defs/ruleChanges" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "history": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/historyFinding" }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/appliedException" }
+    },
+    "baseline": { "$ref": "#/$defs/baseline" },
+    "inventory": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/inventoryGroup" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/warning" }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "evaluatedOn",
+    "engine",
+    "repository",
+    "profile",
+    "historyScanned",
+    "failOn",
+    "exitCode",
+    "packs",
+    "rules",
+    "findings",
+    "history",
+    "exceptions",
+    "baseline",
+    "inventory",
+    "warnings"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "civilDate": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "severity": {
+      "enum": ["error", "warning", "note"]
+    },
+    "hex64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "commitId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "ruleId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)*$"
+    },
+    "locationKind": {
+      "enum": ["log", "migration", "api-model", "configuration", "fixture", "source"]
+    },
+    "citation": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "ndpa": { "type": "string", "minLength": 1 },
+        "gaid": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title"],
+      "additionalProperties": false
+    },
+    "engine": {
+      "type": "object",
+      "properties": {
+        "product": { "const": "gatekeeper" },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        }
+      },
+      "required": ["product", "version"],
+      "additionalProperties": false
+    },
+    "repository": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 200, "pattern": "^[^\\\\\\s]*$" },
+        "revision": { "type": "string", "pattern": "^$|^[0-9a-f]{40}$" }
+      },
+      "required": ["id", "revision"],
+      "additionalProperties": false
+    },
+    "pack": {
+      "oneOf": [
+        { "$ref": "#/$defs/invenioPack" },
+        { "$ref": "#/$defs/localPack" }
+      ]
+    },
+    "invenioPack": {
+      "type": "object",
+      "properties": {
+        "packId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$" },
+        "provenance": { "enum": ["bundled", "plan-gated"] },
+        "coverageDate": { "$ref": "#/$defs/civilDate" },
+        "contentDigest": { "$ref": "#/$defs/hex64" }
+      },
+      "required": ["packId", "version", "provenance", "coverageDate", "contentDigest"],
+      "additionalProperties": false
+    },
+    "localPack": {
+      "type": "object",
+      "properties": {
+        "packId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+        "provenance": { "const": "local" },
+        "contentDigest": { "$ref": "#/$defs/hex64" }
+      },
+      "required": ["packId", "version", "provenance", "contentDigest"],
+      "additionalProperties": false
+    },
+    "ruleChanges": {
+      "type": "object",
+      "properties": {
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "$ref": "#/$defs/ruleId" },
+              "severity": { "$ref": "#/$defs/severity" }
+            },
+            "required": ["id", "severity"],
+            "additionalProperties": false
+          }
+        },
+        "disabled": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "$ref": "#/$defs/ruleId" },
+              "reason": { "type": "string", "minLength": 1, "maxLength": 2000 }
+            },
+            "required": ["id", "reason"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["overrides", "disabled"],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/ruleId" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "category": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "locationKind": { "$ref": "#/$defs/locationKind" },
+        "fingerprint": { "$ref": "#/$defs/hex64" },
+        "baselineState": { "enum": ["unchanged", "new"] },
+        "citation": { "$ref": "#/$defs/citation" }
+      },
+      "required": ["ruleId", "severity", "category", "path", "line", "column", "locationKind", "baselineState", "citation"],
+      "additionalProperties": false
+    },
+    "historyFinding": {
+      "type": "object",
+      "properties": {
+        "commitId": { "$ref": "#/$defs/commitId" },
+        "ruleId": { "$ref": "#/$defs/ruleId" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "category": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "locationKind": { "$ref": "#/$defs/locationKind" },
+        "citation": { "$ref": "#/$defs/citation" }
+      },
+      "required": ["commitId", "ruleId", "severity", "category", "path", "line", "column", "locationKind", "citation"],
+      "additionalProperties": false
+    },
+    "appliedException": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$" },
+        "entryHash": { "$ref": "#/$defs/hex64" },
+        "ruleId": { "$ref": "#/$defs/ruleId" },
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "outcome": { "enum": ["suppressed", "overridden"] }
+      },
+      "required": ["id", "entryHash", "ruleId", "path", "line", "column", "outcome"],
+      "additionalProperties": false
+    },
+    "baseline": {
+      "type": "object",
+      "properties": {
+        "matchedCount": { "type": "integer", "minimum": 0 },
+        "oldestAgeDays": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["matchedCount", "oldestAgeDays"],
+      "additionalProperties": false
+    },
+    "inventoryGroup": {
+      "type": "object",
+      "properties": {
+        "category": { "type": "string", "minLength": 1 },
+        "locationKind": { "$ref": "#/$defs/locationKind" },
+        "count": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["category", "locationKind", "count"],
+      "additionalProperties": false
+    },
+    "warning": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "baseline.not-applied",
+            "config.unknown-key",
+            "fingerprint.missing",
+            "pack.stale",
+            "repository.identity-empty",
+            "scan.history-without-git",
+            "scan.outside-git",
+            "scan.shallow-history",
+            "submodule.not-checked-out"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 }
+      },
+      "required": ["code", "message"],
+      "additionalProperties": false
+    }
+  }
+}

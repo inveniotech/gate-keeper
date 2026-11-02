@@ -1,0 +1,5 @@
+-----BEGIN GATEKEEPER LICENCE-----
+Key-Id: gklic-dev-1
+Signature: ab0bf389e8a4fa56d8023d7b800a43266a8f9b991a8ed9c7e44bd4d9971221fca25aa831baa9183539cfddc20621a646c411f1e9775271c01354cc66a857c206
+{"schemaVersion":1,"product":"gatekeeper","keyId":"gklic-dev-1","orgId":"ORG-EXAMPLE-001","cacRegistrationNumber":"RC0000000","purchasedOn":"2026-11-01","updatesUntil":"2026-10-01"}
+-----END GATEKEEPER LICENCE-----

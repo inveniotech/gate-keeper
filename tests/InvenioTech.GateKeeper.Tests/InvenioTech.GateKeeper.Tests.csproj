@@ -10,6 +10,10 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). Not referenced by cli/ or src/Engine. -->
+    <PackageReference Include="JsonSchema.Net" />
+    <!-- Already approved in AGENTS.md rule 8. Test-only: the P0-06 development-key vectors. Not referenced by cli/ or src/Engine. -->
+    <PackageReference Include="BouncyCastle.Cryptography" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,5 +23,32 @@
   <ItemGroup>
     <ProjectReference Include="..\..\cli\InvenioTech.GateKeeper.Cli.csproj" />
     <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copy the schema and the example packs into the test output so the tests validate the real repository files. -->
+    <None Include="..\..\schemas\rulepack.schema.json" Link="schemas\rulepack.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\minimal.json" Link="examples\rule-pack\minimal.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\full.json" Link="examples\rule-pack\full.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\invalid.json" Link="examples\rule-pack\invalid.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\invalid-correction.json" Link="examples\rule-pack\invalid-correction.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\schemas\gk-results.schema.json" Link="schemas\gk-results.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\schemas\sarif-profile.schema.json" Link="schemas\sarif-profile.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\minimal.gk.json" Link="examples\results\minimal.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\full.gk.json" Link="examples\results\full.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\invalid.gk.json" Link="examples\results\invalid.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\minimal.sarif.json" Link="examples\results\minimal.sarif.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\full.sarif.json" Link="examples\results\full.sarif.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\invalid.sarif.json" Link="examples\results\invalid.sarif.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\development-public-key.json" Link="vectors\licence\development-public-key.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\claims-with-updates.gklic" Link="vectors\licence\claims-with-updates.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\claims-one-time.gklic" Link="vectors\licence\claims-one-time.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\tampered-payload.gklic" Link="vectors\licence\tampered-payload.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\tampered-signature.gklic" Link="vectors\licence\tampered-signature.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\unknown-key.gklic" Link="vectors\licence\unknown-key.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\malformed-armour.gklic" Link="vectors\licence\malformed-armour.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\key-id-mismatch.gklic" Link="vectors\licence\key-id-mismatch.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\claims-dates-out-of-order.gklic" Link="vectors\licence\claims-dates-out-of-order.gklic" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\licence\discovery.json" Link="vectors\licence\discovery.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

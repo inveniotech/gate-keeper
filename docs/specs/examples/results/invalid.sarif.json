@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "gatekeeper-ndpa-check",
+          "version": "1.0.0",
+          "informationUri": "https://gatekeeper.africa/",
+          "rules": [
+            {
+              "id": "pii.bvn",
+              "shortDescription": {
+                "text": "Placeholder citation — approved NDPA wording arrives in P2-02"
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "exitCode": 1
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "pii.bvn",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "pii.bvn. Placeholder citation — approved NDPA wording arrives in P2-02."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/a.cs"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 4,
+                  "snippet": {
+                    "text": "12345678901"
+                  }
+                }
+              }
+            }
+          ],
+          "baselineState": "new"
+        }
+      ],
+      "properties": {
+        "evaluatedOn": "2026-11-02",
+        "historyScanned": false,
+        "profile": "default",
+        "repositoryId": "github.com/acme/payments"
+      }
+    }
+  ]
+}

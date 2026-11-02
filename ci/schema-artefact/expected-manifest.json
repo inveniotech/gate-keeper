@@ -1,5 +1,18 @@
 {
   "name": "gate-keeper-schemas",
-  "version": "0.0.0",
-  "files": []
+  "version": "1.1.0",
+  "files": [
+    {
+      "path": "gk-results.schema.json",
+      "sha256": "31385943e1585be93038f16df3a83aa86854966c51dab20e7f9d36b760e532f1"
+    },
+    {
+      "path": "rulepack.schema.json",
+      "sha256": "1da4d314677c75cae0fb8ff51159a1947b37438e175a38242190cd2aa5b2dacc"
+    },
+    {
+      "path": "sarif-profile.schema.json",
+      "sha256": "732181ca98d0204ca7c53164c7e9f9d3cefa468099e0ba23e785df725982d321"
+    }
+  ]
 }

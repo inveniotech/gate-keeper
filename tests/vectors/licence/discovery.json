@@ -1,0 +1,28 @@
+{
+  "cases": [
+    {
+      "name": "missing-file",
+      "flagSet": true,
+      "flagExists": false,
+      "tokenTextSet": true,
+      "tokenFileSet": true,
+      "tokenFileExists": true,
+      "configFileExists": true,
+      "mountedFileExists": true,
+      "expectSource": "flag",
+      "expect": "missing-file"
+    },
+    {
+      "name": "later-source-when-nothing-earlier-is-set",
+      "flagSet": false,
+      "flagExists": false,
+      "tokenTextSet": false,
+      "tokenFileSet": false,
+      "tokenFileExists": false,
+      "configFileExists": false,
+      "mountedFileExists": true,
+      "expectSource": "mounted-file",
+      "expect": "present"
+    }
+  ]
+}
