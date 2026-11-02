@@ -3,6 +3,8 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). It is not referenced by cli/ or src/Engine. -->
+    <PackageVersion Include="JsonSchema.Net" Version="9.6.0" />
   </ItemGroup>
 
   <!--

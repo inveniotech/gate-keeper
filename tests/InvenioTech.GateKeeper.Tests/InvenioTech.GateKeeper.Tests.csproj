@@ -10,6 +10,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). Not referenced by cli/ or src/Engine. -->
+    <PackageReference Include="JsonSchema.Net" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,5 +21,14 @@
   <ItemGroup>
     <ProjectReference Include="..\..\cli\InvenioTech.GateKeeper.Cli.csproj" />
     <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copy the schema and the example packs into the test output so the tests validate the real repository files. -->
+    <None Include="..\..\schemas\rulepack.schema.json" Link="schemas\rulepack.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\minimal.json" Link="examples\rule-pack\minimal.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\full.json" Link="examples\rule-pack\full.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\invalid.json" Link="examples\rule-pack\invalid.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\rule-pack\invalid-correction.json" Link="examples\rule-pack\invalid-correction.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
