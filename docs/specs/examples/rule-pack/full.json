@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "invenio.ng.example.full",
+  "version": "2027.1.1",
+  "provenance": "bundled",
+  "minEngineVersion": "1.0.0",
+  "coverageDate": "2027-01-01",
+  "contentIssuedAt": "2027-01-15",
+  "baseVersion": "2027.1.0",
+  "rules": [
+    {
+      "id": "pii.bvn",
+      "severity": "error",
+      "category": "bvn",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02",
+        "ndpa": "Placeholder section reference — approved wording arrives in P2-02",
+        "gaid": "Placeholder article reference — approved wording arrives in P2-02"
+      },
+      "sinceVersion": "2027.1.0",
+      "profiles": ["default", "deep"],
+      "suppressionHints": [
+        "An 11-digit bank verification number appears here."
+      ],
+      "processor": {
+        "dataCategories": ["bank-verification-number"],
+        "usualRegion": "NG"
+      },
+      "matcher": {
+        "pattern": {
+          "shape": [
+            { "min": 11, "max": 11, "class": "digit", "emit": true }
+          ],
+          "validator": { "name": "digits-length", "length": 11 },
+          "boundary": "alnum",
+          "keywords": ["BVN"],
+          "window": 256,
+          "location": {
+            "kind": "configuration",
+            "paths": ["**/*.env", "**/*.toml"]
+          },
+          "exclusions": ["repeated-digits", "sequential-digits"],
+          "excludePrefixes": ["0000"],
+          "excludeValues": ["11111111111"]
+        }
+      }
+    },
+    {
+      "id": "pii.synthetic.code",
+      "severity": "note",
+      "category": "synthetic-code",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      },
+      "sinceVersion": "2027.1.0",
+      "redaction": { "optional": true },
+      "matcher": {
+        "pattern": {
+          "shape": [
+            { "min": 1, "max": 1, "oneOf": ["A", "B"] },
+            { "min": 4, "max": 4, "ranges": [["0", "9"], ["A", "F"]] },
+            { "min": 1, "max": 1, "literal": "-" },
+            { "min": 2, "max": 2, "class": "alnum", "emit": true }
+          ],
+          "boundary": "none"
+        }
+      }
+    },
+    {
+      "id": "pii.processor.catalogue",
+      "severity": "note",
+      "category": "processor-catalogue",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      },
+      "sinceVersion": "2027.1.0",
+      "processor": {
+        "dataCategories": ["processor-dependency"],
+        "usualRegion": "NG"
+      },
+      "matcher": {
+        "list": {
+          "package": ["com.example.processor-a"],
+          "hostname": ["processor-a.example.com"]
+        }
+      }
+    }
+  ]
+}
