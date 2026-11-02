@@ -113,7 +113,7 @@ jobs:
 
       - name: Check glossary conformance
         shell: pwsh
-        run: ./ci/glossary/Invoke-GlossaryLint.ps1 -Path . -Exclude 'docs/glossary.json','ci/glossary/fixtures/','ci/glossary/README.md','ci/glossary/Test-Glossary.ps1','AGENTS.md','GateKeeper.slnx','.github/pull_request_template.md','docs/implementation/cards/p3-01/01-middleware-api-contract.md','middleware/dotnet/README.md','docs/specs/examples/rule-pack/README.md'
+        run: ./ci/glossary/Invoke-GlossaryLint.ps1 -Path . -Exclude 'docs/glossary.json','ci/glossary/fixtures/','ci/glossary/README.md','ci/glossary/Test-Glossary.ps1','AGENTS.md','GateKeeper.slnx','.github/pull_request_template.md','docs/implementation/cards/p3-01/01-middleware-api-contract.md','middleware/dotnet/README.md','docs/specs/examples/rule-pack/README.md','.git','**/bin/**','**/obj/**','**/node_modules/**'
 
   spelling:
     name: en-GB spelling lint
