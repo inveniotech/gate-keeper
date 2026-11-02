@@ -1,5 +1,10 @@
 {
   "name": "gate-keeper-schemas",
-  "version": "0.0.0",
-  "files": []
+  "version": "1.0.0",
+  "files": [
+    {
+      "path": "rulepack.schema.json",
+      "sha256": "1da4d314677c75cae0fb8ff51159a1947b37438e175a38242190cd2aa5b2dacc"
+    }
+  ]
 }
