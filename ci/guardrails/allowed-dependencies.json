@@ -3,6 +3,7 @@
     "Microsoft.NET.Test.Sdk": "MIT",
     "xunit": "Apache-2.0",
     "xunit.runner.visualstudio": "Apache-2.0",
+    "JsonSchema.Net": "MIT",
     "BouncyCastle.Cryptography": "MIT",
     "Rebex.Elliptic.Ed25519": "Public domain",
     "SarifKit": "MIT",

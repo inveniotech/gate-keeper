@@ -52,7 +52,7 @@ $identifierExtensions = @(
     '.swift', '.c', '.h', '.cc', '.cpp', '.hpp', '.json', '.toml', '.yaml',
     '.yml', '.xml', '.ps1', '.psm1', '.sh', '.bat', '.cmd', '.css', '.scss',
     '.sass', '.sql', '.proto', '.graphql', '.tf', '.csproj', '.fsproj',
-    '.sln', '.props', '.targets'
+    '.sln', '.slnx', '.props', '.targets'
 )
 
 # One rule object per checkable entry. Vocabulary terms are always matched
@@ -116,6 +116,24 @@ function Test-Excluded([string] $Relative, [string[]] $Exclusions) {
 
         if ($Relative.StartsWith($normalised + '/', [System.StringComparison]::Ordinal)) {
             return $true
+        }
+
+        # Glob-style matching for build artefacts and dependency folders anywhere
+        # in the tree. "**/bin/**" excludes every "bin" directory; "**/node_modules"
+        # excludes the folder and everything beneath it.
+        if ($normalised.StartsWith('**/')) {
+            $pattern = $normalised.Substring(3)
+            if ($pattern.EndsWith('/**')) {
+                $segment = $pattern.Substring(0, $pattern.Length - 3)
+                if ($Relative -eq $segment -or $Relative.StartsWith($segment + '/', [System.StringComparison]::Ordinal) -or $Relative.Contains('/' + $segment + '/')) {
+                    return $true
+                }
+            }
+            else {
+                if ($Relative -eq $pattern -or $Relative.StartsWith($pattern + '/', [System.StringComparison]::Ordinal) -or $Relative.Contains('/' + $pattern)) {
+                    return $true
+                }
+            }
         }
     }
 
