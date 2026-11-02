@@ -1,0 +1,101 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "gatekeeper-ndpa-check",
+          "version": "1.0.0",
+          "informationUri": "https://gatekeeper.africa/",
+          "rules": [
+            {
+              "id": "pii.bvn",
+              "shortDescription": {
+                "text": "Placeholder citation — approved NDPA wording arrives in P2-02"
+              }
+            },
+            {
+              "id": "pii.phone",
+              "shortDescription": {
+                "text": "Placeholder citation — approved NDPA wording arrives in P2-02"
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "exitCode": 1,
+          "toolExecutionNotifications": [
+            {
+              "level": "warning",
+              "message": {
+                "text": "History scanning covered only the commits in this shallow clone."
+              }
+            }
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "pii.bvn",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "pii.bvn. Placeholder citation — approved NDPA wording arrives in P2-02."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/a.cs"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 4
+                }
+              }
+            }
+          ],
+          "baselineState": "new",
+          "partialFingerprints": {
+            "gatekeeper/v1": "00cca3a4746d65803db2fa8f18dfa1d9f05ca1c3c382ca92b2078b31a0e9c3a7"
+          }
+        },
+        {
+          "ruleId": "pii.phone",
+          "ruleIndex": 1,
+          "level": "warning",
+          "message": {
+            "text": "pii.phone. Placeholder citation — approved NDPA wording arrives in P2-02."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/b.cs"
+                },
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "baselineState": "unchanged",
+          "partialFingerprints": {
+            "gatekeeper/v1": "79d1fade04a4d84a7c7b361aeee52791d6fbd3f1545e286bac9f8255816db879"
+          }
+        }
+      ],
+      "properties": {
+        "evaluatedOn": "2026-11-02",
+        "historyScanned": true,
+        "profile": "deep",
+        "repositoryId": "github.com/acme/payments"
+      }
+    }
+  ]
+}

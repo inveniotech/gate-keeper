@@ -30,5 +30,13 @@
     <None Include="..\..\docs\specs\examples\rule-pack\full.json" Link="examples\rule-pack\full.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\docs\specs\examples\rule-pack\invalid.json" Link="examples\rule-pack\invalid.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\docs\specs\examples\rule-pack\invalid-correction.json" Link="examples\rule-pack\invalid-correction.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\schemas\gk-results.schema.json" Link="schemas\gk-results.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\schemas\sarif-profile.schema.json" Link="schemas\sarif-profile.schema.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\minimal.gk.json" Link="examples\results\minimal.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\full.gk.json" Link="examples\results\full.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\invalid.gk.json" Link="examples\results\invalid.gk.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\minimal.sarif.json" Link="examples\results\minimal.sarif.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\full.sarif.json" Link="examples\results\full.sarif.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\docs\specs\examples\results\invalid.sarif.json" Link="examples\results\invalid.sarif.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
