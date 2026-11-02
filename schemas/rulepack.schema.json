@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gatekeeper.africa/schemas/rulepack/v1.json",
+  "title": "Gate-Keeper rule pack v1 — content document",
+  "description": "The content document of a Gate-Keeper rule pack, version 1. The identifier is a name only; it does not need to resolve. The pack manifest is a second root in this file, under $defs.manifest.",
+  "$comment": "This schema validates the content document only. The pack signature is verified against the manifest before the content is parsed, so the signature is not a property of the content. Every object below sets additionalProperties to false.",
+  "oneOf": [
+    { "$ref": "#/$defs/invenioPack" },
+    { "$ref": "#/$defs/localPack" }
+  ],
+  "$defs": {
+    "invenioPack": {
+      "$comment": "A pack authored by Invenio: provenance 'bundled' or 'plan-gated', a calendar version, civil dates, and, on a correction, baseVersion.",
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$" },
+        "provenance": { "enum": ["bundled", "plan-gated"] },
+        "minEngineVersion": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+        "coverageDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "contentIssuedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "baseVersion": { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.0$" },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/rule" }
+        }
+      },
+      "required": ["schemaVersion", "id", "version", "provenance", "minEngineVersion", "coverageDate", "contentIssuedAt", "rules"],
+      "additionalProperties": false
+    },
+    "localPack": {
+      "$comment": "An unsigned local pack: provenance 'local', a positive-integer version, no civil dates, no baseVersion, and rule identifiers that start with 'local.'.",
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "exclusiveMinimum": 0 },
+        "provenance": { "const": "local" },
+        "minEngineVersion": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/rule" }
+        }
+      },
+      "required": ["schemaVersion", "id", "version", "provenance", "minEngineVersion", "rules"],
+      "additionalProperties": false
+    },
+    "rule": {
+      "$comment": "One detection rule. 'sinceVersion' mirrors the pack 'version' form: a YYYY.MM.P string in an Invenio pack, a positive integer in a local pack. The schema accepts either form because a rule cannot see its pack's provenance; the loader enforces the match.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)*$" },
+        "severity": { "enum": ["error", "warning", "note"] },
+        "category": { "type": "string", "minLength": 1 },
+        "citation": { "$ref": "#/$defs/citation" },
+        "sinceVersion": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$" },
+            { "type": "integer", "exclusiveMinimum": 0 }
+          ]
+        },
+        "redaction": { "$ref": "#/$defs/redaction" },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "enum": ["default", "deep"] }
+        },
+        "suppressionHints": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "processor": { "$ref": "#/$defs/processor" },
+        "matcher": { "$ref": "#/$defs/matcher" }
+      },
+      "required": ["id", "severity", "category", "citation", "sinceVersion", "matcher"],
+      "additionalProperties": false
+    },
+    "citation": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "ndpa": { "type": "string", "minLength": 1 },
+        "gaid": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title"],
+      "additionalProperties": false
+    },
+    "redaction": {
+      "$comment": "'optional' defaults to false. A rule may be switched off for redaction only when its pack sets this to true.",
+      "type": "object",
+      "properties": {
+        "optional": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": false
+    },
+    "processor": {
+      "$comment": "The optional catalogue block: which data categories a processor handles and the region where it usually operates.",
+      "type": "object",
+      "properties": {
+        "dataCategories": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "usualRegion": { "type": "string", "minLength": 1 }
+      },
+      "required": ["dataCategories", "usualRegion"],
+      "additionalProperties": false
+    },
+    "matcher": {
+      "$comment": "Exactly one kind of matcher: a structured 'pattern', or an exact 'list' of package and hostname entries.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "pattern": { "$ref": "#/$defs/patternMatcher" }
+          },
+          "required": ["pattern"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "list": { "$ref": "#/$defs/listMatcher" }
+          },
+          "required": ["list"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "patternMatcher": {
+      "type": "object",
+      "properties": {
+        "shape": { "$ref": "#/$defs/shape" },
+        "validator": { "$ref": "#/$defs/validator" },
+        "boundary": { "enum": ["none", "digit", "alnum"] },
+        "keywords": {
+          "$comment": "The literal prefilter: when present, the engine looks for one of these keywords before it runs the shape, and only inside 'window'.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1, "pattern": "^[\\u0020-\\u007E]+$" }
+        },
+        "window": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "location": { "$ref": "#/$defs/location" },
+        "exclusions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["repeated-digits", "sequential-digits", "hex-fragment", "uuid-fragment", "version-string", "date-or-timestamp"]
+          }
+        },
+        "excludePrefixes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "excludeValues": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "required": ["shape", "boundary"],
+      "additionalProperties": false
+    },
+    "shape": {
+      "$comment": "A structured shape: a sequence of at most 32 parts. At most one part may set 'emit' to true, and that part's span is the finding span.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/shapePart" },
+      "contains": {
+        "type": "object",
+        "properties": { "emit": { "const": true } },
+        "required": ["emit"]
+      },
+      "minContains": 0,
+      "maxContains": 1
+    },
+    "shapePart": {
+      "$comment": "One part of a shape: exactly one atom (literal, class, ranges or oneOf) with repetition bounds min and max. A part that carries 'oneOf' is an alternation and must not repeat, so its max is 1.",
+      "type": "object",
+      "properties": {
+        "min": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "max": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "literal": { "type": "string", "minLength": 1, "pattern": "^[\\u0020-\\u007E]+$" },
+        "class": { "enum": ["digit", "alnum"] },
+        "ranges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "string", "minLength": 1, "maxLength": 1, "pattern": "^[\\u0020-\\u007E]$" }
+          }
+        },
+        "oneOf": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1, "pattern": "^[\\u0020-\\u007E]+$" }
+        },
+        "emit": { "type": "boolean" }
+      },
+      "required": ["min", "max"],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": ["literal"],
+          "not": { "anyOf": [{ "required": ["class"] }, { "required": ["ranges"] }, { "required": ["oneOf"] }] }
+        },
+        {
+          "required": ["class"],
+          "not": { "anyOf": [{ "required": ["literal"] }, { "required": ["ranges"] }, { "required": ["oneOf"] }] }
+        },
+        {
+          "required": ["ranges"],
+          "not": { "anyOf": [{ "required": ["literal"] }, { "required": ["class"] }, { "required": ["oneOf"] }] }
+        },
+        {
+          "required": ["oneOf"],
+          "not": { "anyOf": [{ "required": ["literal"] }, { "required": ["class"] }, { "required": ["ranges"] }] }
+        }
+      ],
+      "if": { "required": ["oneOf"] },
+      "then": { "properties": { "max": { "const": 1 } } }
+    },
+    "validator": {
+      "$comment": "A named validator. A new name is an engine capability (rule 9) and needs a schema change plus minEngineVersion. 'digits-length' carries the length as pack data; 'ng-phone-prefix' carries the prefix list as pack data.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": { "const": "digits-length" },
+            "length": { "type": "integer", "minimum": 1, "maximum": 256 }
+          },
+          "required": ["name", "length"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "const": "nuban" }
+          },
+          "required": ["name"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "const": "ng-phone-prefix" },
+            "prefixes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1, "pattern": "^[0-9]+$" }
+            }
+          },
+          "required": ["name", "prefixes"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "const": "email-not-example-domain" }
+          },
+          "required": ["name"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "listMatcher": {
+      "$comment": "Exact package and hostname entries held as pack data. At least one of 'package' or 'hostname' must be present. A shorter entry must not match inside a longer token.",
+      "type": "object",
+      "properties": {
+        "package": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "hostname": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "anyOf": [
+        { "required": ["package"] },
+        { "required": ["hostname"] }
+      ],
+      "additionalProperties": false
+    },
+    "location": {
+      "$comment": "Where a rule applies. 'kind' is the closed inventory set from P0-04. 'paths' is a list of path globs using literal segments, '*' and '**' only, with forward slashes.",
+      "type": "object",
+      "properties": {
+        "kind": { "enum": ["log", "migration", "api-model", "configuration", "fixture", "source"] },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9._*/-]+$" }
+        }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "$comment": "The pack manifest, a second root in this file. It is a single-line JSON document carried inside armour and signed over its exact bytes. Its keyId must match the armour header, and its packId and version must equal the content document's id and version.",
+      "$id": "https://gatekeeper.africa/schemas/rulepack/manifest/v1.json",
+      "type": "object",
+      "properties": {
+        "keyId": { "type": "string", "minLength": 1 },
+        "packId": { "type": "string", "minLength": 1 },
+        "version": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$" },
+            { "type": "integer", "exclusiveMinimum": 0 }
+          ]
+        },
+        "contentHashes": {
+          "type": "object",
+          "properties": {
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "sha512": { "type": "string", "pattern": "^[0-9a-f]{128}$" }
+          },
+          "required": ["sha256", "sha512"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["keyId", "packId", "version", "contentHashes"],
+      "additionalProperties": false
+    }
+  }
+}
