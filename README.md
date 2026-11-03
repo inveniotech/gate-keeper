@@ -8,8 +8,8 @@ This is the scaffold. The scan command does not exist yet; the placeholder proje
 
 | Path | What it is |
 |---|---|
-| `cli/` | The `gatekeeper-ndpa-check` command-line interface. Placeholder. |
-| `src/Engine/` | The rule engine library, shared by the CLI and the .NET middleware. Placeholder. |
+| `cli/` | The `gatekeeper-ndpa-check` command-line interface. Argument surface and version output (P1-01). |
+| `src/Engine/` | The rule engine library, shared by the CLI and the .NET middleware. Domain model and JSON source generation (P1-01). |
 | `rule-packs/` | The bundled rule packs. Empty until Phase 2. |
 | `schemas/` | The JSON Schemas for the open formats, published as a versioned artefact. |
 | `middleware/` | One folder per stack: `dotnet`, `node`, `jvm`, `python`, plus reserved placeholders for `php`, `go` and `rust`. Each folder states its status and toolchain. |

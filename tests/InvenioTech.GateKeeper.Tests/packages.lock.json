@@ -134,7 +134,10 @@
         }
       },
       "gatekeeper-ndpa-check": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Engine": "[1.0.0, )"
+        }
       },
       "inveniotech.gatekeeper.engine": {
         "type": "Project"

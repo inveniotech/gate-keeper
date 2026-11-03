@@ -7,5 +7,8 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/InvenioTech.GateKeeper.Tests/InvenioTech.GateKeeper.Tests.csproj" />
+    <Project Path="tests/Engine.Tests/InvenioTech.GateKeeper.Engine.Tests.csproj" />
+    <!-- cli tests row restored in the next commit -->
   </Folder>
 </Solution>
+
