@@ -12,7 +12,7 @@ public sealed class ScanResultTests
         GaidSection: null);
 
     [Fact]
-    public void Keeps_the_findings_in_the_order_the_scan_supplied_them()
+    public void ScanResult_Should_KeepTheGivenOrder_When_TheScanSuppliesItsFindings()
     {
         // The scan stage owns the deterministic sort (path, line, column, rule
         // identifier); the record must not resort, so the writer in P1-11 can
@@ -49,10 +49,11 @@ public sealed class ScanResultTests
     }
 
     [Fact]
-    public void A_clean_scan_is_a_result_with_no_findings()
+    public void ScanResult_Should_CarryZeroFindings_When_TheScanIsClean()
     {
         var result = new ScanResult([]);
 
         Assert.Empty(result.Findings);
     }
 }
+

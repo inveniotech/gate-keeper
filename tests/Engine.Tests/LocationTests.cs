@@ -7,7 +7,7 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 public sealed class LocationTests
 {
     [Fact]
-    public void Holds_the_repository_relative_path_and_the_one_based_line_and_column()
+    public void Location_Should_HoldThePathLineAndColumn_When_ConstructedFromValidValues()
     {
         var location = new Location("src/engine/Finder.cs", 12, 7);
 
@@ -17,27 +17,27 @@ public sealed class LocationTests
     }
 
     [Fact]
-    public void Rejects_a_line_below_one()
+    public void Location_Should_RejectTheLine_When_TheLineIsBelowOne()
     {
         Assert.Throws<ArgumentOutOfRangeException>(
             () => _ = new Location("src/engine/Finder.cs", 0, 1));
     }
 
     [Fact]
-    public void Rejects_a_column_below_one()
+    public void Location_Should_RejectTheColumn_When_TheColumnIsBelowOne()
     {
         Assert.Throws<ArgumentOutOfRangeException>(
             () => _ = new Location("src/engine/Finder.cs", 12, 0));
     }
 
     [Fact]
-    public void Rejects_an_empty_path()
+    public void Location_Should_RejectThePath_When_ThePathIsEmpty()
     {
         Assert.Throws<ArgumentException>(() => _ = new Location(string.Empty, 12, 7));
     }
 
     [Fact]
-    public void A_location_compares_by_value_so_two_equal_locations_are_equal()
+    public void Location_Should_CompareByValue_When_ComparedToAnEqualLocation()
     {
         var first = new Location("src/engine/Finder.cs", 12, 7);
         var second = new Location("src/engine/Finder.cs", 12, 7);
@@ -45,3 +45,4 @@ public sealed class LocationTests
         Assert.Equal(first, second);
     }
 }
+

@@ -23,7 +23,7 @@ public sealed class FindingSerialisationTests
             GaidSection: null));
 
     [Fact]
-    public void A_finding_serialises_with_the_camel_case_names_and_the_spec_strings()
+    public void Finding_Should_SerialiseWithCamelCaseNamesAndTheSpecStrings_When_WrittenThroughTheEngineContext()
     {
         var json = JsonSerializer.Serialize(
             Finding,
@@ -50,7 +50,7 @@ public sealed class FindingSerialisationTests
     }
 
     [Fact]
-    public void Serialising_the_same_finding_twice_gives_the_same_bytes()
+    public void Finding_Should_ProduceTheSameBytes_When_SerialisedTwice()
     {
         var first = JsonSerializer.Serialize(Finding, EngineJsonSerializerContext.Default.Finding);
         var second = JsonSerializer.Serialize(Finding, EngineJsonSerializerContext.Default.Finding);
@@ -59,7 +59,7 @@ public sealed class FindingSerialisationTests
     }
 
     [Fact]
-    public void A_finding_without_a_fingerprint_omits_the_fingerprint_key()
+    public void Finding_Should_OmitTheFingerprintKey_When_NoFingerprintWasComputed()
     {
         var withoutFingerprint = Finding with { Fingerprint = null };
         var json = JsonSerializer.Serialize(
@@ -71,7 +71,7 @@ public sealed class FindingSerialisationTests
     }
 
     [Fact]
-    public void A_finding_serialisation_carries_the_citation_sections_when_they_exist()
+    public void Finding_Should_CarryTheCitationSections_When_ThePackRecordsThem()
     {
         var withSections = Finding with
         {
@@ -89,3 +89,4 @@ public sealed class FindingSerialisationTests
         Assert.Contains("\"gaid\": \"placeholder\"", json, StringComparison.Ordinal);
     }
 }
+

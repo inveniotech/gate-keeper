@@ -8,7 +8,7 @@ namespace InvenioTech.GateKeeper.Cli.Tests;
 public sealed class CliModuleTests
 {
     [Fact]
-    public void Version_prints_the_product_version_and_addresses_the_pack_version_to_standard_output()
+    public void VersionCommand_Should_PrintTheProductAndPackSections_When_Ran()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -27,7 +27,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void The_version_flag_behaves_like_the_version_command()
+    public void VersionFlag_Should_MatchTheVersionCommand_When_Used()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -41,7 +41,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void The_bare_invocation_is_the_scan_command()
+    public void BareInvocation_Should_MeanTheScanCommand_When_NoArgumentsAreGiven()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -54,7 +54,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void Every_card_command_except_version_and_help_exits_with_a_tool_error_naming_its_command()
+    public void UnimplementedCommands_Should_ExitWithAToolErrorNamingTheCommand_When_Ran()
     {
         var commands = new Dictionary<string[], string>
         {
@@ -78,7 +78,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void Scaffold_without_its_subcommand_asks_for_consent()
+    public void Scaffold_Should_AskForConsent_When_CalledWithoutItsSubcommand()
     {
         var errors = new StringWriter();
 
@@ -90,7 +90,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void Scaffold_with_an_unknown_subcommand_names_the_subcommand()
+    public void Scaffold_Should_NameTheUnknownSubcommand_When_CalledWithOneItDoesNotKnow()
     {
         var errors = new StringWriter();
 
@@ -102,7 +102,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void A_command_with_an_unexpected_argument_is_a_failure_naming_both()
+    public void LeafCommands_Should_TakeNoOtherArgument_When_ExtraTokensArePassed()
     {
         var errors = new StringWriter();
 
@@ -114,7 +114,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void The_version_flag_with_an_extra_argument_is_a_failure()
+    public void VersionFlag_Should_TakeNoOtherArgument_When_AnyOtherTokenIsPassed()
     {
         var errors = new StringWriter();
 
@@ -126,7 +126,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void An_unknown_word_is_a_failure_that_says_what_to_do_next()
+    public void CliModule_Should_SayWhatToDoNext_When_AnUnknownWordIsGiven()
     {
         var errors = new StringWriter();
 
@@ -138,7 +138,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void An_unknown_flag_is_a_failure_that_says_what_to_do_next()
+    public void CliModule_Should_SayWhatToDoNext_When_AnUnknownFlagIsGiven()
     {
         var errors = new StringWriter();
 
@@ -150,7 +150,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void Help_prints_the_product_purpose_the_commands_and_the_version_flag_to_standard_output()
+    public void CliModule_Should_PrintTheProductPurposeCommandsAndVersionFlag_When_HelpIsRequested()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -167,7 +167,7 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void The_short_help_flag_behaves_like_the_long_one()
+    public void CliModule_Should_MatchTheLongHelpOutput_When_HelpIsRequestedWithTheShortFlag()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -192,3 +192,4 @@ public sealed class CliModuleTests
         return output.ToString();
     }
 }
+
