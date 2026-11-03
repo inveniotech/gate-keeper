@@ -99,6 +99,22 @@
 
 25. **Generated code and data are reproducible.** Every generated file has a documented command that regenerates it, and CI fails if regeneration produces a diff.
 
+### A8. Git and branching
+
+- Prefer working on branches rather than Git worktrees.
+- Use a worktree when branch conflicts or concurrent tasks make it materially useful, such as when separate tickets must be developed independently.
+
+#### Commit messages
+
+- Make small, logical commits grouped by the effect on the code.
+- Unless the repository specifies otherwise, use `<identifier>: <change>`, with the change written in lower case.
+- Examples: `CRAB-3648: add support for left aligned inputs`, `#123: add support for left aligned inputs`, `bg: fix null amount on save`.
+- Keep commit messages focused on the change and its relevant rationale. Use architectural decision records or other durable documentation for decisions that need to remain discoverable beyond the commit history.
+- Do not attribute commits or pull requests to Cursor. Do not add `Made-with: Cursor`, `Made with Cursor`, `Co-authored-by: Cursor`, `Co-authored-by: Cursor Agent <cursoragent@cursor.com>`, or any other trailer, footer, or line that names Cursor or `cursoragent@cursor.com`.
+- Do not pass `--trailer` to attach Cursor attribution, and do not set the commit author to Cursor.
+- A co-author trailer that names a person and does not mention Cursor may remain.
+- Do not attribute commits or pull requests to any other AI agent, such as OpenCode or Claude.
+
 ---
 
 ## Part B — Stack rules
