@@ -3,6 +3,8 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <!-- Test-only assertion library, approved under rule 8 by the owner on 3 November 2026 (AwesomeAssertions 9.6.0, Apache-2.0). Not referenced by cli/ or src/Engine. -->
+    <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). It is not referenced by cli/ or src/Engine. -->
     <PackageVersion Include="JsonSchema.Net" Version="9.6.0" />
   </ItemGroup>
@@ -18,6 +20,7 @@
     <PackageVersion Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <PackageVersion Include="Rebex.Elliptic.Ed25519" Version="1.2.2" />
     <PackageVersion Include="SarifKit" Version="1.0.0" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.14" />
     <PackageVersion Include="Tomlyn" Version="2.10.1" />
   </ItemGroup>
 

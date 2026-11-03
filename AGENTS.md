@@ -30,6 +30,7 @@
 26. **Tests must be trustworthy.**
     - Deterministic: no real clock (inject it), no network, no sleeps or timing assumptions, no dependence on test order, file-system order or machine locale.
     - Named for the behaviour they prove (`Rejects_exception_without_justification`), one behaviour per test.
+    - Should follow the pattern, "<System Under Test> Should <Expected Outcome> When <Condition>"
     - Assertions must check outcomes precisely; a test that would still pass if the code were deleted is not a test. Snapshot tests only for genuinely large outputs, and the snapshot is reviewed like code.
     - Coverage targets are a floor, not a goal: ≥ 80 % on the engine and the licence verifier (NFR-026).
 
@@ -127,6 +128,7 @@
 - Use `TimeProvider` for time, `System.IO.Abstractions`-style seams only where the module already uses them (rule 21).
 - Logging through `ILogger` with message templates; never interpolate personal data into log messages.
 - Tests use the framework set up in the repository scaffold; do not introduce another.
+- Tests use naming best practices for the language
 
 ### B2. TypeScript / Node.js (middleware, GitHub Action)
 
