@@ -13,7 +13,7 @@ public sealed class FingerprintTests
 
         var fingerprint = new Fingerprint(hex);
 
-        Assert.Equal(hex, fingerprint.Value);
+        fingerprint.Value.Should().Be(hex);
     }
 
     [Theory]
@@ -26,7 +26,8 @@ public sealed class FingerprintTests
     [InlineData("00cca3a4746d65803db2fa8f18dfa1d9f05ca1c3c382ca92b2078b31a0e9c3a7 ")] // padding space
     public void Fingerprint_Should_RejectTheValue_When_TheTextIsNot64LowercaseHexCharacters(string bad)
     {
-        Assert.Throws<ArgumentException>(() => _ = new Fingerprint(bad));
+        Action act = () => _ = new Fingerprint(bad);
+
+        act.Should().Throw<ArgumentException>().WithMessage("*64 lowercase hexadecimal characters*");
     }
 }
-

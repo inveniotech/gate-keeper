@@ -46,7 +46,7 @@ public sealed class FindingSerialisationTests
             }
             """;
 
-        Assert.Equal(expected.ReplaceLineEndings(), json.ReplaceLineEndings());
+        json.Should().Be(expected.ReplaceLineEndings());
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class FindingSerialisationTests
         var first = JsonSerializer.Serialize(Finding, EngineJsonSerializerContext.Default.Finding);
         var second = JsonSerializer.Serialize(Finding, EngineJsonSerializerContext.Default.Finding);
 
-        Assert.Equal(first, second);
+        first.Should().Be(second);
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public sealed class FindingSerialisationTests
             withoutFingerprint,
             EngineJsonSerializerContext.Default.Finding);
 
-        Assert.DoesNotContain("\"fingerprint\"", json, StringComparison.Ordinal);
-        Assert.Contains("\"ruleId\": \"pii.bvn.log\"", json, StringComparison.Ordinal);
+        json.Should().NotContain("\"fingerprint\"");
+        json.Should().Contain("\"ruleId\": \"pii.bvn.log\"");
     }
 
     [Fact]
@@ -85,8 +85,7 @@ public sealed class FindingSerialisationTests
             withSections,
             EngineJsonSerializerContext.Default.Finding);
 
-        Assert.Contains("\"ndpa\": \"placeholder\"", json, StringComparison.Ordinal);
-        Assert.Contains("\"gaid\": \"placeholder\"", json, StringComparison.Ordinal);
+        json.Should().Contain("\"ndpa\": \"placeholder\"");
+        json.Should().Contain("\"gaid\": \"placeholder\"");
     }
 }
-

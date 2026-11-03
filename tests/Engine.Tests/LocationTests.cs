@@ -11,29 +11,33 @@ public sealed class LocationTests
     {
         var location = new Location("src/engine/Finder.cs", 12, 7);
 
-        Assert.Equal("src/engine/Finder.cs", location.Path);
-        Assert.Equal(12, location.Line);
-        Assert.Equal(7, location.Column);
+        location.Path.Should().Be("src/engine/Finder.cs");
+        location.Line.Should().Be(12);
+        location.Column.Should().Be(7);
     }
 
     [Fact]
     public void Location_Should_RejectTheLine_When_TheLineIsBelowOne()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => _ = new Location("src/engine/Finder.cs", 0, 1));
+        Action act = () => _ = new Location("src/engine/Finder.cs", 0, 1);
+
+        act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("line");
     }
 
     [Fact]
     public void Location_Should_RejectTheColumn_When_TheColumnIsBelowOne()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => _ = new Location("src/engine/Finder.cs", 12, 0));
+        Action act = () => _ = new Location("src/engine/Finder.cs", 12, 0);
+
+        act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("column");
     }
 
     [Fact]
     public void Location_Should_RejectThePath_When_ThePathIsEmpty()
     {
-        Assert.Throws<ArgumentException>(() => _ = new Location(string.Empty, 12, 7));
+        Action act = () => _ = new Location(string.Empty, 12, 7);
+
+        act.Should().Throw<ArgumentException>().WithParameterName("path");
     }
 
     [Fact]
@@ -42,7 +46,6 @@ public sealed class LocationTests
         var first = new Location("src/engine/Finder.cs", 12, 7);
         var second = new Location("src/engine/Finder.cs", 12, 7);
 
-        Assert.Equal(first, second);
+        first.Should().Be(second);
     }
 }
-

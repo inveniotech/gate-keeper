@@ -44,8 +44,8 @@ public sealed class ScanResultTests
                 Citation: AnyCitation),
         ]);
 
-        Assert.Equal("pii.phone.source", result.Findings[0].RuleId);
-        Assert.Equal("pii.bvn.error", result.Findings[1].RuleId);
+        result.Findings[0].RuleId.Should().Be("pii.phone.source");
+        result.Findings[1].RuleId.Should().Be("pii.bvn.error");
     }
 
     [Fact]
@@ -53,7 +53,6 @@ public sealed class ScanResultTests
     {
         var result = new ScanResult([]);
 
-        Assert.Empty(result.Findings);
+        result.Findings.Should().BeEmpty();
     }
 }
-

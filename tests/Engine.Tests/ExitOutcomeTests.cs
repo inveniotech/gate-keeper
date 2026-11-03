@@ -9,9 +9,9 @@ public sealed class ExitOutcomeTests
     [Fact]
     public void ExitOutcome_Should_MapToZeroOneAndTwo_When_CastToIntegers()
     {
-        Assert.Equal(0, (int)ExitOutcome.Pass);
-        Assert.Equal(1, (int)ExitOutcome.Violations);
-        Assert.Equal(2, (int)ExitOutcome.ToolError);
+        ((int)ExitOutcome.Pass).Should().Be(0);
+        ((int)ExitOutcome.Violations).Should().Be(1);
+        ((int)ExitOutcome.ToolError).Should().Be(2);
     }
 
     [Fact]
@@ -19,7 +19,6 @@ public sealed class ExitOutcomeTests
     {
         var names = Enum.GetNames<ExitOutcome>();
 
-        Assert.Equal(["Pass", "Violations", "ToolError"], names);
+        names.Should().Equal("Pass", "Violations", "ToolError");
     }
 }
-

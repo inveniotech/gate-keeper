@@ -15,15 +15,15 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["version"], output, errors);
 
-        Assert.Equal((int)ExitOutcome.Pass, exitCode);
+        exitCode.Should().Be((int)ExitOutcome.Pass);
         var text = output.ToString();
-        Assert.Contains("product: gatekeeper", text, StringComparison.Ordinal);
-        Assert.Contains($"product version: {EngineProduct.EngineVersion}", text, StringComparison.Ordinal);
+        text.Should().Contain("product: gatekeeper");
+        text.Should().Contain($"product version: {EngineProduct.EngineVersion}");
         // The bundled pack arrives with the pack build and signing step, so the
         // absence is printed rather than an invented number. The same section
         // prints the version once the build carries a pack.
-        Assert.Contains("bundled pack version", text, StringComparison.Ordinal);
-        Assert.Equal(string.Empty, errors.ToString());
+        text.Should().Contain("bundled pack version");
+        errors.ToString().Should().BeEmpty();
     }
 
     [Fact]
@@ -36,8 +36,8 @@ public sealed class CliModuleTests
         output.GetStringBuilder().Clear();
         var fromCommand = CliModule.Run(["version"], output, errors);
 
-        Assert.Equal(fromCommand, fromFlag);
-        Assert.Equal(output.ToString(), CliModuleVersionText());
+        fromCommand.Should().Be(fromFlag);
+        output.ToString().Should().Be(CliModuleVersionText());
     }
 
     [Fact]
@@ -48,9 +48,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run([], output, errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("The scan (the default) command is not in this build yet", errors.ToString(), StringComparison.Ordinal);
-        Assert.Equal(string.Empty, output.ToString());
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("The scan (the default) command is not in this build yet");
+        output.ToString().Should().BeEmpty();
     }
 
     [Fact]
@@ -71,9 +71,9 @@ public sealed class CliModuleTests
 
             var exitCode = CliModule.Run(args, new StringWriter(), errors);
 
-            Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-            Assert.Contains($"The {name} command is not in this build yet", errors.ToString(), StringComparison.Ordinal);
-            Assert.Contains("Run the binary with --help", errors.ToString(), StringComparison.Ordinal);
+            exitCode.Should().Be((int)ExitOutcome.ToolError);
+            errors.ToString().Should().Contain($"The {name} command is not in this build yet");
+            errors.ToString().Should().Contain("Run the binary with --help");
         }
     }
 
@@ -84,9 +84,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["scaffold"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("The 'scaffold' command needs its subcommand", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("scaffold consent", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("The 'scaffold' command needs its subcommand");
+        errors.ToString().Should().Contain("scaffold consent");
     }
 
     [Fact]
@@ -96,9 +96,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["scaffold", "licence"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("The 'scaffold' command does not know 'licence'", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("The 'scaffold' command does not know 'licence'");
+        errors.ToString().Should().Contain("--help");
     }
 
     [Fact]
@@ -108,9 +108,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["init", "extra"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("The 'init' command takes no other argument in this build", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("'extra'", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("The 'init' command takes no other argument in this build");
+        errors.ToString().Should().Contain("'extra'");
     }
 
     [Fact]
@@ -120,9 +120,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["--version", "scan"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("The --version flag takes no other argument", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("'scan'", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("The --version flag takes no other argument");
+        errors.ToString().Should().Contain("'scan'");
     }
 
     [Fact]
@@ -132,9 +132,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["wat"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("'wat' is not a command or flag this build knows", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("'wat' is not a command or flag this build knows");
+        errors.ToString().Should().Contain("--help");
     }
 
     [Fact]
@@ -144,9 +144,9 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["--verbose"], new StringWriter(), errors);
 
-        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
-        Assert.Contains("'--verbose' is not a command or flag this build knows", errors.ToString(), StringComparison.Ordinal);
-        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+        exitCode.Should().Be((int)ExitOutcome.ToolError);
+        errors.ToString().Should().Contain("'--verbose' is not a command or flag this build knows");
+        errors.ToString().Should().Contain("--help");
     }
 
     [Fact]
@@ -157,13 +157,13 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["--help"], output, errors);
 
-        Assert.Equal((int)ExitOutcome.Pass, exitCode);
+        exitCode.Should().Be((int)ExitOutcome.Pass);
         var text = output.ToString();
-        Assert.Contains("Nigeria Data Protection Act 2023", text, StringComparison.Ordinal);
-        Assert.Contains("no arguments runs the scan", text, StringComparison.Ordinal);
-        Assert.Contains("--version", text, StringComparison.Ordinal);
-        Assert.Contains("-h", text, StringComparison.Ordinal);
-        Assert.Equal(string.Empty, errors.ToString());
+        text.Should().Contain("Nigeria Data Protection Act 2023");
+        text.Should().Contain("no arguments runs the scan");
+        text.Should().Contain("--version");
+        text.Should().Contain("-h");
+        errors.ToString().Should().BeEmpty();
     }
 
     [Fact]
@@ -174,8 +174,8 @@ public sealed class CliModuleTests
 
         var exitCode = CliModule.Run(["-h"], output, errors);
 
-        Assert.Equal((int)ExitOutcome.Pass, exitCode);
-        Assert.Equal(output.ToString(), CliModuleHelpText());
+        exitCode.Should().Be((int)ExitOutcome.Pass);
+        output.ToString().Should().Be(CliModuleHelpText());
     }
 
     private static string CliModuleVersionText()
@@ -192,4 +192,3 @@ public sealed class CliModuleTests
         return output.ToString();
     }
 }
-
