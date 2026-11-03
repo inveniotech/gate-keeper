@@ -124,6 +124,7 @@
     "updatable",
     "verifier",
     "whitelist",
+    "AwesomeAssertions",
     "worktrees"
   ]
 }

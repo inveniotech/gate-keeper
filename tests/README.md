@@ -1,6 +1,6 @@
 # Tests
 
-xUnit is the test framework for the repository. Do not add another.
+xUnit is the test runner for the repository, and AwesomeAssertions is the assertion library. Do not add another.
 
 The test projects, one folder under `tests/` each:
 
