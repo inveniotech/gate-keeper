@@ -123,6 +123,7 @@
     "untrusted",
     "updatable",
     "verifier",
-    "whitelist"
+    "whitelist",
+    "worktrees"
   ]
 }
