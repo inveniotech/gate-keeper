@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Already approved in AGENTS.md rule 8; the owner confirmed the approval for the hand-rolled parser's replacement on 3 November 2026. -->
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
   </ItemGroup>
 </Project>

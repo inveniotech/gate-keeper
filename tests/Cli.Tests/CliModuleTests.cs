@@ -58,10 +58,9 @@ public sealed class CliModuleTests
     {
         var commands = new Dictionary<string[], string>
         {
-            { ["scan"], "scan (the default)" },
+            { ["scan"], "scan" },
             { ["init"], "init" },
             { ["baseline"], "baseline" },
-            { ["scaffold", "consent"], "scaffold consent" },
             { ["doctor"], "doctor" },
             { ["support-bundle"], "support-bundle" },
         };
@@ -79,7 +78,79 @@ public sealed class CliModuleTests
     }
 
     [Fact]
-    public void Help_prints_the_command_list_and_the_flags_to_standard_output()
+    public void Scaffold_without_its_subcommand_asks_for_consent()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["scaffold"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("The 'scaffold' command needs its subcommand", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("scaffold consent", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Scaffold_with_an_unknown_subcommand_names_the_subcommand()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["scaffold", "licence"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("The 'scaffold' command does not know 'licence'", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_command_with_an_unexpected_argument_is_a_failure_naming_both()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["init", "extra"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("The 'init' command takes no other argument in this build", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("'extra'", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void The_version_flag_with_an_extra_argument_is_a_failure()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["--version", "scan"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("The --version flag takes no other argument", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("'scan'", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void An_unknown_word_is_a_failure_that_says_what_to_do_next()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["wat"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("'wat' is not a command or flag this build knows", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void An_unknown_flag_is_a_failure_that_says_what_to_do_next()
+    {
+        var errors = new StringWriter();
+
+        var exitCode = CliModule.Run(["--verbose"], new StringWriter(), errors);
+
+        Assert.Equal((int)ExitOutcome.ToolError, exitCode);
+        Assert.Contains("'--verbose' is not a command or flag this build knows", errors.ToString(), StringComparison.Ordinal);
+        Assert.Contains("--help", errors.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Help_prints_the_product_purpose_the_commands_and_the_version_flag_to_standard_output()
     {
         var output = new StringWriter();
         var errors = new StringWriter();
@@ -88,10 +159,10 @@ public sealed class CliModuleTests
 
         Assert.Equal((int)ExitOutcome.Pass, exitCode);
         var text = output.ToString();
-        Assert.Contains("scan (the default)", text, StringComparison.Ordinal);
-        Assert.Contains("scaffold consent", text, StringComparison.Ordinal);
-        Assert.Contains("version", text, StringComparison.Ordinal);
+        Assert.Contains("Nigeria Data Protection Act 2023", text, StringComparison.Ordinal);
+        Assert.Contains("no arguments runs the scan", text, StringComparison.Ordinal);
         Assert.Contains("--version", text, StringComparison.Ordinal);
+        Assert.Contains("-h", text, StringComparison.Ordinal);
         Assert.Equal(string.Empty, errors.ToString());
     }
 
