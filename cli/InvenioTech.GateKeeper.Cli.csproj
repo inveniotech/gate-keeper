@@ -6,4 +6,8 @@
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+  </ItemGroup>
 </Project>
