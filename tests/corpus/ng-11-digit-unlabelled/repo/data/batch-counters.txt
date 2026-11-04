@@ -1,0 +1,3 @@
+# Batch walker counters, stamped per run; nothing here is an identity.
+reference-count: 92302271889
+region: Lagos

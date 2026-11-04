@@ -1,0 +1,7 @@
+# The identity the compliance worker verifies from the incoming batch.
+
+[identity]
+bvn = "25847556452"
+
+[work]
+batchSize = 12

@@ -1,0 +1,9 @@
+[
+  {
+    "column": 23,
+    "line": 3,
+    "path": "alerts/recipients.py",
+    "ruleId": "pii.email",
+    "triage": "true-positive"
+  }
+]

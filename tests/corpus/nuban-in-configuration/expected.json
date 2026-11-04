@@ -1,0 +1,9 @@
+[
+  {
+    "column": 19,
+    "line": 4,
+    "path": "config/settlement.toml",
+    "ruleId": "pii.nuban",
+    "triage": "true-positive"
+  }
+]

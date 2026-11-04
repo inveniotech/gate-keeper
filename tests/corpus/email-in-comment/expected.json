@@ -1,0 +1,9 @@
+[
+  {
+    "column": 37,
+    "line": 6,
+    "path": "src/alerts/TeamNotes.cs",
+    "ruleId": "pii.email",
+    "triage": "true-positive"
+  }
+]

@@ -1,0 +1,5 @@
+# The UTF-16 fixture and the binary fixture must travel as exact bytes;
+# the end-of-line normalisation of the repository's text attributes would
+# change their byte marks. The symlink is stored as a git symlink.
+**/environments.toml -text
+**/bulk-export.txt -text

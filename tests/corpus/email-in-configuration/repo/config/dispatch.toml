@@ -1,0 +1,4 @@
+# The dispatch role the compliance mail relay reads.
+
+[dispatch]
+failureMailbox = "chidi.nwosu-18@ledger-ops.example"

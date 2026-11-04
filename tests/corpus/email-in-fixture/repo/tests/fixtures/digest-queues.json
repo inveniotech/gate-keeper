@@ -1,0 +1,8 @@
+{
+  "digestTasks": [
+    {
+      "taskId": "task-0019",
+      "escalationMailbox": "tunde.balogun-27@ledger-ops.example"
+    }
+  ]
+}
