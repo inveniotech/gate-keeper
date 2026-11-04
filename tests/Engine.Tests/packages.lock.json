@@ -108,8 +108,21 @@
       "inveniotech.gatekeeper.engine": {
         "type": "Project",
         "dependencies": {
+          "InvenioTech.GateKeeper.Signing": "[1.0.0, )",
           "Tomlyn": "[2.10.1, )"
         }
+      },
+      "inveniotech.gatekeeper.signing": {
+        "type": "Project",
+        "dependencies": {
+          "BouncyCastle.Cryptography": "[2.7.0, )"
+        }
+      },
+      "BouncyCastle.Cryptography": {
+        "type": "CentralTransitive",
+        "requested": "[2.7.0, )",
+        "resolved": "2.7.0",
+        "contentHash": "U+12df8UEWHgBi04YVf/Lgi2dy3SItlIYvHjjEVa/BngCQIzDCDRBk50DDByCfDvSbe5pRNFr3b7UrVK2kMcLw=="
       },
       "Tomlyn": {
         "type": "CentralTransitive",

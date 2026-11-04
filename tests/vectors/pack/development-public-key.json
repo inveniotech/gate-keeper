@@ -1,0 +1,18 @@
+{
+  "keys": [
+    {
+      "keyId": "gkpk-dev-1",
+      "label": "development-only",
+      "purpose": "pack-signing",
+      "seedHex": "a3e21c4d09f8b7e6560d1a2f3c4b5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e",
+      "publicKeyHex": "cb424a36671ebd54bc348ca3fddb74833f0e980379bb289e0a4b8efb957b65a7"
+    },
+    {
+      "keyId": "gkwm-dev-1",
+      "label": "development-only",
+      "purpose": "pack-watermark",
+      "seedHex": "4c8f2d31a7b09e1665c4d3f2e1a098b7c6d5e4f3a2b1c09d8e7f6a5b4c3d2e1f",
+      "publicKeyHex": "c0cc459c75ca82f5f3791dbd4eef361d3b37d412506e714063b33678adbda537"
+    }
+  ]
+}

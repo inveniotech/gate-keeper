@@ -6,6 +6,10 @@
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
   <ItemGroup>
+    <!-- The signature verifier is internal to the product (card P1-04); the pack loader (P1-03) verifies the pack manifest and watermark signatures through it. -->
+    <ProjectReference Include="..\Signing\InvenioTech.GateKeeper.Signing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Approved in AGENTS.md rule 8; parses the settings file ndpa-check.toml under NativeAOT through the source-generated ScanSettingsTomlContext (card P1-08). -->
     <PackageReference Include="Tomlyn" />
   </ItemGroup>

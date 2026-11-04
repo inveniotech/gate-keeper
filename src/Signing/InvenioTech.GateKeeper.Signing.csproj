@@ -12,5 +12,7 @@
   <ItemGroup>
     <!-- The module's whole surface is internal (card P1-04): consumers add themselves here, never a public package reference. -->
     <InternalsVisibleTo Include="InvenioTech.GateKeeper.Signing.Tests" />
+    <!-- Engine components add themselves to this list, per the module's README: the pack loader (P1-03) verifies the pack signatures through ISignatureVerifier and SignatureVerifiers.Default. -->
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Engine" />
   </ItemGroup>
 </Project>

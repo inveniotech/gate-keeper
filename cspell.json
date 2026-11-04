@@ -99,6 +99,8 @@
     "pipefail",
     "acmeevidence",
     "gklic",
+    "gkpk",
+    "gkwm",
     "timezone",
     "alnum",
     "prefilter",
