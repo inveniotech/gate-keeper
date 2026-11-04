@@ -22,4 +22,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copy the development pack vectors into the test output so PackLoaderTests consumes the real committed files; the easy way to regenerate them is New-PackVectors.mjs. -->
+    <None Include="..\..\tests\vectors\pack\*.pack.json" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\pack\*.manifest.armour" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\pack\*.signature.hex" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\tests\vectors\pack\development-public-key.json" Link="vectors\pack\development-public-key.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

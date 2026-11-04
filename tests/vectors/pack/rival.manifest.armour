@@ -1,0 +1,4 @@
+-----BEGIN GATE-KEEPER RULE PACK MANIFEST-----
+Key-Id: gkpk-dev-1
+{"keyId":"gkpk-dev-1","packId":"invenio.ng.example.rival","version":"2027.1.0","contentHashes":{"sha256":"fcc459a170071c621c81532a493d1d871523371446417614ec819438173456a6","sha512":"9c7cccafe2fcd8fdafc1ebdb60de3ddff6a26e567ed8c4ce7473b73940f732991e381d9e86ac4f802814f8665d3208d1d7f8f34379e368511b6188eb084ef963"}}
+-----END GATE-KEEPER RULE PACK MANIFEST-----

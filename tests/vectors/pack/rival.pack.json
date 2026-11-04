@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "invenio.ng.example.rival",
+  "version": "2027.1.0",
+  "provenance": "bundled",
+  "minEngineVersion": "0.1.0",
+  "coverageDate": "2027-01-01",
+  "contentIssuedAt": "2027-01-01",
+  "rules": [
+    {
+      "category": "bvn",
+      "citation": {
+        "title": "Placeholder citation — approved NDPA wording arrives in P2-02"
+      },
+      "id": "pii.bvn",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "shape": [
+            {
+              "class": "digit",
+              "emit": true,
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          }
+        }
+      },
+      "sinceVersion": "2027.1.0",
+      "severity": "error"
+    }
+  ]
+}
