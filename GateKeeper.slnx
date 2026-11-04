@@ -13,6 +13,7 @@
     <Project Path="tests/Engine.Tests/InvenioTech.GateKeeper.Engine.Tests.csproj" />
     <Project Path="tests/Signing.Tests/InvenioTech.GateKeeper.Signing.Tests.csproj" />
     <Project Path="tests/Cli.Tests/InvenioTech.GateKeeper.Cli.Tests.csproj" />
+    <Project Path="tests/Corpus.Tests/InvenioTech.GateKeeper.Corpus.Tests.csproj" />
   </Folder>
 </Solution>
 

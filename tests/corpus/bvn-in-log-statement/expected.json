@@ -1,0 +1,9 @@
+[
+  {
+    "column": 52,
+    "line": 17,
+    "path": "src/payments/BvnVerificationLog.cs",
+    "ruleId": "pii.bvn",
+    "triage": "true-positive"
+  }
+]

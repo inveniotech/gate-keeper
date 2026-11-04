@@ -1,0 +1,9 @@
+[
+  {
+    "column": 55,
+    "line": 5,
+    "path": "src/support/RoutingNotes.cs",
+    "ruleId": "pii.phone",
+    "triage": "true-positive"
+  }
+]

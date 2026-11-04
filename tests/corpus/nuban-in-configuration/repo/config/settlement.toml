@@ -1,0 +1,4 @@
+# The settlement role the payout worker debits every run.
+
+[settlement]
+payrollAccount = "7152808393"

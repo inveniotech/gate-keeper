@@ -1,0 +1,9 @@
+[
+  {
+    "column": 104001,
+    "line": 1,
+    "path": "data/reference-indexes.txt",
+    "ruleId": "pii.bvn",
+    "triage": "true-positive"
+  }
+]

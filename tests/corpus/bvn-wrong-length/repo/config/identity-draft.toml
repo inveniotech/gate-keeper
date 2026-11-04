@@ -1,0 +1,4 @@
+# A draft settings file: the blocked identity below has one digit missing.
+
+[identity.blocked]
+bvn = "6219160147"

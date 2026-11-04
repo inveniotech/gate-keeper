@@ -1,0 +1,9 @@
+[
+  {
+    "column": 66,
+    "line": 17,
+    "path": "src/compliance/KycReviewLog.cs",
+    "ruleId": "pii.nin",
+    "triage": "true-positive"
+  }
+]

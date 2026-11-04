@@ -1,0 +1,9 @@
+[
+  {
+    "column": 12,
+    "line": 3,
+    "path": "config/compliance.env",
+    "ruleId": "pii.nin",
+    "triage": "true-positive"
+  }
+]
