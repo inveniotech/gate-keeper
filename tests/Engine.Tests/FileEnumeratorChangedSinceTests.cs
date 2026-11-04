@@ -12,7 +12,7 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 /// </summary>
 public sealed class FileEnumeratorChangedSinceTests
 {
-    private const string BeforeContent = "Sensor 0001 synthevalues fixture\n";
+    private const string BeforeContent = "Sensor 0001 synthetic fixture\n";
     private const string AfterContent = "Sensor 0002 synthetic fixture\n";
 
     private static GitTestRepository BuildTwoCommitRepository()

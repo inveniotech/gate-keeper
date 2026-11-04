@@ -132,7 +132,7 @@ public sealed class FileEnumeratorHistoryTests
         result.History.Should().BeEmpty();
         result.Notes.Should().Equal(
             "Skipped 'engine.ini': the file is 26 bytes, and the limit is 16 bytes.",
-            "Skipped 'pointer.bin': the file is a Git LFS pointer. The scan does not fetch Git LFS objects.",
+            "Skipped 'pointer.bin': the file is 127 bytes, and the limit is 16 bytes.",
             "Skipped 'weird.bin': the file is binary.");
     }
 

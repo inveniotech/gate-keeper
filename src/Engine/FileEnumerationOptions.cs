@@ -21,17 +21,13 @@ public sealed class FileEnumerationOptions
     /// <summary>
     /// Gets or sets the directory the scan runs on. Inside a git work tree
     /// this MUST be the repository root; outside git it is the directory the
-    /// scan walks.
+    /// scan walks. An empty value is repaired by
+    /// <see cref="FileEnumerator.EnumerateAsync"/>, which refuses the scan.
     /// </summary>
-    /// <exception cref="ArgumentException">The root is empty or whitespace.</exception>
     public string Root
     {
         get;
-        set => field = string.IsNullOrWhiteSpace(value)
-            ? throw new ArgumentException(
-                "A scan needs the directory to scan. Give the repository root, or the directory to walk.",
-                "root")
-            : value;
+        set;
     } = string.Empty;
 
     /// <summary>
@@ -59,7 +55,24 @@ public sealed class FileEnumerationOptions
     /// removed, whatever the globs name.
     /// </summary>
     /// <exception cref="EngineToolException">An entry is outside the glob subset.</exception>
-    public IReadOnlyList<string>? ExcludeGlobs { get; set; }
+    public IReadOnlyList<string>? ExcludeGlobs
+    {
+        get;
+        set
+        {
+            // Validation runs here, so a glob outside the subset is a tool
+            // error before any file is read (rule 28).
+            if (value is not null)
+            {
+                foreach (var entry in value)
+                {
+                    PathGlob.Compile(entry);
+                }
+            }
+
+            field = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets whether checked-out submodules are enumerated with their

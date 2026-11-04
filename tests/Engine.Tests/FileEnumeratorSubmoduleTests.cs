@@ -81,11 +81,18 @@ public sealed class FileEnumeratorSubmoduleTests
         parent.Stage("super.txt");
         _ = parent.Commit("super: add the super fixture");
 
-        // The checkout of the submodule is a plain local-path clone, which
-        // avoids the git file protocol entirely, and the clone lands the
-        // child's fixed commit, so the checkout is deterministic too.
+        // The checkout is a plain local-path clone with the line-ending
+        // conversion pinned off, so its bytes match the committed bytes
+        // (rule 26).
         var innerPath = Path.Combine(parent.RootPath, "modules", "inner");
-        parent.Git("clone", child.RootPath, innerPath);
+        parent.Git(
+            "-c",
+            "core.autocrlf=false",
+            "-c",
+            "core.eol=lf",
+            "clone",
+            child.RootPath,
+            innerPath);
 
         parent.Git(
             "update-index",

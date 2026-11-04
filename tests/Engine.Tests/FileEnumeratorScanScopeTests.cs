@@ -20,6 +20,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteFile("engine.ini", "value=pretty-large-setting");
+        repository.Stage("engine.ini");
 
         var options = repository.Options(o => o.MaxFileBytes = 16);
 
@@ -35,13 +36,14 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteFile("engine.ini", "value=pretty-large-setting");
-        repository.WriteFile("small.txt", PlainContent);
+        repository.WriteFile("small.txt", "hi\n");
+        repository.Stage("engine.ini", "small.txt");
 
         var options = repository.Options(o => o.MaxFileBytes = 16);
 
         var result = await new FileEnumerator().EnumerateAsync(options, CancellationToken.None);
 
-        result.Files.Should().Equal(new EnumeratedFile("small.txt", PlainContent));
+        result.Files.Should().Equal(new EnumeratedFile("small.txt", "hi\n"));
     }
 
     [Fact]
@@ -49,6 +51,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteBytes("weird.txt", [0x50, 0x49, 0x00, 0x4E, 0xFF, 0xFE, 0x00, 0x01]);
+        repository.Stage("weird.txt");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -61,6 +64,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteBytes("sensor.log", [0xFF, 0xFE, 0x61, 0x00, 0x62, 0x00, 0x0A, 0x00]);
+        repository.Stage("sensor.log");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -72,7 +76,8 @@ public sealed class FileEnumeratorScanScopeTests
     public async Task Enumerator_Should_DecodeUtf16BeBytes_When_TheFileStartsWithTheBigEndianByteOrderMark()
     {
         var repository = GitTestRepository.Create();
-        repository.WriteBytes("sensor.log", [0xFE, 0xFF, 0x61, 0x00, 0x62, 0x00, 0x0A, 0x00]);
+        repository.WriteBytes("sensor.log", [0xFE, 0xFF, 0x00, 0x61, 0x00, 0x62, 0x00, 0x0A]);
+        repository.Stage("sensor.log");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -84,6 +89,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteBytes("sensor.log", [0x61, 0x00, 0x62, 0x00, 0x0A, 0x00]);
+        repository.Stage("sensor.log");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -96,6 +102,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteBytes("odd.md", [0x48, 0xC3, 0x28, 0x4C, 0x0A]);
+        repository.Stage("odd.md");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -109,6 +116,7 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteBytes("marked.md", [0xEF, 0xBB, 0xBF, 0x48, 0x4C, 0x0A]);
+        repository.Stage("marked.md");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -123,6 +131,7 @@ public sealed class FileEnumeratorScanScopeTests
         repository.WriteFile(
             "assets/pointer.bin",
             "version https://git-lfs.github.com/spec/v1\noid sha256:" + new string('0', 64) + "\nsize 12\n");
+        repository.Stage("assets/pointer.bin");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
@@ -239,15 +248,15 @@ public sealed class FileEnumeratorScanScopeTests
     {
         var repository = GitTestRepository.Create();
         repository.WriteFile("assets/app.min.js.txt", "var a=1;\n");
-        repository.WriteFile("assets/app.minparser.js", "var a=1;\n");
-        repository.Stage("assets/app.min.js.txt", "assets/app.minparser.js");
+        repository.WriteFile("assets/app.minimal.js", "var a=1;\n");
+        repository.Stage("assets/app.min.js.txt", "assets/app.minimal.js");
         repository.Commit("one: add the minified look-alike fixtures");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
         result.Files.Should().Equal(
             new EnumeratedFile("assets/app.min.js.txt", "var a=1;\n"),
-            new EnumeratedFile("assets/app.minparser.js", "var a=1;\n"));
+            new EnumeratedFile("assets/app.minimal.js", "var a=1;\n"));
     }
 
     [Fact]

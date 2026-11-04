@@ -55,18 +55,21 @@ public sealed class FileEnumeratorInsideGitTests
     }
 
     [Fact]
-    public async Task Enumerator_Should_OrderTrackedFilesOrdinally_When_TheIndexOrderDiffersFromTheOrdinalSort()
+    public async Task Enumerator_Should_ReturnThePathsInOrdinalOrder_When_TheNamesCapitalisationVaries()
     {
         var repository = GitTestRepository.Create();
         repository.WriteFile("a.txt", GitTestRepository.SensorLine(1));
-        repository.WriteFile("A.txt", GitTestRepository.SensorLine(2));
-        repository.WriteFile("B.txt", GitTestRepository.SensorLine(3));
-        repository.Stage("A.txt", "B.txt", "a.txt");
+        repository.WriteFile("b/deeper.txt", GitTestRepository.SensorLine(2));
+        repository.WriteFile("B2/upper.x", GitTestRepository.SensorLine(3));
+        repository.Stage("a.txt", "b/deeper.txt", "B2/upper.x");
         repository.Commit("one: add the ordinal-order fixture");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
-        result.Files.Select(file => file.Path).Should().Equal("A.txt", "B.txt", "a.txt");
+        result.Files.Select(file => file.Path).Should().Equal(
+            "B2/upper.x",
+            "a.txt",
+            "b/deeper.txt");
     }
 
     [Fact]
