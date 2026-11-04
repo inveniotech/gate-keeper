@@ -153,6 +153,38 @@ public sealed class FindingPolicyTests
     }
 
     [Fact]
+    public async Task Key_Should_RestrictAccess_When_ItIsCreated()
+    {
+        using var repo = new PolicyRepository();
+        await PolicyStore.EnsureKeyAsync(repo.Root);
+        var path = Path.Combine(repo.Root, ".ndpa-check", "fingerprint.key");
+        if (OperatingSystem.IsWindows())
+        {
+            var security = System.IO.FileSystemAclExtensions.GetAccessControl(new FileInfo(path));
+            security.AreAccessRulesProtected.Should().BeTrue();
+            var rules = security.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+            rules.Count.Should().Be(1);
+            using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+            rules[0]!.IdentityReference.Should().Be(identity.User);
+        }
+        else
+        {
+            File.GetUnixFileMode(path).Should().Be(UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        }
+    }
+
+    [Theory]
+    [InlineData("../outside/**")]
+    [InlineData("[bad]")]
+    public async Task Loader_Should_NameTheException_When_AnEntryHasInvalidPaths(string glob)
+    {
+        using var repo = new PolicyRepository();
+        repo.Exceptions($"paths = [\"{glob}\"]");
+        Func<Task> load = async () => await PolicyStore.LoadAsync(repo.Root, [PolicyRepository.Rule]);
+        await load.Should().ThrowAsync<EngineToolException>().WithMessage("*exceptions.toml*exc-test*paths*");
+    }
+
+    [Fact]
     public void Fingerprint_Should_AgreeWithThePublishedVector_When_ComputingTheKeyedMessage()
     {
         var key = Convert.FromHexString("00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff");

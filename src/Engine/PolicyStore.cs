@@ -2,6 +2,8 @@
 
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -37,7 +39,7 @@ public static class PolicyStore
             warnings.OrderBy(w => w.Code, StringComparer.Ordinal).ToArray());
     }
 
-    /// <summary>Creates an absent random key with exclusive creation and restrictive Unix permissions, never replacing an existing key; ensures it is gitignored.</summary>
+    /// <summary>Creates an absent random key with exclusive creation and owner-only permissions, never replacing an existing key; ensures it is gitignored.</summary>
     public static async Task EnsureKeyAsync(string root, CancellationToken cancellationToken = default)
     {
         var folder = Path.Combine(root, ".ndpa-check");
@@ -47,14 +49,30 @@ public static class PolicyStore
         {
             var options = new FileStreamOptions { Mode = FileMode.CreateNew, Access = FileAccess.Write, Options = FileOptions.Asynchronous };
             if (!OperatingSystem.IsWindows()) options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+            FileStream? created;
             try
             {
-                await using var stream = new FileStream(path, options);
-                await stream.WriteAsync(Encoding.ASCII.GetBytes(Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(32)) + "\n"), cancellationToken).ConfigureAwait(false);
+                if (OperatingSystem.IsWindows())
+                {
+                    using var identity = WindowsIdentity.GetCurrent();
+                    var user = identity.User ?? throw Error("fingerprint.key", "the creating user has no identity; run under an identified user account");
+                    var security = new FileSecurity();
+                    security.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
+                    security.SetOwner(user);
+                    security.AddAccessRule(new FileSystemAccessRule(user, FileSystemRights.FullControl, AccessControlType.Allow));
+                    created = new FileInfo(path).Create(FileMode.CreateNew, FileSystemRights.FullControl, FileShare.None, 4096, FileOptions.Asynchronous, security);
+                }
+                else created = new FileStream(path, options);
             }
             catch (IOException) when (File.Exists(path))
             {
                 // Exclusive creation preserves the key another invocation created.
+                created = null;
+            }
+            if (created is not null)
+            {
+                await using var stream = created;
+                await stream.WriteAsync(Encoding.ASCII.GetBytes(Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(32)) + "\n"), cancellationToken).ConfigureAwait(false);
             }
         }
         var ignore = Path.Combine(folder, ".gitignore");
@@ -142,7 +160,12 @@ public static class PolicyStore
             Severity? severity = entry.Severity switch { null => null, "error" => Severity.Error, "warning" => Severity.Warning, "note" => Severity.Note, _ => throw Error("exceptions.toml", $"entry '{id}' has an invalid severity; use error, warning or note") };
             if (entry.Paths is not { Count: > 0 } paths || paths.Distinct(StringComparer.Ordinal).Count() != paths.Count)
                 throw Error("exceptions.toml", $"entry '{id}' needs paths; supply unique path globs");
-            var globs = paths.Select(PathGlob.Compile).ToArray();
+            PathGlob[] globs;
+            try { globs = paths.Select(PathGlob.Compile).ToArray(); }
+            catch (EngineToolException)
+            {
+                throw Error("exceptions.toml", $"entry '{id}' has invalid paths; use repository-relative literal, * or ** globs without traversal");
+            }
             var lines = new List<string> { id, rule ?? "", category ?? "" }; lines.AddRange(paths); lines.AddRange([justification, owner, expiry, entry.Severity ?? ""]);
             var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', lines) + "\n")));
             result.Add(new ExceptionEntry(id, rule, category, globs, expires, severity, hash));
