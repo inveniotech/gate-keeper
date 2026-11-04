@@ -10,7 +10,7 @@ namespace InvenioTech.GateKeeper.Cli;
 /// The composition root of the command line: build the command tree with
 /// System.CommandLine, parse the arguments, and run the one command they name.
 /// Results go to the output writer and diagnostics to the error writer
-/// (rule 31). Only the version surface works in this build; every other
+/// (rule 31). The version and baseline surfaces work in this build; every other
 /// command is honest about not being implemented yet and exits with a tool
 /// error, never pretending it scanned anything (rule 13, rule 23).
 ///
@@ -43,36 +43,40 @@ public static class CliModule
     /// <returns>The process exit code: 0 pass, 1 violations, 2 tool error (rule 13).</returns>
     public static int Run(string[] args, TextWriter output, TextWriter errors)
     {
-        var rootCommand = BuildCommandTree(output, errors);
-        var parseResult = rootCommand.Parse(args);
-
-        if (parseResult.Errors.Count > 0)
-        {
-            errors.WriteLine(ParseFailedLawSentence(parseResult, rootCommand, args));
-            return (int)ExitOutcome.ToolError;
-        }
-
-        var versionFlagIndex = Array.IndexOf(args, VersionFlag);
-        if (versionFlagIndex >= 0 && args.Length > 1)
-        {
-            // The version flag owns the invocation. The parser would happily
-            // combine it with a subcommand, but the contract is that the
-            // version output stands alone, so any other token is a tool error.
-            var other = versionFlagIndex == 0 ? args[1] : args[0];
-            errors.WriteLine(VersionLawSentence(other));
-            return (int)ExitOutcome.ToolError;
-        }
-
-        var configuration = new InvocationConfiguration
-        {
-            Output = output,
-            Error = errors,
-        };
-
-        return parseResult.Invoke(configuration);
+        var parsed = PrepareInvocation(args, output, errors, null);
+        return parsed is null ? (int)ExitOutcome.ToolError : parsed.Invoke(new InvocationConfiguration { Output = output, Error = errors });
     }
 
-    private static RootCommand BuildCommandTree(TextWriter output, TextWriter errors)
+    /// <summary>Runs an invocation asynchronously. The optional root supplies the repository for baseline; defaults to the current directory. Cancellation propagates.</summary>
+    public static async Task<int> RunAsync(string[] args, TextWriter? output = null, TextWriter? errors = null,
+        string? rootPath = null, CancellationToken cancellationToken = default)
+    {
+        output ??= Console.Out;
+        errors ??= Console.Error;
+        var parsed = PrepareInvocation(args, output, errors, rootPath);
+        return parsed is null ? (int)ExitOutcome.ToolError
+            : await parsed.InvokeAsync(new InvocationConfiguration { Output = output, Error = errors }, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static ParseResult? PrepareInvocation(string[] args, TextWriter output, TextWriter errors, string? rootPath)
+    {
+        var rootCommand = BuildCommandTree(output, errors, rootPath);
+        var parsed = rootCommand.Parse(args);
+        if (parsed.Errors.Count > 0)
+        {
+            errors.WriteLine(ParseFailedLawSentence(parsed, rootCommand, args));
+            return null;
+        }
+        var versionIndex = Array.IndexOf(args, VersionFlag);
+        if (versionIndex >= 0 && args.Length > 1)
+        {
+            errors.WriteLine(VersionLawSentence(versionIndex == 0 ? args[1] : args[0]));
+            return null;
+        }
+        return parsed;
+    }
+
+    private static RootCommand BuildCommandTree(TextWriter output, TextWriter errors, string? rootPath)
     {
         var rootCommand = new RootCommand(
             "Scans a repository for personal data that the Nigeria Data Protection Act 2023 protects. " +
@@ -84,7 +88,7 @@ public static class CliModule
 
         rootCommand.Subcommands.Add(NotImplementedCommand("scan", "Scans a repository and writes the results files; not implemented in this build", errors));
         rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
-        rootCommand.Subcommands.Add(NotImplementedCommand("baseline", "Writes the baseline file from the current findings; not implemented in this build", errors));
+        rootCommand.Subcommands.Add(BaselineCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(NotImplementedCommand("doctor", "Explains the configuration, the licence and the installation state; not implemented in this build", errors));
         rootCommand.Subcommands.Add(NotImplementedCommand("support-bundle", "Creates the support bundle for a support request; not implemented in this build", errors));
         rootCommand.Subcommands.Add(new Command("version", "Prints the product version and the bundled pack version")
