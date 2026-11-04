@@ -70,7 +70,7 @@ public static class PolicyStore
         var key = await ReadAsync(root, "fingerprint.key", cancellationToken).ConfigureAwait(false);
         if (key is null || key.Length != 65 || key[64] != '\n' || !IsHex(key[..64]) || result.Findings.Any(f => f.Fingerprint is null)) throw Error("fingerprint.key", "baseline requires a readable key; run baseline again after restoring the key");
         using var bytes = new MemoryStream();
-        using (var writer = new Utf8JsonWriter(bytes, new JsonWriterOptions { Indented = true }))
+        using (var writer = new Utf8JsonWriter(bytes, new JsonWriterOptions { Indented = true, NewLine = "\n" }))
         {
             writer.WriteStartObject(); writer.WriteNumber("schemaVersion", 1); writer.WriteStartArray("entries");
             foreach (var fingerprint in result.Findings.Select(f => f.Fingerprint!).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))

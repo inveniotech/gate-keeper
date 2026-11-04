@@ -68,6 +68,7 @@ public sealed class FindingPolicyTests
         await PolicyStore.WriteBaselineAsync(repo.Root, result);
         var path = Path.Combine(repo.Root, ".ndpa-check", "baseline.json");
         var first = await File.ReadAllBytesAsync(path);
+        first.Should().NotContain((byte)'\r');
         var again = await Evaluate(repo, Day.AddDays(1));
         again.Findings.Should().ContainSingle().Which.BaselineState.Should().Be(BaselineState.Unchanged);
         again.Baseline.Should().Be(new BaselineSummary(1, 1));
