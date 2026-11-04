@@ -13,8 +13,7 @@ public static class BaselineCommand
         var load = ConfigurationLoader.Load(root);
         if (load.Settings is not { } settings || load.Errors.Count > 0) throw new EngineToolException(string.Join(" ", load.Errors));
         if (rules.Count == 0) throw new EngineToolException("No rule pack is available for baseline. This build has no bundled pack; configure packs.local before running baseline.");
-        foreach (var id in settings.SeverityOverrides.Keys.Concat(settings.DisabledRules.Select(d => d.Id)))
-            if (!rules.Any(r => r.Id == id)) throw new EngineToolException($"ndpa-check.toml names unknown rule '{id}'. Load its pack or remove the rule setting.");
+        SeverityPolicy.ValidateSettings(settings, rules);
         var day = EvaluationDate.Resolve(clock, evaluatedOn, sourceDateEpoch);
         await PolicyStore.LoadAsync(root, rules, cancellationToken).ConfigureAwait(false);
         var enabled = rules.Where(r => !settings.DisabledRules.Any(d => d.Id == r.Id)
