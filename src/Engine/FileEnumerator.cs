@@ -69,11 +69,13 @@ public sealed class FileEnumerator
                 .ConfigureAwait(false);
         }
 
-        // git prints the work-tree root with forward slashes whatever the
-        // platform; the full path puts it in the platform's canonical form,
-        // so the comparison and the tool-error message are exact.
-        toplevel = Path.GetFullPath(toplevel);
-        var root = Path.GetFullPath(options.Root);
+        // Both sides of the comparison go through the canonical form: git
+        // prints the physical work-tree root, while the caller may name the
+        // same directory through a symlink (the temporary directory on macOS
+        // routes '/var' into '/private/var'), and a plain full path keeps the
+        // link, so the comparison would refuse a legitimate root (rule 22).
+        toplevel = Canonicalise(toplevel);
+        var root = Canonicalise(options.Root);
 
         if (!SamePath(toplevel, root))
         {
@@ -409,6 +411,57 @@ public sealed class FileEnumerator
     private static bool SamePath(string left, string right) =>
         string.CompareOrdinal(left, right) == 0
         || string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Resolves the symbolic links along a path the way the file system opens
+    /// it, so a directory named through a link (macOS routes '/var' into
+    /// '/private/var' and '/tmp' into '/private/tmp') compares equal to the
+    /// physical path git prints for the same directory. Each component is
+    /// resolved with <c>ResolveLinkTarget</c> down to its final target, and a
+    /// component that is not a link leaves the walk unchanged. A resolved
+    /// target is canonicalised again, because the stored target may itself
+    /// name another link (a link into the temporary directory carries the
+    /// un-resolved '/var' spelling), so the walk repeats until the path holds
+    /// no link.
+    /// </summary>
+    /// <param name="path">The path to canonicalise, absolute or relative.</param>
+    /// <returns>The full path with every symbolic link resolved.</returns>
+    private static string Canonicalise(string path) => Canonicalise(path, depth: 0);
+
+    private static string Canonicalise(string path, int depth)
+    {
+        var fullPath = Path.GetFullPath(path);
+
+        // A pathological link chain could cycle; the limit keeps the scan
+        // responsive and the comparison then falls back to the two names it
+        // already compared.
+        if (depth >= MaxSymbolicLinkDepth)
+        {
+            return fullPath;
+        }
+
+        var baseName = Path.GetPathRoot(fullPath) ?? string.Empty;
+        var resolved = baseName;
+
+        foreach (var segment in fullPath[baseName.Length..].Split(
+                     [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+                     StringSplitOptions.RemoveEmptyEntries))
+        {
+            var candidate = Path.Combine(resolved, segment);
+
+            if (Directory.Exists(candidate)
+                && new DirectoryInfo(candidate).ResolveLinkTarget(returnFinalTarget: true) is { } target)
+            {
+                candidate = Canonicalise(target.FullName, depth + 1);
+            }
+
+            resolved = candidate;
+        }
+
+        return resolved;
+    }
+
+    private const int MaxSymbolicLinkDepth = 32;
 
     // ---------------------------------------------------------------------
     // History (IQ-83).

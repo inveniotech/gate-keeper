@@ -119,8 +119,36 @@ public sealed class FileEnumeratorInsideGitTests
 
         var act = async () => await new FileEnumerator().EnumerateAsync(options, CancellationToken.None);
 
+        // The message names git's own answer for the work-tree root, which on
+        // macOS is the physical path behind the symlinked temporary directory
+        // ('/private/var/folders/...'). The normalisation here is the plain
+        // full-path form of git's answer, not the scan's own canonicalisation.
+        var toplevel = Path.GetFullPath(
+            repository.Git("rev-parse", "--show-toplevel").TrimEnd('\n', '\r'));
+
         await act.Should().ThrowAsync<EngineToolException>().WithMessage(
             $"The scan must run on the repository root. '{options.Root}' is not the repository root; " +
-            $"the repository root is '{repository.RootPath}'.");
+            $"the repository root is '{toplevel}'.");
+    }
+
+    [SymlinkFact]
+    public async Task Enumerator_Should_ScanThroughASymlinkedRoot_When_TheRepositoryRootIsNamedThroughALink()
+    {
+        var repository = GitTestRepository.Create();
+        repository.WriteFile("tracked.txt", GitTestRepository.SensorLine(1));
+        repository.Stage("tracked.txt");
+        repository.Commit("one: add the symlinked-root fixture");
+
+        var link = Path.Combine(
+            Path.GetDirectoryName(repository.RootPath)!,
+            $"gk-link-{Guid.NewGuid():N}");
+        _ = Directory.CreateSymbolicLink(link, repository.RootPath);
+
+        var options = repository.Options(o => o.Root = link);
+
+        var result = await new FileEnumerator().EnumerateAsync(options, CancellationToken.None);
+
+        result.IsInsideGitWorkTree.Should().BeTrue();
+        result.Files.Should().ContainSingle().Which.Path.Should().Be("tracked.txt");
     }
 }
