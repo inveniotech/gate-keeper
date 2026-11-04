@@ -5,4 +5,8 @@
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Approved in AGENTS.md rule 8; parses the settings file ndpa-check.toml under NativeAOT through the source-generated ScanSettingsTomlContext (card P1-08). -->
+    <PackageReference Include="Tomlyn" />
+  </ItemGroup>
 </Project>
