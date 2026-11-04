@@ -93,7 +93,7 @@ public sealed class RuleValidatorTests
     [InlineData("ada@localhost", false)]
     [InlineData("ada@files.localhost", false)]
     [InlineData("ada@", false)]
-    [InlineData("@ledgerops.ng", false)]
+    [InlineData("@ledger-ops.ng", false)]
     [InlineData("not-an-address", false)]
     public void Email_Should_RefuseADocumentationDomain_When_TheAddressUsesOne(string span, bool accepted)
     {

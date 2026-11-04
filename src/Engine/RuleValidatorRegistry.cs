@@ -229,8 +229,9 @@ public sealed class EmailNotExampleDomainValidator : IRuleValidator
 
     /// <summary>
     /// A domain is reserved when it equals the reserved name, or when the
-    /// reserved name is a parent label sequence. The character before a parent
-    /// must be a dot, so <c>notexample.com</c> is not under <c>example.com</c>.
+    /// reserved name is a parent of it. The character before a parent must be
+    /// a dot, so a longer name that only ends with the same letters is not a
+    /// subdomain.
     /// </summary>
     private static bool IsReservedDomain(ReadOnlySpan<char> domain, string reserved)
     {

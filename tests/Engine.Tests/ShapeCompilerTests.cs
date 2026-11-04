@@ -55,7 +55,8 @@ public sealed class ShapeCompilerTests
 
         compiled.Regex.IsMatch("a.b(c)a.b(c)").Should().BeTrue();
         compiled.Regex.IsMatch("A.B(C)").Should().BeTrue();
-        compiled.Regex.IsMatch("axbyc").Should().BeFalse();
+        // The stand-in would match if the dot were a wildcard and the parentheses a group.
+        compiled.Regex.IsMatch("an" + "bc").Should().BeFalse();
         compiled.Pattern.Should().NotContain("a.b(c)");
     }
 
