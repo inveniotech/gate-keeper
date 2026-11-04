@@ -39,9 +39,10 @@ public sealed class ShapeCompilerTests
 
         var compiled = CompiledShape.Compile(shape, "pii.synthetic.code", ShapeRegexCache.DefaultMatchTimeout);
 
-        // Alternatives sort longest first, then ordinal, and the emitting
-        // part is wrapped in the one named group the engine reads back.
-        compiled.Pattern.Should().Be("(?:A|B){1}[0-9A-F]{4}-{1}(?<emit>[0-9A-Za-z]{2})");
+        // Alternatives sort longest first, then ordinal. Letters fold to a
+        // two-case class (section 7.2), and the emitting part is the one
+        // named group the engine reads back.
+        compiled.Pattern.Should().Be("(?:[Aa]|[Bb]){1}[0-9A-F]{4}-{1}(?<emit>[0-9A-Za-z]{2})");
         compiled.HasEmitGroup.Should().BeTrue();
     }
 
@@ -53,8 +54,35 @@ public sealed class ShapeCompilerTests
         var compiled = CompiledShape.Compile(shape, "local.escaped", ShapeRegexCache.DefaultMatchTimeout);
 
         compiled.Regex.IsMatch("a.b(c)a.b(c)").Should().BeTrue();
+        compiled.Regex.IsMatch("A.B(C)").Should().BeTrue();
         compiled.Regex.IsMatch("axbyc").Should().BeFalse();
         compiled.Pattern.Should().NotContain("a.b(c)");
+    }
+
+    [Fact]
+    public void Compiler_Should_RepeatTheWholeLiteral_When_AMultiCharacterLiteralIsBounded()
+    {
+        var compiled = CompiledShape.Compile(
+            [Part(2, 2, literal: "ab")],
+            "local.repeated-literal",
+            ShapeRegexCache.DefaultMatchTimeout);
+
+        compiled.Regex.IsMatch("abab").Should().BeTrue();
+        compiled.Regex.IsMatch("abb").Should().BeFalse();
+        compiled.Pattern.Should().Be("(?:[Aa][Bb]){2}");
+    }
+
+    [Fact]
+    public void Compiler_Should_FoldAsciiLettersOnly_When_ALiteralCarriesALetter()
+    {
+        var compiled = CompiledShape.Compile(
+            [Part(1, 1, literal: "BVN ")],
+            "local.folded",
+            ShapeRegexCache.DefaultMatchTimeout);
+
+        compiled.Regex.IsMatch("bvn ").Should().BeTrue();
+        compiled.Regex.IsMatch("BVN ").Should().BeTrue();
+        compiled.Regex.IsMatch("bvN ").Should().BeTrue();
     }
 
     [Theory]

@@ -109,7 +109,7 @@ These three assumptions are the part of the corpus the rule-pack work packages c
 
 `tests/Corpus.Tests` runs the engine over each case and diffs the findings the run produced against `expected.json`, reporting precision and recall per rule. One theory member per case keeps a malformed case naming itself rather than failing an aggregate run, and adding a case is a folder and a documentation row — no code change.
 
-The engine's matching stage is not in this build (it lands with P1-06, and the scan orchestrator with P1-07), so the harness's findings list is empty by construction. The report marks recall `unmeasured` rather than zero, because a scan that cannot see any rule proves nothing about missed detections (rule 16). What this build can verify, and the suite verifies for every case:
+The matcher engine is in this build (P1-06). The harness still reports an empty findings list, because the scan orchestrator (P1-07) is what runs the matcher over an enumerated repository, and the cited rule pack is later work (P2). The report marks recall `unmeasured` rather than zero, because a scan that is not yet given those rules proves nothing about missed detections (rule 16). What this build can verify, and the suite verifies for every case:
 
 1. Every expected location is a file the enumeration reaches, at a line and column the decoded text actually holds.
 2. The edge-case behaviour is exact: the UTF-16 file decodes per its byte-order mark, the long line reaches the engine at full length, the minified bundle and the ignored spool file stay out of the scan silently, the binary text file skips with its note, and the symbolic link skips with its note wherever the checkout materialised the link.

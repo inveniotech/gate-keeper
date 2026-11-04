@@ -16,10 +16,10 @@ namespace InvenioTech.GateKeeper.Corpus.Tests;
 public sealed class CorpusWholeRunTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// Gets whether the engine's matching stage is part of this build. It is
-    /// not yet: the matcher engine lands with P1-06 and the scan orchestrator
-    /// with P1-07, so the report marks recall unmeasured until then, and no
-    /// test claims a measurement this build cannot take (rule 16).
+    /// Gets whether this harness ran the matcher over a rule pack. The matcher
+    /// engine is in the build (P1-06); the scan orchestrator (P1-07) and the
+    /// cited pack are not, so the report marks recall unmeasured and no test
+    /// claims a measurement this build cannot take (rule 16).
     /// </summary>
     private const bool MatcherStagePresent = false;
 

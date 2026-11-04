@@ -22,10 +22,14 @@ namespace InvenioTech.GateKeeper.Engine;
 /// becomes one character class, and an alternation part becomes a
 /// non-capturing group whose alternatives are tried longest first, so a
 /// shorter alternative never masks a longer one at the same position and the
-/// pack's listing order carries no priority. Repetition bounds become the
-/// bounded quantifier <c>{min,max}</c>; the language allows nothing else, so
-/// the output always sits inside the portable profile the specification fixes
-/// (section 7.3).
+/// pack's listing order carries no priority. Letters in a literal or an
+/// alternation fold ASCII A–Z only (section 7.2): each letter becomes a
+/// two-character class, and every other scalar value is escaped unchanged.
+/// Unicode case folding stays out. A literal of more than one scalar value is
+/// grouped, so the repetition bound repeats the whole atom rather than its
+/// last character. Repetition bounds become the bounded quantifier
+/// <c>{min,max}</c>; the language allows nothing else, so the output always
+/// sits inside the portable profile the specification fixes (section 7.3).
 /// </para>
 /// <para>
 /// The timeout honesty note: .NET's <c>NonBacktracking</c> engine accepts a
@@ -164,7 +168,7 @@ public sealed class CompiledShape
                     $"A shape part of the rule '{ruleId}' sets literal to an empty string (section 7.1).");
             }
 
-            atom = Regex.Escape(part.Literal);
+            atom = CompileLiteral(part.Literal);
         }
         else if (part.Class is not null)
         {
@@ -237,7 +241,7 @@ public sealed class CompiledShape
                     alternation.Append('|');
                 }
 
-                alternation.Append(Regex.Escape(alternatives[index]));
+                alternation.Append(CompileLiteral(alternatives[index]));
             }
 
             atom = alternation.Append(')').ToString();
@@ -245,6 +249,38 @@ public sealed class CompiledShape
 
         var quantifier = part.Min == part.Max ? $"{{{part.Min}}}" : $"{{{part.Min},{part.Max}}}";
         return atom + quantifier;
+    }
+
+    /// <summary>
+    /// Translates one literal under the ASCII folding of section 7.2.
+    /// A letter becomes the class of its two ASCII cases. Any other character
+    /// is escaped. A literal longer than one character is a non-capturing
+    /// group, so a later quantifier repeats the whole literal.
+    /// </summary>
+    private static string CompileLiteral(string literal)
+    {
+        var body = new StringBuilder();
+
+        foreach (var character in literal)
+        {
+            if (character is >= 'A' and <= 'Z' or >= 'a' and <= 'z')
+            {
+                var lower = character is >= 'A' and <= 'Z' ? (char)(character + 32) : character;
+                var upper = (char)(lower - 32);
+                body.Append('[').Append(upper).Append(lower).Append(']');
+            }
+            else
+            {
+                body.Append(Regex.Escape(character.ToString()));
+            }
+        }
+
+        if (literal.Length == 1)
+        {
+            return body.ToString();
+        }
+
+        return "(?:" + body + ")";
     }
 
     /// <summary>

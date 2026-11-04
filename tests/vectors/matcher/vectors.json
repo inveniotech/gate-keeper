@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "keyword-within-window",
+      "path": "src/pay.cs",
+      "text": "Identity BVN 32826314843.\n",
+      "rule": {
+        "id": "local.bvn",
+        "boundary": "digit",
+        "keywords": ["bvn"],
+        "window": 16,
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.bvn", "line": 1, "column": 14 }]
+    },
+    {
+      "name": "keyword-inside-identifier",
+      "path": "src/pay.cs",
+      "text": "customerBvn=32826314843",
+      "rule": {
+        "id": "local.bvn",
+        "boundary": "digit",
+        "keywords": ["bvn"],
+        "window": 8,
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.bvn", "line": 1, "column": 13 }]
+    },
+    {
+      "name": "keyword-outside-window",
+      "path": "src/pay.cs",
+      "text": "bvn                    32826314843",
+      "rule": {
+        "id": "local.bvn",
+        "boundary": "digit",
+        "keywords": ["bvn"],
+        "window": 8,
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": []
+    },
+    {
+      "name": "twelve-digit-run",
+      "path": "src/pay.cs",
+      "text": "123456789012",
+      "rule": {
+        "id": "local.digits",
+        "boundary": "digit",
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": []
+    },
+    {
+      "name": "nuban-valid",
+      "path": "payments/settlement.py",
+      "text": "acct 0000014579.",
+      "rule": {
+        "id": "local.nuban",
+        "boundary": "digit",
+        "validator": "nuban",
+        "shape": [{ "min": 10, "max": 10, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.nuban", "line": 1, "column": 6 }]
+    },
+    {
+      "name": "nuban-invalid-check-digit",
+      "path": "payments/settlement.py",
+      "text": "acct 0000014570.",
+      "rule": {
+        "id": "local.nuban",
+        "boundary": "digit",
+        "validator": "nuban",
+        "shape": [{ "min": 10, "max": 10, "class": "digit", "emit": true }]
+      },
+      "expected": []
+    },
+    {
+      "name": "phone-prefix",
+      "path": "src/support/CallbackLog.cs",
+      "text": "call 08079012062.",
+      "rule": {
+        "id": "local.phone",
+        "boundary": "digit",
+        "validator": "ng-phone-prefix",
+        "prefixes": ["080", "081", "090"],
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.phone", "line": 1, "column": 6 }]
+    },
+    {
+      "name": "phone-other-prefix",
+      "path": "src/support/CallbackLog.cs",
+      "text": "call 06079012062.",
+      "rule": {
+        "id": "local.phone",
+        "boundary": "digit",
+        "validator": "ng-phone-prefix",
+        "prefixes": ["080", "081", "090"],
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": []
+    },
+    {
+      "name": "email-kept",
+      "path": "alerts/recipients.py",
+      "text": "to ada@ledgerops.ng.",
+      "rule": {
+        "id": "local.email",
+        "boundary": "alnum",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 16, "class": "alnum" }
+        ]
+      },
+      "expected": [{ "ruleId": "local.email", "line": 1, "column": 4 }]
+    },
+    {
+      "name": "email-example-domain",
+      "path": "docs/support-policy.md",
+      "text": "to ada@example.com.",
+      "rule": {
+        "id": "local.email",
+        "boundary": "alnum",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 16, "class": "alnum" }
+        ]
+      },
+      "expected": []
+    },
+    {
+      "name": "location-path",
+      "path": "config/app.env",
+      "text": "BVN 32826314843",
+      "rule": {
+        "id": "local.bvn",
+        "boundary": "digit",
+        "keywords": ["BVN"],
+        "window": 8,
+        "kind": "configuration",
+        "paths": ["**/*.env"],
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.bvn", "line": 1, "column": 5, "locationKind": "configuration" }]
+    },
+    {
+      "name": "location-path-miss",
+      "path": "src/App.cs",
+      "text": "BVN 32826314843",
+      "rule": {
+        "id": "local.bvn",
+        "boundary": "digit",
+        "keywords": ["BVN"],
+        "window": 8,
+        "kind": "configuration",
+        "paths": ["**/*.env"],
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": []
+    },
+    {
+      "name": "suppression-hint",
+      "path": "src/pay.cs",
+      "text": "32826314843",
+      "rule": {
+        "id": "local.digits",
+        "boundary": "none",
+        "hints": ["suppress this match"],
+        "shape": [{ "min": 11, "max": 11, "class": "digit", "emit": true }]
+      },
+      "expected": [{ "ruleId": "local.digits", "line": 1, "column": 1, "hints": ["suppress this match"] }]
+    },
+    {
+      "name": "list-exact-package",
+      "path": "package.json",
+      "text": "dep com.example.processor-a\n",
+      "rule": {
+        "id": "local.processor",
+        "packages": ["com.example.processor-a"],
+        "hostnames": ["processor-a.example.com"]
+      },
+      "expected": [{ "ruleId": "local.processor", "line": 1, "column": 5 }]
+    },
+    {
+      "name": "list-shorter-package",
+      "path": "package.json",
+      "text": "dep com.example.processor-alpha\n",
+      "rule": {
+        "id": "local.processor",
+        "packages": ["com.example.processor-a"]
+      },
+      "expected": []
+    },
+    {
+      "name": "list-hostname-in-url",
+      "path": "config/hosts.env",
+      "text": "url https://processor-a.example.com/v1",
+      "rule": {
+        "id": "local.processor",
+        "hostnames": ["processor-a.example.com"]
+      },
+      "expected": [{ "ruleId": "local.processor", "line": 1, "column": 13 }]
+    },
+    {
+      "name": "list-shorter-hostname",
+      "path": "config/hosts.env",
+      "text": "url https://processor-a.example.com/v1",
+      "rule": {
+        "id": "local.processor",
+        "hostnames": ["example.com"]
+      },
+      "expected": []
+    }
+  ]
+}

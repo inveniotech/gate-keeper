@@ -45,11 +45,12 @@ internal sealed class CorpusScanRunner
             },
             cancellationToken).ConfigureAwait(true);
 
-        // The engine's matching stage is not in this build: it lands with
-        // P1-06 and the scan orchestrator (P1-07). Until it does, the runner
-        // reports an empty findings list and the scorers treat every expected
-        // finding as unmeasured rather than missed, because a scan that
-        // cannot see any rule proves nothing about detection.
+        // The matcher engine (P1-06) can run rules. This harness still reports
+        // an empty findings list: the scan orchestrator (P1-07) is what runs
+        // the matcher over the enumeration, and the cited rule pack is later
+        // work (P2). The scorers treat every expected finding as unmeasured
+        // rather than missed, because a scan that is not yet given those
+        // rules proves nothing about detection.
         return new CorpusScan(this.@case, copyRoot, enumeration, Findings: []);
     }
 
@@ -104,7 +105,11 @@ internal sealed record CorpusScan(
     /// <summary>Gets the scanned work-tree files, in ordinal path order.</summary>
     public IReadOnlyList<EnumeratedFile> Files => this.Enumeration.Files;
 
-    /// <summary>Gets whether the engine's matching stage is in this build.</summary>
+    /// <summary>
+    /// Gets whether this harness ran the matcher over a rule pack. The matcher
+    /// exists (P1-06); the orchestrator and the pack do not, so recall stays
+    /// unmeasured.
+    /// </summary>
     public bool MatcherStagePresent => false;
 }
 
