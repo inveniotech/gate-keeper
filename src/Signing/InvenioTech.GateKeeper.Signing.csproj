@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>InvenioTech.GateKeeper.Signing</RootNamespace>
+    <AssemblyName>InvenioTech.GateKeeper.Signing</AssemblyName>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Approved in AGENTS.md rule 8. The P0-16 spike (IQ-11) measured that the package signs and verifies every pure-Ed25519 RFC 8032 vector under NativeAOT with zero trim and AOT warnings, so the pre-approved fallback (Rebex) is not referenced. Callers reach this package only through this assembly. -->
+    <PackageReference Include="BouncyCastle.Cryptography" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The module's whole surface is internal (card P1-04): consumers add themselves here, never a public package reference. -->
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Signing.Tests" />
+  </ItemGroup>
+</Project>
