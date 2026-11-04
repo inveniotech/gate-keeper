@@ -48,6 +48,8 @@ The pack loader's tests (`PackLoaderTests`) read the committed vectors under `te
 
 ## Scan orchestration (P1-07)
 
+The matcher conformance-vector tests explicitly disable the regular-expression deadline: they check exact semantic outcomes independently of runner scheduling and cold-start time. Production keeps its 100 ms default deadline. `ShapeCompilerTests` verifies that the default and explicitly configured timeouts are carried by the compiled regular expression. `NonBacktracking` enforces finite deadlines even though its matching algorithm is linear.
+
 `ScanOrchestrator` accepts a prepared `MatcherEngine` and scans either `FileEnumerationOptions` or an existing `FileEnumerationResult`. File selection and decoding remain with `FileEnumerator`. Work-tree reads and matching use at most `Environment.ProcessorCount` workers. Each worker owns its collections; the caller merges them only after all workers finish. History blob reads retain the enumerator's serial Git batch protocol.
 
 The returned `ScanMatchResult` contains work-tree `RuleMatch` values sorted by ordinal path, line, column and rule identifier, plus separate `HistoryMatch` values ordered by commit identifier, path, line, rule identifier and column (results format section 5.4, IQ-83). It retains enumeration diagnostics for the caller. This is an intermediate result: never serialise the enumeration, which carries source text. Policy, fingerprints and evidence writers remain later stages; `ScanResult` and its serialised contract are unchanged. Cancellation and tool errors propagate without returning partial findings. Concurrent scans share only prepared read-only matchers. No output is written by the orchestrator.

@@ -32,11 +32,10 @@ namespace InvenioTech.GateKeeper.Engine;
 /// sits inside the portable profile the specification fixes (section 7.3).
 /// </para>
 /// <para>
-/// The timeout honesty note: .NET's <c>NonBacktracking</c> engine accepts a
-/// match timeout in the constructor and does not enforce it, because that
-/// engine is linear in the input by construction. The timeout is still passed
-/// so any runtime that enforces one is bounded, and the real protection is
-/// structural, exactly as the specification states (section 1.2 of the
+/// .NET's <c>NonBacktracking</c> engine enforces a finite match timeout,
+/// including elapsed time spent in lazy initialisation and runner scheduling.
+/// Linear matching therefore can still time out on a heavily loaded host.
+/// The primary protection is structural, as the specification states (section 1.2 of the
 /// rule-pack format: the shape bounds are the safety control) — at most 32
 /// parts, at most 64 repetitions per part, at most 256 scalar values consumed
 /// and no nesting, all checked here before a regular expression is built.
@@ -307,10 +306,9 @@ public sealed class ShapeRegexCache
 {
     /// <summary>
     /// The match timeout every compiled shape carries when the caller names
-    /// none: 100 milliseconds, an order above the whole per-file budget of
-    /// NFR-011, so a legitimate single match never approaches it. The
-    /// <c>NonBacktracking</c> engine does not enforce a timeout (it is linear
-    /// by construction); the value bounds any runtime that does.
+    /// none: 100 milliseconds. This is a safety deadline, separate from the
+    /// NFR-011 performance budget, and includes elapsed time during matching.
+    /// The <c>NonBacktracking</c> engine enforces it even though matching is linear.
     /// </summary>
     public static readonly TimeSpan DefaultMatchTimeout = TimeSpan.FromMilliseconds(100);
 
