@@ -19,6 +19,33 @@ internal static class ResultsTestSupport
     /// <summary>Validates a SARIF log against the Gate-Keeper SARIF profile schema.</summary>
     public static ValidationSummary ValidateSarif(string instanceText) => Validate(SarifSchema.Value, instanceText);
 
+    /// <summary>Validates emitted bytes against the offline official SARIF schema.</summary>
+    public static ValidationSummary ValidateOfficialSarif(string text)
+    {
+        var schemaText = ReadOutputFile("schemas/sarif-2.1.0.schema");
+        // The pinned draft-04 schema uses the common draft-06 validation subset.
+        // Refuse dialect-specific bounds so fixture updates cannot silently change semantics.
+        using var document = JsonDocument.Parse(schemaText);
+        CheckSubset(document.RootElement);
+        var registry = new DialectRegistry();
+        registry.Register(Dialect.Draft06.With([], id: new Uri("http://json-schema.org/draft-04/schema#")));
+        var schema = JsonSchema.Build(document.RootElement, new BuildOptions { DialectRegistry = registry });
+        return Validate(schema, text);
+    }
+
+    private static void CheckSubset(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Array)
+            foreach (var item in element.EnumerateArray()) CheckSubset(item);
+        if (element.ValueKind != JsonValueKind.Object) return;
+        foreach (var property in element.EnumerateObject())
+        {
+            if (property.Name is "exclusiveMinimum" or "exclusiveMaximum")
+                throw new InvalidOperationException("The official fixture now requires draft-04 numeric-bound semantics.");
+            CheckSubset(property.Value);
+        }
+    }
+
     /// <summary>Reads a file copied into the test output directory.</summary>
     public static string ReadOutputFile(string relativePath)
     {

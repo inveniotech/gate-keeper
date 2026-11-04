@@ -16,7 +16,11 @@ public sealed record LoadedPack(
     string Id,
     string Version,
     PackProvenance Provenance,
-    string ContentDigest);
+    string ContentDigest)
+{
+    /// <summary>The coverage date of an Invenio pack, omitted for local packs (IQ-36).</summary>
+    public string? CoverageDate { get; init; }
+}
 
 /// <summary>
 /// One merged rule with the pack it came from, so the matcher engine and the
