@@ -38,6 +38,7 @@ internal static class DirectoryWalker
             return;
         }
 
+        var candidates = new List<(string FullPath, string RelativePath)>();
         await WalkDirectoryAsync(
             root,
             [],
@@ -47,7 +48,8 @@ internal static class DirectoryWalker
             excludeGlobs,
             files,
             notes,
-            cancellationToken).ConfigureAwait(false);
+            cancellationToken, candidates).ConfigureAwait(false);
+        await EnumerationFileReader.ReadFilesAsync(candidates, options.MaxFileBytes, files, notes, cancellationToken).ConfigureAwait(false);
     }
 
     private static async Task WalkDirectoryAsync(
@@ -59,7 +61,8 @@ internal static class DirectoryWalker
         PathGlob[] excludeGlobs,
         List<EnumeratedFile> files,
         List<string> notes,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        List<(string FullPath, string RelativePath)> candidates)
     {
         var directoryPath = Path.Combine([root, .. parentSegments]);
         var rules = await GitignoreRules.LoadAsync(directoryPath, depth, cancellationToken).ConfigureAwait(false);
@@ -115,7 +118,7 @@ internal static class DirectoryWalker
                             excludeGlobs,
                             files,
                             notes,
-                            cancellationToken).ConfigureAwait(false);
+                            cancellationToken, candidates).ConfigureAwait(false);
                     }
                 }
 
@@ -137,13 +140,7 @@ internal static class DirectoryWalker
                 continue;
             }
 
-            await EnumerationFileReader.ReadFileAsync(
-                fullPath: Path.Combine(directoryPath, entry.Name),
-                relativePath: relativePath,
-                maxFileBytes: options.MaxFileBytes,
-                files,
-                notes,
-                coveredBlobs: null).ConfigureAwait(false);
+            candidates.Add((Path.Combine(directoryPath, entry.Name), relativePath));
         }
     }
 

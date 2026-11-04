@@ -32,7 +32,9 @@ public sealed class MatcherConformanceVectorTests
             .Single(candidate => candidate.GetProperty("name").GetString() == name);
         var ruleElement = vectorCase.GetProperty("rule");
         var rule = ReadRule(ruleElement);
-        var matches = new MatcherEngine([rule]).Match(
+        // Conformance checks matching semantics, not runner scheduling or cold-start time.
+        // Production retains its finite deadline, which ShapeCompilerTests checks separately.
+        var matches = new MatcherEngine([rule], shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan)).Match(
             vectorCase.GetProperty("path").GetString()!,
             vectorCase.GetProperty("text").GetString()!);
 
