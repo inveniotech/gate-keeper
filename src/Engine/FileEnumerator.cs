@@ -201,6 +201,7 @@ public sealed class FileEnumerator
                 .ConfigureAwait(false)];
         }
 
+        var candidates = new List<(string Directory, string Path, string? Destination)>();
         foreach (var entry in entries)
         {
             if (!entry.IsSubmodule
@@ -230,16 +231,9 @@ public sealed class FileEnumerator
                 continue;
             }
 
-            await this.ReadFileFromWorkTreeAsync(
-                toplevel,
-                repositoryRelativePath: entry.Path,
-                destinationPath: null,
-                options.MaxFileBytes,
-                files,
-                notes,
-                coveredBlobs,
-                cancellationToken).ConfigureAwait(false);
+            candidates.Add((toplevel, entry.Path, null));
         }
+        await ReadWorkTreeFilesAsync(candidates, options.MaxFileBytes, files, notes, coveredBlobs, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -280,7 +274,7 @@ public sealed class FileEnumerator
             maxFileBytes,
             files,
             notes,
-            coveredBlobs).ConfigureAwait(false);
+            coveredBlobs, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task EnumerateSubmoduleAsync(
@@ -325,6 +319,7 @@ public sealed class FileEnumerator
             return;
         }
 
+        var candidates = new List<(string Directory, string Path, string? Destination)>();
         foreach (var entry in moduleEntries)
         {
             if (entry.IsSubmodule)
@@ -358,15 +353,30 @@ public sealed class FileEnumerator
                 continue;
             }
 
-            await this.ReadFileFromWorkTreeAsync(
-                submoduleDirectory,
-                repositoryRelativePath: entry.Path,
-                destinationPath: submodulePath + "/" + entry.Path,
-                options.MaxFileBytes,
-                files,
-                notes,
-                coveredBlobs,
-                cancellationToken).ConfigureAwait(false);
+            candidates.Add((submoduleDirectory, entry.Path, submodulePath + "/" + entry.Path));
+        }
+        await ReadWorkTreeFilesAsync(candidates, options.MaxFileBytes, files, notes, coveredBlobs, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task ReadWorkTreeFilesAsync(
+        IReadOnlyList<(string Directory, string Path, string? Destination)> candidates,
+        long maxFileBytes, List<EnumeratedFile> files, List<string> notes,
+        HashSet<string> coveredBlobs, CancellationToken cancellationToken)
+    {
+        var batches = await BoundedWorkers.MapAsync(candidates, async (candidate, token) =>
+        {
+            var localFiles = new List<EnumeratedFile>();
+            var localNotes = new List<string>();
+            var localBlobs = new HashSet<string>(StringComparer.Ordinal);
+            await ReadFileFromWorkTreeAsync(candidate.Directory, candidate.Path, candidate.Destination,
+                maxFileBytes, localFiles, localNotes, localBlobs, token).ConfigureAwait(false);
+            return (Files: localFiles, Notes: localNotes, Blobs: localBlobs);
+        }, cancellationToken).ConfigureAwait(false);
+        foreach (var batch in batches)
+        {
+            files.AddRange(batch.Files);
+            notes.AddRange(batch.Notes);
+            coveredBlobs.UnionWith(batch.Blobs);
         }
     }
 

@@ -20,6 +20,7 @@ internal static class EnumerationFileReader
     /// <param name="files">The files the scan keeps.</param>
     /// <param name="notes">The notes the skips reach.</param>
     /// <param name="coveredBlobs">The blob identifiers the work tree read; <see langword="null"/> for the outside-git walk.</param>
+    /// <param name="cancellationToken">Cancels the file read.</param>
     /// <returns><see langword="true"/> when the file entered the scan.</returns>
     internal static async Task<bool> ReadFileAsync(
         string fullPath,
@@ -27,7 +28,8 @@ internal static class EnumerationFileReader
         long maxFileBytes,
         List<EnumeratedFile> files,
         List<string> notes,
-        HashSet<string>? coveredBlobs)
+        HashSet<string>? coveredBlobs,
+        CancellationToken cancellationToken = default)
     {
         var length = new FileInfo(fullPath).Length;
 
@@ -42,7 +44,7 @@ internal static class EnumerationFileReader
 
         try
         {
-            bytes = await File.ReadAllBytesAsync(fullPath).ConfigureAwait(false);
+            bytes = await File.ReadAllBytesAsync(fullPath, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
@@ -61,5 +63,24 @@ internal static class EnumerationFileReader
 
         files.Add(new EnumeratedFile(relativePath, content));
         return true;
+    }
+    internal static async Task ReadFilesAsync(
+        IReadOnlyList<(string FullPath, string RelativePath)> candidates,
+        long maxFileBytes, List<EnumeratedFile> files, List<string> notes,
+        CancellationToken cancellationToken)
+    {
+        var batches = await BoundedWorkers.MapAsync(candidates, async (candidate, token) =>
+        {
+            var localFiles = new List<EnumeratedFile>();
+            var localNotes = new List<string>();
+            await ReadFileAsync(candidate.FullPath, candidate.RelativePath, maxFileBytes,
+                localFiles, localNotes, null, token).ConfigureAwait(false);
+            return (Files: localFiles, Notes: localNotes);
+        }, cancellationToken).ConfigureAwait(false);
+        foreach (var batch in batches)
+        {
+            files.AddRange(batch.Files);
+            notes.AddRange(batch.Notes);
+        }
     }
 }

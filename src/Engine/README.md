@@ -45,3 +45,11 @@ dotnet test --filter FullyQualifiedName~Engine.Tests
 The enumerator's tests build real throw-away git repositories under the machine's temporary directory with fixed author identities and fixed commit dates, so the object identifiers are byte-stable across machines and runs (rule 26). One test skips itself when the machine does not grant the symbolic-link privilege the fixture needs.
 
 The pack loader's tests (`PackLoaderTests`) read the committed vectors under `tests/vectors/pack/`, which `node tests/vectors/pack/New-PackVectors.mjs` regenerates; the signed scenarios run every content-level check behind a verified signature, exactly as a real pack arrives. The local-pack scenarios write small unsigned documents with synthetic identifiers (rule 10).
+
+## Scan orchestration (P1-07)
+
+`ScanOrchestrator` accepts a prepared `MatcherEngine` and scans either `FileEnumerationOptions` or an existing `FileEnumerationResult`. File selection and decoding remain with `FileEnumerator`. Work-tree reads and matching use at most `Environment.ProcessorCount` workers. Each worker owns its collections; the caller merges them only after all workers finish. History blob reads retain the enumerator's serial Git batch protocol.
+
+The returned `ScanMatchResult` contains work-tree `RuleMatch` values sorted by ordinal path, line, column and rule identifier, plus separate `HistoryMatch` values ordered by commit identifier, path, line, rule identifier and column (results format section 5.4, IQ-83). It retains enumeration diagnostics for the caller. This is an intermediate result: never serialise the enumeration, which carries source text. Policy, fingerprints and evidence writers remain later stages; `ScanResult` and its serialised contract are unchanged. Cancellation and tool errors propagate without returning partial findings. Concurrent scans share only prepared read-only matchers. No output is written by the orchestrator.
+
+Run `dotnet test tests/Engine.Tests --filter FullyQualifiedName~ScanOrchestratorTests` for shuffled-input byte equality, exact ordering, history separation, cancellation, concurrent calls and directory integration. The whole-process benchmark in quality-budgets section 6 needs the scan command, embedded pack and P1-15 harness; these are not provided by this engine card.
