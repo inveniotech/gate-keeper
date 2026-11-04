@@ -1,0 +1,9 @@
+[
+  {
+    "column": 55,
+    "line": 5,
+    "path": "src/payments/ReviewNotes.cs",
+    "ruleId": "pii.bvn",
+    "triage": "true-positive"
+  }
+]

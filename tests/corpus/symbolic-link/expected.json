@@ -1,0 +1,9 @@
+[
+  {
+    "column": 15,
+    "line": 2,
+    "path": "data/dispatch-notes.log",
+    "ruleId": "pii.phone",
+    "triage": "true-positive"
+  }
+]

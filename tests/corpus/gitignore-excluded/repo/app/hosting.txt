@@ -1,0 +1,2 @@
+host=ledger-ops-lag
+region=NG-LAG-1

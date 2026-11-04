@@ -1,0 +1,9 @@
+[
+  {
+    "column": 54,
+    "line": 17,
+    "path": "src/alerts/DigestLog.cs",
+    "ruleId": "pii.email",
+    "triage": "true-positive"
+  }
+]

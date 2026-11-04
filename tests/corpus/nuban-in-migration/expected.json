@@ -1,0 +1,9 @@
+[
+  {
+    "column": 70,
+    "line": 8,
+    "path": "migrations/0003_settlement_accounts.sql",
+    "ruleId": "pii.nuban",
+    "triage": "true-positive"
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "column": 18,
+    "line": 2,
+    "path": "data/batch-counters.txt",
+    "ruleId": "pii.ng-11-digit-id"
+  }
+]

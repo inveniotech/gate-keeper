@@ -1,0 +1,9 @@
+[
+  {
+    "column": 8,
+    "line": 4,
+    "path": "config/environments.toml",
+    "ruleId": "pii.bvn",
+    "triage": "true-positive"
+  }
+]

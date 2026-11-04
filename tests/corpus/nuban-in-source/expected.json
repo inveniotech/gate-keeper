@@ -1,0 +1,9 @@
+[
+  {
+    "column": 20,
+    "line": 4,
+    "path": "payments/settlement_records.py",
+    "ruleId": "pii.nuban",
+    "triage": "true-positive"
+  }
+]

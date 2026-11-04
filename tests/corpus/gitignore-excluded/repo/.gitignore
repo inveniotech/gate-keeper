@@ -1,0 +1,3 @@
+# The QA-only identity spool stays untracked; the team never commits it here.
+secrets/
+*.env
