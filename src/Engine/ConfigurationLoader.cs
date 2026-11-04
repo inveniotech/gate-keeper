@@ -401,7 +401,7 @@ public static class ConfigurationLoader
     /// <summary>
     /// Collects every key the document carries that the configuration
     /// specification does not list, as a dotted path such as
-    /// <c>scan.maxfilSize</c>. Quoted keys count as one path segment, so a
+    /// <c>scan.supervisionDepth</c>. Quoted keys count as one path segment, so a
     /// quoted rule identifier under <c>severity.overrides</c> is never unknown,
     /// while an unquoted dotted key still reads segment by segment.
     /// </summary>
