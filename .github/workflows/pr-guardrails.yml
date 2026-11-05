@@ -100,6 +100,14 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for correction checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Test correction-release constraints
+        run: node --test ci/pack-release/corrections/check.test.mjs
+
       - name: Validate rule packs
         shell: pwsh
         run: ./ci/guardrails/Invoke-PackSchemaLint.ps1
