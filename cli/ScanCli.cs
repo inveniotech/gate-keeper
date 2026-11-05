@@ -59,6 +59,10 @@ internal static class ScanCli
             ExcludeGlobs = settings.Exclude,
             IncludeSubmodules = settings.IncludeSubmodules,
         }, token).ConfigureAwait(false);
+#if GATEKEEPER_BENCHMARK
+        if (Environment.GetEnvironmentVariable("GATEKEEPER_BENCHMARK_OUTPUT") is { Length: > 0 } metricsPath)
+            await File.WriteAllBytesAsync(metricsPath, BenchmarkMetrics.Write(scan.Measurements), token).ConfigureAwait(false);
+#endif
         var policy = FindingPolicy.Apply(scan, settings, state, day, token);
         var metadata = await RepositoryMetadata.ReadAsync(root, settings.RepositoryId, token).ConfigureAwait(false);
         var warnings = policy.Warnings.Concat(PackAgeWarning.Evaluate(packs.Packs, day)).Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();

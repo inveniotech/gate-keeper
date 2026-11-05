@@ -89,13 +89,17 @@ jobs:
           node --test candidate/ci/native-release/benchmark-generator.test.mjs
           pwsh -File candidate/ci/native-release/Test-BenchmarkMath.ps1
           pwsh -File candidate/ci/native-release/Test-PackNative.ps1
+          dotnet test candidate/tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests --verbosity quiet
+          pwsh -File candidate/ci/native-release/Enable-BaselineInstrumentation.ps1 -BaselineRoot baseline
       - name: Publish both comparison arms on the same runner
         run: |
-          dotnet publish baseline/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
-          dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/candidate
+          dotnet publish baseline/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
+          dotnet publish candidate/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/candidate
+      - name: Publish the release binary for the size measurement
+        run: dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/release-size
       - name: Measure paired cold start, whole scan and added CI time
         shell: pwsh
-        run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper-ndpa-check -CandidateBinary artifacts/candidate/gatekeeper-ndpa-check -Destination artifacts/benchmarks -ReferencePack candidate/ci/zero-egress/probe.pack.json
+        run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper-ndpa-check -CandidateBinary artifacts/candidate/gatekeeper-ndpa-check -Destination artifacts/benchmarks -ReferencePack candidate/ci/native-release/reference.pack.json -ReleaseBinary artifacts/release-size/gatekeeper-ndpa-check
       - uses: actions/upload-artifact@v4
         if: always()
         with:

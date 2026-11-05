@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "local.benchmark",
+  "version": 1,
+  "minEngineVersion": "0.1.0",
+  "provenance": "local",
+  "rules": [{
+    "id": "local.benchmark.tokens",
+    "severity": "error",
+    "category": "synthetic",
+    "citation": {"title": "Synthetic matching-stage benchmark workload."},
+    "sinceVersion": 1,
+    "matcher": {"pattern": {
+      "shape": [{"class": "alnum", "min": 32, "max": 32}],
+      "boundary": "none",
+      "validator": {"name": "digits-length", "length": 32}
+    }}
+  }]
+}

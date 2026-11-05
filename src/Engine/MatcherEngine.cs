@@ -90,6 +90,23 @@ public sealed class MatcherEngine
     /// <exception cref="ArgumentNullException">The text is null.</exception>
     /// <exception cref="EngineToolException">A match exceeded its match timeout.</exception>
     public IReadOnlyList<RuleMatch> Match(string relativePath, string text, CancellationToken cancellationToken = default)
+        => MatchCore(relativePath, text, cancellationToken
+#if GATEKEEPER_BENCHMARK
+            , null
+#endif
+            );
+
+#if GATEKEEPER_BENCHMARK
+    /// <summary>Matches a file while recording search counters in the benchmark-only build.</summary>
+    public IReadOnlyList<RuleMatch> Match(string relativePath, string text, CancellationToken cancellationToken, BenchmarkRegexCounters measurements)
+        => MatchCore(relativePath, text, cancellationToken, measurements);
+#endif
+
+    private IReadOnlyList<RuleMatch> MatchCore(string relativePath, string text, CancellationToken cancellationToken
+#if GATEKEEPER_BENCHMARK
+        , BenchmarkRegexCounters? measurements
+#endif
+        )
     {
         if (string.IsNullOrWhiteSpace(relativePath))
         {
@@ -113,7 +130,11 @@ public sealed class MatcherEngine
 
             if (prepared.Shape is not null)
             {
-                MatchPattern(prepared, relativePath, text, matches, cancellationToken);
+                MatchPattern(prepared, relativePath, text, matches, cancellationToken
+#if GATEKEEPER_BENCHMARK
+                    , measurements
+#endif
+                    );
             }
             else
             {
@@ -205,7 +226,11 @@ public sealed class MatcherEngine
         string relativePath,
         string text,
         List<RuleMatch> matches,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+#if GATEKEEPER_BENCHMARK
+        , BenchmarkRegexCounters? measurements
+#endif
+        )
     {
         if (prepared.FoldedKeywords is not null && !ContainsKeyword(text, prepared.FoldedKeywords))
         {
@@ -223,6 +248,9 @@ public sealed class MatcherEngine
 
             try
             {
+#if GATEKEEPER_BENCHMARK
+                measurements?.Record(prepared.Rule.Id, (text.Length - searchFrom) * 2L);
+#endif
                 match = regex.Match(text, searchFrom);
             }
             catch (RegexMatchTimeoutException)

@@ -10,4 +10,7 @@
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <EnableAotAnalyzer>true</EnableAotAnalyzer>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(BenchmarkInstrumentation)' == 'true'">
+    <DefineConstants>$(DefineConstants);GATEKEEPER_BENCHMARK</DefineConstants>
+  </PropertyGroup>
 </Project>

@@ -7,6 +7,15 @@ namespace InvenioTech.GateKeeper.Engine;
 public sealed class ScanOrchestrator(MatcherEngine matcher)
 {
     private readonly MatcherEngine matcher = matcher ?? throw new ArgumentNullException(nameof(matcher));
+#if GATEKEEPER_BENCHMARK
+    private readonly TimeProvider measurementClock = TimeProvider.System;
+
+    /// <summary>Creates the benchmark-only orchestrator with an injected monotonic clock.</summary>
+    public ScanOrchestrator(MatcherEngine matcher, TimeProvider clock) : this(matcher)
+    {
+        measurementClock = clock ?? throw new ArgumentNullException(nameof(clock));
+    }
+#endif
 
     /// <summary>Enumerates the repository and matches its work tree and requested history.</summary>
     /// <param name="options">The existing file selection and decoding options.</param>
@@ -28,8 +37,22 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
     {
         ArgumentNullException.ThrowIfNull(input);
         cancellationToken.ThrowIfCancellationRequested();
+#if GATEKEEPER_BENCHMARK
+        var measured = await BoundedWorkers.MapAsync(input.Files, (file, token) =>
+        {
+            var counters = new BenchmarkRegexCounters();
+            var allocated = GC.GetAllocatedBytesForCurrentThread();
+            var started = measurementClock.GetTimestamp();
+            var matches = this.matcher.Match(file.Path, file.Text, token, counters);
+            var elapsed = measurementClock.GetElapsedTime(started).TotalMilliseconds;
+            var allocationBytes = GC.GetAllocatedBytesForCurrentThread() - allocated;
+            return Task.FromResult((Matches: matches, Metric: new BenchmarkFileMetric(elapsed, allocationBytes, counters.Values)));
+        }, cancellationToken).ConfigureAwait(false);
+        var batches = measured.Select(b => b.Matches);
+#else
         var batches = await BoundedWorkers.MapAsync(input.Files, (file, token) =>
             Task.FromResult(this.matcher.Match(file.Path, file.Text, token)), cancellationToken).ConfigureAwait(false);
+#endif
         var findings = new List<RuleMatch>();
         foreach (var batch in batches)
         {
@@ -66,7 +89,11 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
             return order != 0 ? order : left.Match.Column.CompareTo(right.Match.Column);
         });
         cancellationToken.ThrowIfCancellationRequested();
-        return new ScanMatchResult(findings.AsReadOnly(), history.AsReadOnly(), input);
+        return new ScanMatchResult(findings.AsReadOnly(), history.AsReadOnly(), input)
+#if GATEKEEPER_BENCHMARK
+        { Measurements = measured.Select(b => b.Metric).ToArray() }
+#endif
+        ;
     }
 
     private static int Compare(RuleMatch left, RuleMatch right)
@@ -86,7 +113,13 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
 /// <param name="Findings">Sorted work-tree matches without matched values.</param>
 /// <param name="History">History matches sorted by commit identifier, path, line, rule identifier and column (results format section 5.4).</param>
 /// <param name="Enumeration">The original enumeration, including warnings and skip notes; never serialise its source text.</param>
-public sealed record ScanMatchResult(IReadOnlyList<RuleMatch> Findings, IReadOnlyList<HistoryMatch> History, FileEnumerationResult Enumeration);
+public sealed record ScanMatchResult(IReadOnlyList<RuleMatch> Findings, IReadOnlyList<HistoryMatch> History, FileEnumerationResult Enumeration)
+{
+#if GATEKEEPER_BENCHMARK
+    /// <summary>Anonymous matching-stage measurements available only in instrumented benchmark builds.</summary>
+    public IReadOnlyList<BenchmarkFileMetric> Measurements { get; init; } = [];
+#endif
+}
 
 /// <summary>A history match has no fingerprint or baseline state (IQ-83).</summary>
 /// <param name="CommitId">The commit identifier supplied by the enumerator.</param>

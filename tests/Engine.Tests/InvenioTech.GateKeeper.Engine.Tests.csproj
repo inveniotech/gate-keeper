@@ -29,6 +29,7 @@
     <None Include="..\..\tests\vectors\pack\*.manifest.armour" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\tests\vectors\pack\*.signature.hex" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\tests\vectors\pack\development-public-key.json" Link="vectors\pack\development-public-key.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\ci\native-release\reference.pack.json" Link="benchmark/reference.pack.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\tests\vectors\matcher\vectors.json" Link="vectors\matcher\vectors.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
