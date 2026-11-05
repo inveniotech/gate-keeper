@@ -14,14 +14,14 @@ public sealed class LicenceVectorTests
         using (documented)
         {
             var root = documented.RootElement;
-            Assert.Equal(LicenceVectorSupport.DevelopmentKeyId, root.GetProperty("keyId").GetString());
-            Assert.Equal("development-only", root.GetProperty("label").GetString());
-            Assert.Equal(LicenceVectorSupport.DevelopmentSeedHex, root.GetProperty("seedHex").GetString());
-            Assert.Equal(LicenceVectorSupport.DevelopmentPublicKeyHex, root.GetProperty("publicKeyHex").GetString());
+            root.GetProperty("keyId").GetString().Should().Be(LicenceVectorSupport.DevelopmentKeyId);
+            root.GetProperty("label").GetString().Should().Be("development-only");
+            root.GetProperty("seedHex").GetString().Should().Be(LicenceVectorSupport.DevelopmentSeedHex);
+            root.GetProperty("publicKeyHex").GetString().Should().Be(LicenceVectorSupport.DevelopmentPublicKeyHex);
         }
 
         var derived = Convert.ToHexString(LicenceVectorSupport.PublicKeyFromSeed()).ToLowerInvariant();
-        Assert.Equal(LicenceVectorSupport.DevelopmentPublicKeyHex, derived);
+        derived.Should().Be(LicenceVectorSupport.DevelopmentPublicKeyHex);
     }
 
     [Fact]
@@ -30,13 +30,11 @@ public sealed class LicenceVectorTests
         var token = LicenceVectorSupport.ReadVector("claims-with-updates.gklic");
         var payload = LicenceVectorSupport.PayloadLine(token);
 
-        Assert.Equal(LicenceVectorSupport.Outcome.Valid, LicenceVectorSupport.Inspect(token));
-        Assert.True(Encoding.UTF8.GetByteCount(payload) <= 4096);
-        Assert.Contains("\"purchasedOn\":\"2026-11-01\"", payload, StringComparison.Ordinal);
-        Assert.Contains("\"updatesUntil\":\"2027-11-01\"", payload, StringComparison.Ordinal);
-        Assert.Equal(
-            Convert.ToHexString(LicenceVectorSupport.Sign(payload)).ToLowerInvariant(),
-            SignatureHex(token));
+        LicenceVectorSupport.Inspect(token).Should().Be(LicenceVectorSupport.Outcome.Valid);
+        Encoding.UTF8.GetByteCount(payload).Should().BeLessThanOrEqualTo(4096);
+        payload.Should().Contain("\"purchasedOn\":\"2026-11-01\"");
+        payload.Should().Contain("\"updatesUntil\":\"2027-11-01\"");
+        SignatureHex(token).Should().Be(Convert.ToHexString(LicenceVectorSupport.Sign(payload)).ToLowerInvariant());
     }
 
     [Fact]
@@ -45,11 +43,9 @@ public sealed class LicenceVectorTests
         var token = LicenceVectorSupport.ReadVector("claims-one-time.gklic");
         var payload = LicenceVectorSupport.PayloadLine(token);
 
-        Assert.Equal(LicenceVectorSupport.Outcome.Valid, LicenceVectorSupport.Inspect(token));
-        Assert.DoesNotContain("updatesUntil", payload, StringComparison.Ordinal);
-        Assert.Equal(
-            Convert.ToHexString(LicenceVectorSupport.Sign(payload)).ToLowerInvariant(),
-            SignatureHex(token));
+        LicenceVectorSupport.Inspect(token).Should().Be(LicenceVectorSupport.Outcome.Valid);
+        payload.Should().NotContain("updatesUntil");
+        SignatureHex(token).Should().Be(Convert.ToHexString(LicenceVectorSupport.Sign(payload)).ToLowerInvariant());
     }
 
     [Fact]
@@ -57,39 +53,31 @@ public sealed class LicenceVectorTests
     {
         var crlf = LicenceVectorSupport.ReadVector("claims-with-updates.gklic").Replace("\n", "\r\n", StringComparison.Ordinal);
 
-        Assert.Equal(LicenceVectorSupport.Outcome.Valid, LicenceVectorSupport.Inspect(crlf));
+        LicenceVectorSupport.Inspect(crlf).Should().Be(LicenceVectorSupport.Outcome.Valid);
     }
 
     [Fact]
     public void Tampered_payload_does_not_verify()
     {
-        Assert.Equal(
-            LicenceVectorSupport.Outcome.BadSignature,
-            LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("tampered-payload.gklic")));
+        LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("tampered-payload.gklic")).Should().Be(LicenceVectorSupport.Outcome.BadSignature);
     }
 
     [Fact]
     public void Tampered_signature_does_not_verify()
     {
-        Assert.Equal(
-            LicenceVectorSupport.Outcome.BadSignature,
-            LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("tampered-signature.gklic")));
+        LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("tampered-signature.gklic")).Should().Be(LicenceVectorSupport.Outcome.BadSignature);
     }
 
     [Fact]
     public void Unknown_key_id_is_rejected_before_the_claims_are_accepted()
     {
-        Assert.Equal(
-            LicenceVectorSupport.Outcome.UnknownKey,
-            LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("unknown-key.gklic")));
+        LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("unknown-key.gklic")).Should().Be(LicenceVectorSupport.Outcome.UnknownKey);
     }
 
     [Fact]
     public void Malformed_armour_is_rejected()
     {
-        Assert.Equal(
-            LicenceVectorSupport.Outcome.Malformed,
-            LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("malformed-armour.gklic")));
+        LicenceVectorSupport.Inspect(LicenceVectorSupport.ReadVector("malformed-armour.gklic")).Should().Be(LicenceVectorSupport.Outcome.Malformed);
     }
 
     [Fact]
@@ -97,10 +85,8 @@ public sealed class LicenceVectorTests
     {
         var token = LicenceVectorSupport.ReadVector("key-id-mismatch.gklic");
 
-        Assert.Equal(LicenceVectorSupport.Outcome.KeyIdMismatch, LicenceVectorSupport.Inspect(token));
-        Assert.Equal(
-            Convert.ToHexString(LicenceVectorSupport.Sign(LicenceVectorSupport.PayloadLine(token))).ToLowerInvariant(),
-            SignatureHex(token));
+        LicenceVectorSupport.Inspect(token).Should().Be(LicenceVectorSupport.Outcome.KeyIdMismatch);
+        SignatureHex(token).Should().Be(Convert.ToHexString(LicenceVectorSupport.Sign(LicenceVectorSupport.PayloadLine(token))).ToLowerInvariant());
     }
 
     [Fact]
@@ -108,10 +94,8 @@ public sealed class LicenceVectorTests
     {
         var token = LicenceVectorSupport.ReadVector("claims-dates-out-of-order.gklic");
 
-        Assert.Equal(LicenceVectorSupport.Outcome.RejectedClaims, LicenceVectorSupport.Inspect(token));
-        Assert.Equal(
-            Convert.ToHexString(LicenceVectorSupport.Sign(LicenceVectorSupport.PayloadLine(token))).ToLowerInvariant(),
-            SignatureHex(token));
+        LicenceVectorSupport.Inspect(token).Should().Be(LicenceVectorSupport.Outcome.RejectedClaims);
+        SignatureHex(token).Should().Be(Convert.ToHexString(LicenceVectorSupport.Sign(LicenceVectorSupport.PayloadLine(token))).ToLowerInvariant());
     }
 
     [Fact]
@@ -119,8 +103,8 @@ public sealed class LicenceVectorTests
     {
         var discovery = DiscoveryCase("missing-file");
 
-        Assert.Equal("flag", discovery.Source);
-        Assert.Equal("missing-file", discovery.Kind);
+        discovery.Source.Should().Be("flag");
+        discovery.Kind.Should().Be("missing-file");
     }
 
     [Fact]
@@ -128,8 +112,8 @@ public sealed class LicenceVectorTests
     {
         var discovery = DiscoveryCase("later-source-when-nothing-earlier-is-set");
 
-        Assert.Equal("mounted-file", discovery.Source);
-        Assert.Equal("present", discovery.Kind);
+        discovery.Source.Should().Be("mounted-file");
+        discovery.Kind.Should().Be("present");
     }
 
     private static LicenceVectorSupport.DiscoveryResult DiscoveryCase(string name)

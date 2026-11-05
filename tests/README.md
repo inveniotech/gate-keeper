@@ -1,6 +1,6 @@
 # Tests
 
-xUnit is the test runner for the repository, and AwesomeAssertions is the assertion library. Do not add another.
+Every test project uses xUnit for discovery and execution, and AwesomeAssertions for assertions. Use `.Should()` assertions instead of xUnit assertion calls; preserve sequence order with `.Equal()` and exact exception types with `.ThrowExactly()` when those are part of the expected behaviour. Do not add another test or assertion framework.
 
 The test projects, one folder under `tests/` each:
 

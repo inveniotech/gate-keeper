@@ -9,7 +9,7 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateEvidence(ResultsTestSupport.ReadOutputFile("examples/results/minimal.gk.json"));
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -17,7 +17,7 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateEvidence(ResultsTestSupport.ReadOutputFile("examples/results/full.gk.json"));
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -25,9 +25,9 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateEvidence(ResultsTestSupport.ReadOutputFile("examples/results/invalid.gk.json"));
 
-        Assert.False(summary.IsValid);
+        summary.IsValid.Should().BeFalse();
         var message = string.Join(Environment.NewLine, summary.Errors);
-        Assert.Contains("/findings/0/match", message);
+        message.Should().Contain("/findings/0/match");
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateSarif(ResultsTestSupport.ReadOutputFile("examples/results/minimal.sarif.json"));
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateSarif(ResultsTestSupport.ReadOutputFile("examples/results/full.sarif.json"));
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -51,8 +51,8 @@ public sealed class ResultsSchemaTests
     {
         var summary = ResultsTestSupport.ValidateSarif(ResultsTestSupport.ReadOutputFile("examples/results/invalid.sarif.json"));
 
-        Assert.False(summary.IsValid);
+        summary.IsValid.Should().BeFalse();
         var message = string.Join(Environment.NewLine, summary.Errors);
-        Assert.Contains("snippet", message);
+        message.Should().Contain("snippet");
     }
 }

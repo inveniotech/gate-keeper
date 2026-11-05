@@ -16,10 +16,10 @@ public sealed class ResultsConsistencyTests
         using var document = JsonDocument.Parse(ResultsTestSupport.ReadOutputFile("examples/results/minimal.gk.json"));
         var root = document.RootElement;
 
-        Assert.False(root.GetProperty("historyScanned").GetBoolean());
-        Assert.Equal(0, root.GetProperty("history").GetArrayLength());
-        Assert.Equal(0, root.GetProperty("exitCode").GetInt32());
-        Assert.Equal(0, root.GetProperty("baseline").GetProperty("matchedCount").GetInt32());
+        root.GetProperty("historyScanned").GetBoolean().Should().BeFalse();
+        root.GetProperty("history").GetArrayLength().Should().Be(0);
+        root.GetProperty("exitCode").GetInt32().Should().Be(0);
+        root.GetProperty("baseline").GetProperty("matchedCount").GetInt32().Should().Be(0);
     }
 
     [Fact]
@@ -29,13 +29,13 @@ public sealed class ResultsConsistencyTests
         var root = document.RootElement;
         var findings = root.GetProperty("findings");
 
-        Assert.Equal(BvnFingerprint, findings[0].GetProperty("fingerprint").GetString());
-        Assert.Equal(PhoneFingerprint, findings[1].GetProperty("fingerprint").GetString());
-        Assert.Equal(FixtureEntryHash, root.GetProperty("exceptions")[0].GetProperty("entryHash").GetString());
-        Assert.Equal(1, root.GetProperty("exitCode").GetInt32());
-        Assert.Equal(1, root.GetProperty("baseline").GetProperty("matchedCount").GetInt32());
-        Assert.True(root.GetProperty("historyScanned").GetBoolean());
-        Assert.Equal(1, root.GetProperty("history").GetArrayLength());
+        findings[0].GetProperty("fingerprint").GetString().Should().Be(BvnFingerprint);
+        findings[1].GetProperty("fingerprint").GetString().Should().Be(PhoneFingerprint);
+        root.GetProperty("exceptions")[0].GetProperty("entryHash").GetString().Should().Be(FixtureEntryHash);
+        root.GetProperty("exitCode").GetInt32().Should().Be(1);
+        root.GetProperty("baseline").GetProperty("matchedCount").GetInt32().Should().Be(1);
+        root.GetProperty("historyScanned").GetBoolean().Should().BeTrue();
+        root.GetProperty("history").GetArrayLength().Should().Be(1);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class ResultsConsistencyTests
             counted += group.GetProperty("count").GetInt32();
         }
 
-        Assert.Equal(root.GetProperty("findings").GetArrayLength(), counted);
+        counted.Should().Be(root.GetProperty("findings").GetArrayLength());
     }
 
     [Fact]
@@ -60,17 +60,17 @@ public sealed class ResultsConsistencyTests
         var rules = run.GetProperty("tool").GetProperty("driver").GetProperty("rules");
         var results = run.GetProperty("results");
 
-        Assert.Equal(2, results.GetArrayLength());
+        results.GetArrayLength().Should().Be(2);
         for (var index = 0; index < results.GetArrayLength(); index++)
         {
             var result = results[index];
             var ruleIndex = result.GetProperty("ruleIndex").GetInt32();
-            Assert.Equal(result.GetProperty("ruleId").GetString(), rules[ruleIndex].GetProperty("id").GetString());
+            rules[ruleIndex].GetProperty("id").GetString().Should().Be(result.GetProperty("ruleId").GetString());
         }
 
-        Assert.Equal(BvnFingerprint, results[0].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString());
-        Assert.Equal(PhoneFingerprint, results[1].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString());
-        Assert.DoesNotContain("old/removed.cs", ResultsTestSupport.ReadOutputFile("examples/results/full.sarif.json"));
+        results[0].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString().Should().Be(BvnFingerprint);
+        results[1].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString().Should().Be(PhoneFingerprint);
+        ResultsTestSupport.ReadOutputFile("examples/results/full.sarif.json").Should().NotContain("old/removed.cs");
     }
 
     [Theory]
@@ -82,7 +82,7 @@ public sealed class ResultsConsistencyTests
     {
         var text = ResultsTestSupport.ReadOutputFile(relativePath);
 
-        Assert.DoesNotContain("\r", text);
-        Assert.EndsWith("\n", text);
+        text.Should().NotContain("\r");
+        text.Should().EndWith("\n");
     }
 }

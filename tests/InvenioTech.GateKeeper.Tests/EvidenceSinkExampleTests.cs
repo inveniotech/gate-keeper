@@ -13,6 +13,6 @@ public sealed class EvidenceSinkExampleTests
         var bytes = Encoding.ASCII.GetBytes("example\n");
         var digest = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
-        Assert.Equal("13550350a8681c84c861aac2e5b440161c2b33a3e4f302ac680ca5b686de48de", digest);
+        digest.Should().Be("13550350a8681c84c861aac2e5b440161c2b33a3e4f302ac680ca5b686de48de");
     }
 }

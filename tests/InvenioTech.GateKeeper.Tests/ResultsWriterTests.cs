@@ -16,10 +16,10 @@ public sealed class ResultsWriterTests
         var documents = ResultsWriter.Write(Input(populated));
         var evidence = ResultsTestSupport.ValidateEvidence(Encoding.UTF8.GetString(documents.Evidence));
         var sarif = ResultsTestSupport.ValidateSarif(Encoding.UTF8.GetString(documents.Sarif));
-        Assert.True(evidence.IsValid, string.Join("; ", evidence.Errors));
-        Assert.True(sarif.IsValid, string.Join("; ", sarif.Errors));
+        evidence.IsValid.Should().BeTrue(string.Join("; ", evidence.Errors));
+        sarif.IsValid.Should().BeTrue(string.Join("; ", sarif.Errors));
         var official = ResultsTestSupport.ValidateOfficialSarif(Encoding.UTF8.GetString(documents.Sarif));
-        Assert.True(official.IsValid, string.Join("; ", official.Errors));
+        official.IsValid.Should().BeTrue(string.Join("; ", official.Errors));
     }
 
     [Fact]
@@ -29,12 +29,12 @@ public sealed class ResultsWriterTests
         var first = ResultsWriter.Write(input);
         var shuffled = input with { Policy = input.Policy with { Findings = input.Policy.Findings.Reverse().ToArray(), History = input.Policy.History.Reverse().ToArray(), Warnings = input.Policy.Warnings.Reverse().ToArray() } };
         var second = ResultsWriter.Write(shuffled);
-        Assert.Equal(first.Evidence, second.Evidence);
-        Assert.Equal(first.Sarif, second.Sarif);
-        Assert.Equal((byte)'\n', first.Evidence[^1]);
-        Assert.Equal((byte)'\n', first.Sarif[^1]);
-        Assert.DoesNotContain((byte)'\r', first.Evidence);
-        Assert.DoesNotContain((byte)'\r', first.Sarif);
+        second.Evidence.Should().Equal(first.Evidence);
+        second.Sarif.Should().Equal(first.Sarif);
+        first.Evidence[^1].Should().Be((byte)'\n');
+        first.Sarif[^1].Should().Be((byte)'\n');
+        first.Evidence.Should().NotContain((byte)'\r');
+        first.Sarif.Should().NotContain((byte)'\r');
     }
 
     [Fact]
@@ -43,27 +43,27 @@ public sealed class ResultsWriterTests
         var output = ResultsWriter.Write(Input(true));
         using var evidence = JsonDocument.Parse(output.Evidence);
         var root = evidence.RootElement;
-        Assert.Equal(1, root.GetProperty("schemaVersion").GetInt32());
-        Assert.Equal(EngineProduct.EngineVersion, root.GetProperty("engine").GetProperty("version").GetString());
-        Assert.Equal("2027.1.0", root.GetProperty("packs")[0].GetProperty("version").GetString());
-        Assert.Equal("2026-11-01", root.GetProperty("packs")[0].GetProperty("coverageDate").GetString());
-        Assert.Equal("exc-test", root.GetProperty("exceptions")[0].GetProperty("id").GetString());
-        Assert.Equal(1, root.GetProperty("baseline").GetProperty("matchedCount").GetInt32());
-        Assert.Equal(2, root.GetProperty("inventory")[0].GetProperty("count").GetInt32());
-        Assert.Equal(1, root.GetProperty("history").GetArrayLength());
+        root.GetProperty("schemaVersion").GetInt32().Should().Be(1);
+        root.GetProperty("engine").GetProperty("version").GetString().Should().Be(EngineProduct.EngineVersion);
+        root.GetProperty("packs")[0].GetProperty("version").GetString().Should().Be("2027.1.0");
+        root.GetProperty("packs")[0].GetProperty("coverageDate").GetString().Should().Be("2026-11-01");
+        root.GetProperty("exceptions")[0].GetProperty("id").GetString().Should().Be("exc-test");
+        root.GetProperty("baseline").GetProperty("matchedCount").GetInt32().Should().Be(1);
+        root.GetProperty("inventory")[0].GetProperty("count").GetInt32().Should().Be(2);
+        root.GetProperty("history").GetArrayLength().Should().Be(1);
         using var sarif = JsonDocument.Parse(output.Sarif);
         var results = sarif.RootElement.GetProperty("runs")[0].GetProperty("results");
-        Assert.Equal(2, results.GetArrayLength());
-        Assert.Equal("unchanged", results[0].GetProperty("baselineState").GetString());
-        Assert.Equal(new string('a', 64), results[0].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString());
-        Assert.Equal(new[] { "evaluatedOn", "historyScanned", "packs", "profile", "repositoryId" }, sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").EnumerateObject().Select(p => p.Name));
-        Assert.DoesNotContain("snippet", Encoding.UTF8.GetString(output.Sarif));
+        results.GetArrayLength().Should().Be(2);
+        results[0].GetProperty("baselineState").GetString().Should().Be("unchanged");
+        results[0].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString().Should().Be(new string('a', 64));
+        sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").EnumerateObject().Select(p => p.Name).Should().Equal(new[] { "evaluatedOn", "historyScanned", "packs", "profile", "repositoryId" });
+        Encoding.UTF8.GetString(output.Sarif).Should().NotContain("snippet");
     }
 
     [Fact]
     public void Writer_Should_RejectToolErrors_When_AnOutputWouldClaimAScanCompleted()
     {
-        Assert.Throws<EngineToolException>(() => ResultsWriter.Write(Input(false) with { Outcome = ExitOutcome.ToolError }));
+        ((Action)(() => ResultsWriter.Write(Input(false) with { Outcome = ExitOutcome.ToolError }))).Should().ThrowExactly<EngineToolException>();
     }
 
     [Theory]
@@ -77,24 +77,24 @@ public sealed class ResultsWriterTests
         using var evidence = JsonDocument.Parse(documents.Evidence);
         using var sarif = JsonDocument.Parse(documents.Sarif);
         var stamps = sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").GetProperty("packs");
-        Assert.True(JsonElement.DeepEquals(evidence.RootElement.GetProperty("packs"), stamps));
-        Assert.Equal("invenio.ng.synthetic.p1", stamps[0].GetProperty("packId").GetString());
-        Assert.Equal("2027.1.0", stamps[0].GetProperty("version").GetString());
-        Assert.Equal("2", stamps[1].GetProperty("version").GetString());
-        Assert.False(stamps[1].TryGetProperty("coverageDate", out _));
+        JsonElement.DeepEquals(evidence.RootElement.GetProperty("packs"), stamps).Should().BeTrue();
+        stamps[0].GetProperty("packId").GetString().Should().Be("invenio.ng.synthetic.p1");
+        stamps[0].GetProperty("version").GetString().Should().Be("2027.1.0");
+        stamps[1].GetProperty("version").GetString().Should().Be("2");
+        stamps[1].TryGetProperty("coverageDate", out _).Should().BeFalse();
         var shuffled = ResultsWriter.Write(input with { Packs = input.Packs.Reverse().ToArray() });
-        Assert.Equal(documents.Sarif, shuffled.Sarif);
-        Assert.Equal(documents.Evidence, shuffled.Evidence);
+        shuffled.Sarif.Should().Equal(documents.Sarif);
+        shuffled.Evidence.Should().Equal(documents.Evidence);
         var valid = ResultsTestSupport.ValidateSarif(Encoding.UTF8.GetString(documents.Sarif));
-        Assert.True(valid.IsValid, string.Join("; ", valid.Errors));
-        Assert.True(ResultsTestSupport.ValidateOfficialSarif(Encoding.UTF8.GetString(documents.Sarif)).IsValid);
+        valid.IsValid.Should().BeTrue(string.Join("; ", valid.Errors));
+        ResultsTestSupport.ValidateOfficialSarif(Encoding.UTF8.GetString(documents.Sarif)).IsValid.Should().BeTrue();
     }
 
     [Fact]
     public void Writer_Should_EmitAnEmptyPackArray_When_NoPackWasLoaded()
     {
         using var sarif = JsonDocument.Parse(ResultsWriter.Write(Input(false) with { Packs = [] }).Sarif);
-        Assert.Empty(sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").GetProperty("packs").EnumerateArray());
+        sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").GetProperty("packs").EnumerateArray().Should().BeEmpty();
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class ResultsWriterTests
         var documents = ResultsWriter.Write(Input(false));
         var node = System.Text.Json.Nodes.JsonNode.Parse(documents.Sarif)!;
         node["runs"]![0]!["properties"]!["packs"]![0]!["version"] = "latest";
-        Assert.False(ResultsTestSupport.ValidateSarif(node.ToJsonString()).IsValid);
+        ResultsTestSupport.ValidateSarif(node.ToJsonString()).IsValid.Should().BeFalse();
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class ResultsWriterTests
         var documents = ResultsWriter.Write(Input(true));
         var node = System.Text.Json.Nodes.JsonNode.Parse(documents.Sarif)!;
         node["runs"]![0]!["results"]![0]!["locations"]![0]!["physicalLocation"]!["region"]!["startLine"] = 0;
-        Assert.False(ResultsTestSupport.ValidateOfficialSarif(node.ToJsonString()).IsValid);
+        ResultsTestSupport.ValidateOfficialSarif(node.ToJsonString()).IsValid.Should().BeFalse();
     }
 
     [Fact]
@@ -126,8 +126,8 @@ public sealed class ResultsWriterTests
             new Dictionary<string, DateOnly>(), null, []);
         var policy = FindingPolicy.Apply(scan, input.Settings, state, new(2026, 11, 2));
         using var evidence = JsonDocument.Parse(ResultsWriter.Write(input with { Policy = policy }).Evidence);
-        Assert.Empty(evidence.RootElement.GetProperty("findings").EnumerateArray());
-        Assert.Equal("suppressed", evidence.RootElement.GetProperty("exceptions")[0].GetProperty("outcome").GetString());
+        evidence.RootElement.GetProperty("findings").EnumerateArray().Should().BeEmpty();
+        evidence.RootElement.GetProperty("exceptions")[0].GetProperty("outcome").GetString().Should().Be("suppressed");
     }
 
     private static ResultsInput Input(bool populated)
