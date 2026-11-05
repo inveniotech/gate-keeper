@@ -21,10 +21,13 @@ try {
   $secondRecord = Get-Content (Join-Path $second 'gatekeeper-ndpa-check-win-x64.json') -Raw | ConvertFrom-Json
   if ($secondRecord.sha256 -cne $record.sha256) { throw 'Archive bytes must not depend on the input file timestamp.' }
   $stream = [IO.File]::OpenWrite($binary)
-  try { $stream.SetLength(8MB + 1) } finally { $stream.Dispose() }
+  try { $stream.SetLength(10MB) } finally { $stream.Dispose() }
+  & "$PSScriptRoot/Pack-Native.ps1" -Binary $binary -RuntimeIdentifier win-x64 -Destination (Join-Path $root 'boundary') -ProductVersion 0.1.0
+  $stream = [IO.File]::OpenWrite($binary)
+  try { $stream.SetLength(10MB + 1) } finally { $stream.Dispose() }
   $rejected = $false
   try { & "$PSScriptRoot/Pack-Native.ps1" -Binary $binary -RuntimeIdentifier win-x64 -Destination (Join-Path $root 'oversize') -ProductVersion 0.1.0 } catch { $rejected = $true }
-  if (-not $rejected) { throw 'An executable above the unchanged 8 MiB budget must fail.' }
+  if (-not $rejected) { throw 'An executable above the owner-approved 10 MiB budget must fail.' }
   Write-Output 'Native archive integrity, version stamp, checksum and size-budget tests passed.'
 } finally {
   $resolved = [IO.Path]::GetFullPath($root)

@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $path = (Resolve-Path -LiteralPath $Binary).Path
 $size = (Get-Item -LiteralPath $path).Length
-if ($size -gt 8MB) { throw "The $RuntimeIdentifier binary is $size bytes, above the unchanged 8 MiB budget (IQ-90)." }
+if ($size -gt 10MB) { throw "The $RuntimeIdentifier binary is $size bytes, above the owner-approved 10 MiB budget (IQ-90)." }
 New-Item -ItemType Directory -Path $Destination -Force | Out-Null
 $destinationPath = (Resolve-Path -LiteralPath $Destination).Path
 $name = "gatekeeper-ndpa-check-$RuntimeIdentifier"
@@ -49,5 +49,5 @@ try {
 } finally { $stream.Dispose() }
 $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText((Join-Path $destinationPath "$name.sha256"), "$hash  $([IO.Path]::GetFileName($archive))`n")
-$record = [ordered]@{ product = 'gatekeeper'; productVersion = $ProductVersion; runtimeIdentifier = $RuntimeIdentifier; binaryBytes = $size; archive = [IO.Path]::GetFileName($archive); sha256 = $hash }
+$record = [ordered]@{ product = 'gatekeeper'; productVersion = $ProductVersion; runtimeIdentifier = $RuntimeIdentifier; binaryBytes = $size; binarySizeBudgetBytes = 10MB; archive = [IO.Path]::GetFileName($archive); sha256 = $hash }
 [IO.File]::WriteAllText((Join-Path $destinationPath "$name.json"), ($record | ConvertTo-Json) + "`n")

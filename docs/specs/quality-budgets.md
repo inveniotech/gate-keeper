@@ -18,6 +18,7 @@ Normative text in this specification comes from the recorded decisions listed he
 |---|---|---|
 | IQ-49 | Decided | The 5 % false-positive gate (NFR-013) is measured on failing findings. Findings reported at `note` sit outside the gate. A randomly generated identifier that happens to match a real one is not a problem in code or tests: the corpus, the unit tests and the conformance vectors may use random synthetic values. Documentation uses obviously fake sequential values instead. |
 | IQ-60 | Decided | The `main` build and the candidate build are benchmarked in the same continuous-integration job, and a regression of more than 20 % fails. Machine-independent counts — allocations per file and bytes scanned per regex call — are tracked as well, because they catch regressions that timing noise on hosted runners would hide. |
+| IQ-90 | Amended by the owner on 5 November 2026 | The native executable size cap is 10 MiB (10,485,760 bytes) per runtime identifier. |
 | IQ-83 | Decided | History scanning is off in the `default` profile and on in `deep` unless `scan.history = false`. History findings are a separate result list; they are not fingerprinted and not baselined. A clean default-profile result does not claim that history was scanned. |
 
 The register entry for each identifier is an owner record. This specification cites the identifier and does not describe where that register is kept. Nothing here restates more of any decision than the decision itself settles.
@@ -298,3 +299,9 @@ Both counters gate on the same 20 % band as the timings (section 0.4 item 13). T
 | Rule 27 (the 20 % standing rule, unchanged here) | Sections 2 item 3, 6.3 |
 | Rule 10 / NFR-004 (personal-data discipline) | Sections 4.2, 4.3, 4.5 |
 | Rule 6 (determinism) | Sections 4.3 item 1, 6.2, 6.5 |
+
+## 8. Native executable size amendment (IQ-90)
+
+On 5 November 2026, the owner approved a **10 MiB (10,485,760 bytes)** hard cap per uncompressed native executable, superseding the earlier 8 MiB build threshold. The completed CLI with local support bundles measured 8,634,832 bytes on Linux arm64 and passed its corpus run; the earlier threshold blocked packaging after that successful test. The new cap applies uniformly to every supported runtime identifier. Archive sizes are separate from executable sizes.
+
+The packaging gate accepts an executable exactly at the limit and rejects one byte above it. The benchmark report records the applied byte limit. The 20 per cent performance and counter regression checks, the 60-second whole-scan budget, the 10 ms median and 50 ms 95th-percentile per-file budgets, and the 30-second added continuous-integration budget are unchanged. This records the owner's specific size decision; the rest of this draft is not marked accepted by this amendment.

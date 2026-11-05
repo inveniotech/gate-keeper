@@ -149,6 +149,7 @@ try {
     loadedPacks = @($metadata.candidate.Packs)
     baselineSha256 = (Get-FileHash -LiteralPath $baseline -Algorithm SHA256).Hash.ToLowerInvariant()
     candidateSha256 = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash.ToLowerInvariant()
+    binarySizeBudgetBytes = 10MB
     candidateBytes = (Get-Item -LiteralPath $release).Length
     candidateInstrumentedBytes = (Get-Item -LiteralPath $candidate).Length
     releaseSha256 = (Get-FileHash -LiteralPath $release -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -162,9 +163,9 @@ try {
   [IO.File]::WriteAllText((Join-Path $reportPath 'benchmark.json'), ($record | ConvertTo-Json -Depth 10) + "`n")
   $lines = @('# Provisional native benchmark report', '', 'One warm-up pair was discarded; values are medians of three fresh-process pairs on the same runner.', '', '| Measurement | Baseline | Candidate |', '|---|---:|---:|')
   foreach ($entry in $measurements.GetEnumerator()) { $lines += "| $($entry.Key) | $($entry.Value.baseline.ToString('F3', [Globalization.CultureInfo]::InvariantCulture)) | $($entry.Value.candidate.ToString('F3', [Globalization.CultureInfo]::InvariantCulture)) |" }
-  $lines += @('', "Candidate binary: $($record.candidateBytes) bytes (budget 8,388,608). Whole-scan budget: 60,000 ms; added-CI budget: 30,000 ms.", '', 'Per-file timing and allocation counters come from the same instrumented whole-scan invocation. The size gate uses the release binary. Regex input bytes count UTF-16 searchable suffixes, including unsuccessful searches.')
+  $lines += @('', "Candidate binary: $($record.candidateBytes) bytes (budget 10,485,760). Whole-scan budget: 60,000 ms; added-CI budget: 30,000 ms.", '', 'Per-file timing and allocation counters come from the same instrumented whole-scan invocation. The size gate uses the release binary. Regex input bytes count UTF-16 searchable suffixes, including unsuccessful searches.')
   [IO.File]::WriteAllText((Join-Path $reportPath 'benchmark.md'), ($lines -join "`n") + "`n")
-  if ($record.candidateBytes -gt 8MB -or $measurements.scan10000Milliseconds.candidate -gt 60000 -or $measurements.ci500Milliseconds.candidate -gt 30000 -or $measurements.fileMedianMilliseconds.candidate -gt 10 -or $measurements.fileP95Milliseconds.candidate -gt 50 -or @($measurements.Values | Where-Object regression).Count -gt 0 -or @($regexByRule | Where-Object regression).Count -gt 0) { throw 'A native size, absolute time or 20 per cent regression budget failed. Inspect benchmark.json.' }
+  if ($record.candidateBytes -gt 10MB -or $measurements.scan10000Milliseconds.candidate -gt 60000 -or $measurements.ci500Milliseconds.candidate -gt 30000 -or $measurements.fileMedianMilliseconds.candidate -gt 10 -or $measurements.fileP95Milliseconds.candidate -gt 50 -or @($measurements.Values | Where-Object regression).Count -gt 0 -or @($regexByRule | Where-Object regression).Count -gt 0) { throw 'A native size, absolute time or 20 per cent regression budget failed. Inspect benchmark.json.' }
 } catch {
   $failure = [ordered]@{ status = 'Blocked (IQ-60) or measurement failure'; message = $_.Exception.Message }
   [IO.File]::WriteAllText((Join-Path $reportPath 'failure.json'), ($failure | ConvertTo-Json) + "`n")
