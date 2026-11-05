@@ -36,6 +36,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 | Version | Date | Change |
 |---|---|---|
 | 1 (draft) | 2 November 2026 | First draft. |
+| 1 (additive amendment) | 5 November 2026 | The owner approved pack-version stamps in SARIF as well as evidence. Schema artefact 1.2.0 adds the optional run property `packs`; new producers always emit it. The SARIF standard version remains 2.1.0 and the evidence schema version remains 1. This approval covers the amendment, not acceptance of the whole specification. |
 
 ### 0.4 Details this draft fixes
 
@@ -117,7 +118,11 @@ Run keys, in order: `tool`, `invocations`, `results`, `properties`.
 
 Each notification has `level` equal to `warning` and `message.text` equal to the warning sentence in section 5.6. Notifications follow the warning sort order.
 
-`properties` keys, in alphabetical order: `evaluatedOn`, `historyScanned`, `profile`, `repositoryId`.
+`properties` keys, in alphabetical order: `evaluatedOn`, `historyScanned`, `packs`, `profile`, `repositoryId`.
+
+`properties.packs` MUST contain every loaded pack, including packs that produced no work-tree findings. It uses the same fields, omission rules, field order and ordinal sorting as the evidence `packs` array in section 5.1. An empty array means no packs were loaded. The schema keeps this property optional so logs produced before schema artefact 1.2.0 remain valid; a missing property in such a log means pack provenance is unknown, not that no pack was loaded. New producers always write the array, including on clean scans.
+
+The engine version identifies the scanner implementation. Pack versions identify the detection rules, which can change independently of the engine; content digests identify the exact pack payload, including local content that may reuse a declared version across scans. Carrying these stamps in both artefacts makes each independently traceable for reproducing findings, explaining differences between scans and auditing which rules were evaluated. Retaining SARIF alongside its evidence JSON already preserves that information, but a SARIF file stored or uploaded on its own must not lose it. These stamps contain no matched values, source content or secret key material.
 
 ### 4.2 Results
 

@@ -56,7 +56,7 @@ public sealed class ResultsWriterTests
         Assert.Equal(2, results.GetArrayLength());
         Assert.Equal("unchanged", results[0].GetProperty("baselineState").GetString());
         Assert.Equal(new string('a', 64), results[0].GetProperty("partialFingerprints").GetProperty("gatekeeper/v1").GetString());
-        Assert.Equal(new[] { "evaluatedOn", "historyScanned", "profile", "repositoryId" }, sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").EnumerateObject().Select(p => p.Name));
+        Assert.Equal(new[] { "evaluatedOn", "historyScanned", "packs", "profile", "repositoryId" }, sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").EnumerateObject().Select(p => p.Name));
         Assert.DoesNotContain("snippet", Encoding.UTF8.GetString(output.Sarif));
     }
 
@@ -64,6 +64,46 @@ public sealed class ResultsWriterTests
     public void Writer_Should_RejectToolErrors_When_AnOutputWouldClaimAScanCompleted()
     {
         Assert.Throws<EngineToolException>(() => ResultsWriter.Write(Input(false) with { Outcome = ExitOutcome.ToolError }));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Writer_Should_StampAllLoadedPacks_When_TheScanIsCleanOrHasFindings(bool populated)
+    {
+        var input = Input(populated);
+        input = input with { Packs = [new("local.example", "2", PackProvenance.Local, new string('f', 64)), .. input.Packs] };
+        var documents = ResultsWriter.Write(input);
+        using var evidence = JsonDocument.Parse(documents.Evidence);
+        using var sarif = JsonDocument.Parse(documents.Sarif);
+        var stamps = sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").GetProperty("packs");
+        Assert.True(JsonElement.DeepEquals(evidence.RootElement.GetProperty("packs"), stamps));
+        Assert.Equal("invenio.ng.synthetic.p1", stamps[0].GetProperty("packId").GetString());
+        Assert.Equal("2027.1.0", stamps[0].GetProperty("version").GetString());
+        Assert.Equal("2", stamps[1].GetProperty("version").GetString());
+        Assert.False(stamps[1].TryGetProperty("coverageDate", out _));
+        var shuffled = ResultsWriter.Write(input with { Packs = input.Packs.Reverse().ToArray() });
+        Assert.Equal(documents.Sarif, shuffled.Sarif);
+        Assert.Equal(documents.Evidence, shuffled.Evidence);
+        var valid = ResultsTestSupport.ValidateSarif(Encoding.UTF8.GetString(documents.Sarif));
+        Assert.True(valid.IsValid, string.Join("; ", valid.Errors));
+        Assert.True(ResultsTestSupport.ValidateOfficialSarif(Encoding.UTF8.GetString(documents.Sarif)).IsValid);
+    }
+
+    [Fact]
+    public void Writer_Should_EmitAnEmptyPackArray_When_NoPackWasLoaded()
+    {
+        using var sarif = JsonDocument.Parse(ResultsWriter.Write(Input(false) with { Packs = [] }).Sarif);
+        Assert.Empty(sarif.RootElement.GetProperty("runs")[0].GetProperty("properties").GetProperty("packs").EnumerateArray());
+    }
+
+    [Fact]
+    public void Profile_Should_RejectInvalidPackVersions_When_StampsArePresent()
+    {
+        var documents = ResultsWriter.Write(Input(false));
+        var node = System.Text.Json.Nodes.JsonNode.Parse(documents.Sarif)!;
+        node["runs"]![0]!["properties"]!["packs"]![0]!["version"] = "latest";
+        Assert.False(ResultsTestSupport.ValidateSarif(node.ToJsonString()).IsValid);
     }
 
     [Fact]

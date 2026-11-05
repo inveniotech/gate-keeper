@@ -19,6 +19,38 @@
   "required": ["$schema", "version", "runs"],
   "additionalProperties": false,
   "$defs": {
+    "civilDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "hex64": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "pack": {
+      "oneOf": [
+        { "$ref": "#/$defs/invenioPack" },
+        { "$ref": "#/$defs/localPack" }
+      ]
+    },
+    "invenioPack": {
+      "type": "object",
+      "properties": {
+        "packId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$" },
+        "provenance": { "enum": ["bundled", "plan-gated"] },
+        "coverageDate": { "$ref": "#/$defs/civilDate" },
+        "contentDigest": { "$ref": "#/$defs/hex64" }
+      },
+      "required": ["packId", "version", "provenance", "coverageDate", "contentDigest"],
+      "additionalProperties": false
+    },
+    "localPack": {
+      "type": "object",
+      "properties": {
+        "packId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+        "provenance": { "const": "local" },
+        "contentDigest": { "$ref": "#/$defs/hex64" }
+      },
+      "required": ["packId", "version", "provenance", "contentDigest"],
+      "additionalProperties": false
+    },
+
     "run": {
       "type": "object",
       "properties": {
@@ -179,6 +211,11 @@
       "properties": {
         "evaluatedOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
         "historyScanned": { "type": "boolean" },
+        "packs": {
+          "$comment": "New producers always emit the loaded-pack stamps. Optional for logs from schema artefact versions before 1.2.0.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/pack" }
+        },
         "profile": { "enum": ["default", "deep"] },
         "repositoryId": { "type": "string", "maxLength": 200 }
       },

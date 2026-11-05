@@ -50,15 +50,8 @@ public static class ResultsWriter
         writer.WriteStartObject("repository"); writer.WriteString("id", input.RepositoryId); writer.WriteString("revision", input.Revision); writer.WriteEndObject();
         writer.WriteString("profile", Profile(input.Settings)); writer.WriteBoolean("historyScanned", input.HistoryScanned);
         writer.WriteString("failOn", Word(input.Settings.FailOn)); writer.WriteNumber("exitCode", (int)input.Outcome);
-        writer.WriteStartArray("packs");
-        foreach (var pack in input.Packs.OrderBy(p => p.Id, StringComparer.Ordinal).ThenBy(p => p.Version, StringComparer.Ordinal))
-        {
-            writer.WriteStartObject(); writer.WriteString("packId", pack.Id); writer.WriteString("version", pack.Version);
-            writer.WriteString("provenance", pack.Provenance == PackProvenance.PlanGated ? "plan-gated" : pack.Provenance.ToString().ToLowerInvariant());
-            if (pack.Provenance != PackProvenance.Local) writer.WriteString("coverageDate", pack.CoverageDate);
-            writer.WriteString("contentDigest", pack.ContentDigest); writer.WriteEndObject();
-        }
-        writer.WriteEndArray(); writer.WriteStartObject("rules"); writer.WriteStartArray("overrides");
+        writer.WritePropertyName("packs"); WritePacks(writer, input.Packs);
+        writer.WriteStartObject("rules"); writer.WriteStartArray("overrides");
         foreach (var entry in input.Settings.SeverityOverrides.OrderBy(p => p.Key, StringComparer.Ordinal))
         { writer.WriteStartObject(); writer.WriteString("id", entry.Key); writer.WriteString("severity", Word(entry.Value)); writer.WriteEndObject(); }
         writer.WriteEndArray(); writer.WriteStartArray("disabled");
@@ -87,6 +80,25 @@ public static class ResultsWriter
         { writer.WriteStartObject(); writer.WriteString("code", warning.Code); writer.WriteString("message", warning.Message); writer.WriteEndObject(); }
         writer.WriteEndArray(); writer.WriteEndObject();
     });
+
+    private static void WritePacks(Utf8JsonWriter writer, IReadOnlyList<LoadedPack> packs)
+    {
+        writer.WriteStartArray();
+        foreach (var pack in packs.OrderBy(p => p.Id, StringComparer.Ordinal).ThenBy(p => p.Version, StringComparer.Ordinal))
+        {
+            writer.WriteStartObject(); writer.WriteString("packId", pack.Id); writer.WriteString("version", pack.Version);
+            writer.WriteString("provenance", pack.Provenance == PackProvenance.PlanGated ? "plan-gated" : pack.Provenance.ToString().ToLowerInvariant());
+            if (pack.Provenance != PackProvenance.Local) writer.WriteString("coverageDate", pack.CoverageDate);
+            writer.WriteString("contentDigest", pack.ContentDigest); writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
+    }
+
+    private static JsonElement PackStamps(IReadOnlyList<LoadedPack> packs)
+    {
+        using var document = JsonDocument.Parse(Bytes(writer => WritePacks(writer, packs)));
+        return document.RootElement.Clone();
+    }
 
     private static byte[] Sarif(ResultsInput input, Finding[] findings, ScanWarning[] warnings)
     {
@@ -124,6 +136,7 @@ public static class ResultsWriter
                 {
                     ["evaluatedOn"] = Text(Day(input.Policy.EvaluatedOn)),
                     ["historyScanned"] = JsonSerializer.SerializeToElement(input.HistoryScanned, EngineJsonSerializerContext.Default.Boolean),
+                    ["packs"] = PackStamps(input.Packs),
                     ["profile"] = Text(Profile(input.Settings)), ["repositoryId"] = Text(input.RepositoryId),
                 },
             }],
@@ -143,6 +156,7 @@ public static class ResultsWriter
             "runs" => ["tool", "invocations", "results", "properties"],
             "tool" => ["driver"],
             "driver" => ["name", "version", "informationUri", "rules"],
+            "packs" => ["packId", "version", "provenance", "coverageDate", "contentDigest"],
             "rules" => ["id", "shortDescription", "properties"],
             "invocations" => ["executionSuccessful", "exitCode", "toolExecutionNotifications"],
             "toolExecutionNotifications" => ["level", "message"],
