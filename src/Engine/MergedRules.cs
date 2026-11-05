@@ -20,6 +20,9 @@ public sealed record LoadedPack(
 {
     /// <summary>The coverage date of an Invenio pack, omitted for local packs (IQ-36).</summary>
     public string? CoverageDate { get; init; }
+
+    /// <summary>The content issue date used for the deterministic age warning, omitted for local packs (IQ-26).</summary>
+    public string? ContentIssuedAt { get; init; }
 }
 
 /// <summary>
