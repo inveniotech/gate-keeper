@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nuban",
+    "path": "src/example.kt",
+    "line": 1,
+    "column": 22,
+    "triage": "true-positive"
+  }
+]

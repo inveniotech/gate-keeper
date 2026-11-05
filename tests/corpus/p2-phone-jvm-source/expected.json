@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.phone",
+    "path": "src/example.kt",
+    "line": 1,
+    "column": 14,
+    "triage": "true-positive"
+  }
+]
