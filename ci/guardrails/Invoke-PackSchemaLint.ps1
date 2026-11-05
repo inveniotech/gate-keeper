@@ -10,47 +10,47 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$here = $PSScriptRoot
-$repositoryRoot = if (git rev-parse --show-toplevel 2>$null) {
-    (git rev-parse --show-toplevel).Trim()
-}
-else {
-    (Resolve-Path (Join-Path $here '../..')).Path
-}
-$rulePacksRoot = Join-Path $repositoryRoot $RulePacksPath
-$schemaFile = Join-Path $repositoryRoot $SchemaPath
+$repositoryRoot = [IO.Path]::GetFullPath("$PSScriptRoot/../..")
+$rulePacksRoot = if ([IO.Path]::IsPathRooted($RulePacksPath)) { $RulePacksPath } else { Join-Path $repositoryRoot $RulePacksPath }
+$schemaFile = if ([IO.Path]::IsPathRooted($SchemaPath)) { $SchemaPath } else { Join-Path $repositoryRoot $SchemaPath }
 
-if (-not (Test-Path -LiteralPath $rulePacksRoot)) {
-    Write-Output "Rule-packs folder '$RulePacksPath' does not exist; nothing to validate."
-    exit 0
+if (-not (Test-Path -LiteralPath $rulePacksRoot -PathType Container) -or -not (Test-Path -LiteralPath $schemaFile -PathType Leaf)) {
+    Write-Output 'Pack-schema lint cannot run. Supply an existing pack directory and rule-pack schema file.'
+    exit 2
 }
 
-$packs = @(Get-ChildItem -LiteralPath $rulePacksRoot -Recurse -File -Filter '*.json' |
-    Where-Object { $_.Name -ne 'rulepack.schema.json' })
+try {
+    $schema = Get-Content -LiteralPath $schemaFile -Raw -Encoding utf8 | ConvertFrom-Json -AsHashtable
+    if (-not $schema.ContainsKey('$schema') -or -not $schema.ContainsKey('$defs')) { throw 'Not the rule-pack schema.' }
+    [string[]] $packs = @(Get-ChildItem -LiteralPath $rulePacksRoot -Recurse -File -Filter '*.json' |
+        Where-Object { $_.Name -cne 'rulepack.schema.json' -and $_.Name -cne 'citations.json' } |
+        ForEach-Object FullName)
+    [Array]::Sort($packs, [StringComparer]::Ordinal)
+} catch {
+    Write-Output 'Pack-schema lint could not read its inputs. Check the directory, schema JSON and file permissions.'
+    exit 2
+}
 
 if ($packs.Count -eq 0) {
     Write-Output "No rule-pack JSON files found; nothing to validate."
     exit 0
 }
 
-if (-not (Test-Path -LiteralPath $schemaFile)) {
-    Write-Output "Schema '$SchemaPath' does not exist yet; skipping schema validation (P0-03 will add the schema)."
-    Write-Output "$($packs.Count) rule-pack file(s) present but not validated against a schema."
-    exit 0
-}
-
-# Validate that every rule pack is well-formed JSON. When the schema exists,
-# real schema validation will be added here; for Phase 0 the schema is empty.
 $invalid = $false
 foreach ($pack in $packs) {
+    $relative = [IO.Path]::GetRelativePath($rulePacksRoot, $pack).Replace('\', '/')
     try {
-        $null = Get-Content -LiteralPath $pack.FullName -Raw | ConvertFrom-Json
-        $relative = $pack.FullName.Substring($repositoryRoot.Length + 1).Replace('\', '/')
-        Write-Output "$relative is valid JSON."
+        $valid = (Get-Content -LiteralPath $pack -Raw -Encoding utf8) | Test-Json -SchemaFile $schemaFile -ErrorAction SilentlyContinue
+        if (-not $valid) {
+            $invalid = $true
+            Write-Output "$relative does not match the rule-pack schema. Correct its fields and shape before submitting it."
+        } else {
+            Write-Output "$relative matches the rule-pack schema."
+        }
     }
     catch {
         $invalid = $true
-        Write-Error "Failed to parse '$($pack.FullName)': $_"
+        Write-Output "$relative could not be validated. Check its JSON and file access before submitting it."
     }
 }
 
