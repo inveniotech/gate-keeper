@@ -25,8 +25,8 @@ public enum Severity
     Warning = 1,
 
     /// <summary>
-    /// A finding that is reported for the record and never fails a scan, for
-    /// example an inventory-only catalogue entry.
+    /// A finding that is reported for the record and fails only when the
+    /// failure threshold is note (configuration section 8, IQ-22).
     /// </summary>
     [JsonStringEnumMemberName("note")]
     Note = 2,
