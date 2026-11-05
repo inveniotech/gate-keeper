@@ -202,4 +202,32 @@ for (const [label, value] of Object.entries(table)) {
 }
 lines.push("");
 lines.push("documented examples verified: 3");
-console.log(lines.join("\n"));
+if (process.argv[2] === "--benchmark") {
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const { join, resolve } = await import("node:path");
+  const { createHash } = await import("node:crypto");
+  const fileCount = Number(process.argv[5]);
+  if (!process.argv[3] || process.argv[4] !== "--files" || ![500, 10000].includes(fileCount) || process.argv.length !== 6) {
+    throw new Error("Use --benchmark <new-directory> --files 500 or 10000.");
+  }
+  const destination = resolve(process.argv[3]);
+  // Exclusive directory creation prevents overwriting an existing repository.
+  await mkdir(destination);
+  const parameters = { generatorVersion: 1, seed, fileCount, historyScanned: false, utf16Every: 10, largeEvery: 20 };
+  const parameterHash = createHash("sha256").update(JSON.stringify(parameters)).digest("hex");
+  const next = mulberry32(seed);
+  let totalBytes = 0;
+  for (let index = 0; index < fileCount; index++) {
+    let body = "";
+    const size = index % 20 === 0 ? 4096 : 256;
+    for (let letter = 0; letter < size; letter++) body += String.fromCharCode(97 + Math.floor(next() * 26));
+    body += "\n";
+    const bytes = index % 10 === 0 ? Buffer.concat([Buffer.from([255, 254]), Buffer.from(body, "utf16le")]) : Buffer.from(body, "utf8");
+    await writeFile(join(destination, `file-${String(index).padStart(5, "0")}.txt`), bytes, { flag: "wx" });
+    totalBytes += bytes.length;
+  }
+  await writeFile(destination + ".manifest.json", JSON.stringify({ ...parameters, parameterHash, totalBytes }, null, 2) + "\n", { flag: "wx" });
+  console.log(`Generated ${fileCount} deterministic benchmark files.`);
+} else {
+  console.log(lines.join("\n"));
+}

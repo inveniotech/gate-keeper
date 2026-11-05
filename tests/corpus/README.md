@@ -133,3 +133,7 @@ From the repository root:
 ```powershell
 dotnet test --filter FullyQualifiedName~Corpus.Tests
 ```
+
+## Native benchmark trees (P1-15)
+
+The same generator also supports benchmark mode: pass --benchmark followed by a new directory and --files followed by 500 or 10000. It creates that exact number of eligible text files, with pinned sizes, encodings and seed, and writes a sibling manifest with the parameter hash and byte count. It refuses an existing destination. The native-release harness records those inputs and explicitly selects the synthetic probe pack for provisional measurements; the golden corpus values printed by the original invocation stay unchanged. See ci/native-release/README.md.
