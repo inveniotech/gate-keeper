@@ -61,7 +61,7 @@ internal static class ScanCli
         }, token).ConfigureAwait(false);
         var policy = FindingPolicy.Apply(scan, settings, state, day, token);
         var metadata = await RepositoryMetadata.ReadAsync(root, settings.RepositoryId, token).ConfigureAwait(false);
-        var warnings = policy.Warnings.Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();
+        var warnings = policy.Warnings.Concat(PackAgeWarning.Evaluate(packs.Packs, day)).Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();
         if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in ndpa-check.toml."));
         policy = policy with { Warnings = warnings.OrderBy(w => w.Code, StringComparer.Ordinal).ThenBy(w => w.Message, StringComparer.Ordinal).ToArray() };
         return new(policy, settings, packs.Packs, metadata.Id, metadata.Revision,

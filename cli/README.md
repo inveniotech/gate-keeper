@@ -27,3 +27,5 @@ dotnet test --filter FullyQualifiedName~Cli.Tests
 dotnet run --project cli -- --version
 dotnet run --project cli -- --help
 ```
+
+Pack-age diagnostics use the declared evaluation date. When the newest dated loaded pack is more than 90 days old, the existing pack.stale warning appears on standard error and in the evidence warnings array; it never changes the exit code. Local packs have no content issue date and do not raise this warning.

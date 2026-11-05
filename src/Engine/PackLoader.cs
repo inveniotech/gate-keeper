@@ -18,6 +18,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// <param name="ContentDigest">The lowercase-hex SHA-256 of the content bytes (IQ-80).</param>
 /// <param name="Rules">The rules the content carries, in document order.</param>
 /// <param name="CoverageDate">The coverage date retained for evidence stamps.</param>
+/// <param name="ContentIssuedAt">The content issue date retained for age warnings.</param>
 internal sealed record PackCandidate(
     string Name,
     string Id,
@@ -26,7 +27,8 @@ internal sealed record PackCandidate(
     PackProvenance Provenance,
     string ContentDigest,
     IReadOnlyList<Rule> Rules,
-    string? CoverageDate);
+    string? CoverageDate,
+    string? ContentIssuedAt);
 
 /// <summary>
 /// The one entry point that turns pack bytes into the merged rule set the
@@ -217,7 +219,8 @@ public static class PackLoader
             Provenance: rulePack.Provenance,
             ContentDigest: sha256Hex,
             Rules: rulePack.Rules,
-            CoverageDate: rulePack.CoverageDate);
+            CoverageDate: rulePack.CoverageDate,
+            ContentIssuedAt: rulePack.ContentIssuedAt);
     }
 
     /// <summary>
@@ -238,7 +241,8 @@ public static class PackLoader
             Provenance: rulePack.Provenance,
             ContentDigest: Convert.ToHexStringLower(SHA256.HashData(input.ContentBytes)),
             Rules: rulePack.Rules,
-            CoverageDate: rulePack.CoverageDate);
+            CoverageDate: rulePack.CoverageDate,
+            ContentIssuedAt: rulePack.ContentIssuedAt);
     }
 
     /// <summary>Refuses a pack whose minimum engine version is newer than this build (IQ-24).</summary>
@@ -425,7 +429,7 @@ public static class PackLoader
         var packRecords = new Dictionary<string, LoadedPack>(StringComparer.Ordinal);
         foreach (var pack in packsInOrder)
         {
-            packRecords.Add(pack.Id, new LoadedPack(pack.Id, pack.VersionText, pack.Provenance, pack.ContentDigest) { CoverageDate = pack.CoverageDate });
+            packRecords.Add(pack.Id, new LoadedPack(pack.Id, pack.VersionText, pack.Provenance, pack.ContentDigest) { CoverageDate = pack.CoverageDate, ContentIssuedAt = pack.ContentIssuedAt });
         }
 
         var rulesInOrder = new Dictionary<string, LoadedRule>(StringComparer.Ordinal);
