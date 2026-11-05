@@ -10,6 +10,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- The approved test-only assertion library, shared by every test project. -->
+    <PackageReference Include="AwesomeAssertions" />
     <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). Not referenced by cli/ or src/Engine. -->
     <PackageReference Include="JsonSchema.Net" />
     <!-- Already approved in AGENTS.md rule 8. Test-only: the P0-06 development-key vectors. Not referenced by cli/ or src/Engine. -->
@@ -18,6 +20,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="AwesomeAssertions" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\tests\vectors\sarif\sarif-2.1.0.schema" Link="schemas\sarif-2.1.0.schema" CopyToOutputDirectory="PreserveNewest" />
     <!-- Copy the schema and the example packs into the test output so the tests validate the real repository files. -->
     <None Include="..\..\schemas\rulepack.schema.json" Link="schemas\rulepack.schema.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\docs\specs\examples\rule-pack\minimal.json" Link="examples\rule-pack\minimal.json" CopyToOutputDirectory="PreserveNewest" />

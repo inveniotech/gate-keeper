@@ -2,6 +2,12 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "AwesomeAssertions": {
+        "type": "Direct",
+        "requested": "[9.6.0, )",
+        "resolved": "9.6.0",
+        "contentHash": "8kdtgI+tZIgP46ncnk650/dU4JSrn+n2Dkic8FvjIFn72P6Nv1Afyr5F8F3PsokHg1GBSBVo1/Z+eZOrU5esSA=="
+      },
       "BouncyCastle.Cryptography": {
         "type": "Direct",
         "requested": "[2.7.0, )",
@@ -144,6 +150,7 @@
         "type": "Project",
         "dependencies": {
           "InvenioTech.GateKeeper.Signing": "[1.0.0, )",
+          "SarifKit": "[1.0.0, )",
           "Tomlyn": "[2.10.1, )"
         }
       },
@@ -152,6 +159,12 @@
         "dependencies": {
           "BouncyCastle.Cryptography": "[2.7.0, )"
         }
+      },
+      "SarifKit": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "CJH8MjgTGLqT1Uy7nJ4CZqVigk+5yMP+oQbJ9QucEZyxB4s8ybi8jvYXi+ZhGTV9hrdkUvuC6CYHLTonIJ33BQ=="
       },
       "System.CommandLine": {
         "type": "CentralTransitive",

@@ -14,3 +14,5 @@ Evidence documents and SARIF logs for the results format, version 1. The test pr
 These files live under `docs/`, not `schemas/`, so they are not published in the `gate-keeper-schemas` artefact (every `*.json` under `schemas/` is).
 
 The content digests in the evidence examples are the SHA-256 of the ASCII strings `example-pack-bytes` and `example-local-pack-bytes`. They are not digests of a released pack.
+
+The SARIF examples preserve the original version 1 profile without pack stamps and test backwards compatibility. New writers also include `runs[0].properties.packs`, with exactly the pack facts shown by the matching evidence example. The results-writer tests validate these current outputs, including clean scans, against both the profile and the official SARIF schema. See results-format section 4.1 for why both engine and pack versions are recorded.

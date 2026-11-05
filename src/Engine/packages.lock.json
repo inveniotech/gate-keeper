@@ -8,6 +8,12 @@
         "resolved": "10.0.14",
         "contentHash": "YlTamXppEQls6DYWt7RdUuwWDb0lyw/vXCaGeQpLCpsLmfwGuCkOz/vIGgMTV7ECsJcavkCOkxZXv9s8rdAHkQ=="
       },
+      "SarifKit": {
+        "type": "Direct",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "CJH8MjgTGLqT1Uy7nJ4CZqVigk+5yMP+oQbJ9QucEZyxB4s8ybi8jvYXi+ZhGTV9hrdkUvuC6CYHLTonIJ33BQ=="
+      },
       "Tomlyn": {
         "type": "Direct",
         "requested": "[2.10.1, )",

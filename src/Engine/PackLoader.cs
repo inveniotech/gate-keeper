@@ -17,6 +17,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// <param name="Provenance">The provenance the content declares.</param>
 /// <param name="ContentDigest">The lowercase-hex SHA-256 of the content bytes (IQ-80).</param>
 /// <param name="Rules">The rules the content carries, in document order.</param>
+/// <param name="CoverageDate">The coverage date retained for evidence stamps.</param>
 internal sealed record PackCandidate(
     string Name,
     string Id,
@@ -24,7 +25,8 @@ internal sealed record PackCandidate(
     PackVersionValue Version,
     PackProvenance Provenance,
     string ContentDigest,
-    IReadOnlyList<Rule> Rules);
+    IReadOnlyList<Rule> Rules,
+    string? CoverageDate);
 
 /// <summary>
 /// The one entry point that turns pack bytes into the merged rule set the
@@ -214,7 +216,8 @@ public static class PackLoader
             Version: content.PackVersion,
             Provenance: rulePack.Provenance,
             ContentDigest: sha256Hex,
-            Rules: rulePack.Rules);
+            Rules: rulePack.Rules,
+            CoverageDate: rulePack.CoverageDate);
     }
 
     /// <summary>
@@ -234,7 +237,8 @@ public static class PackLoader
             Version: content.PackVersion,
             Provenance: rulePack.Provenance,
             ContentDigest: Convert.ToHexStringLower(SHA256.HashData(input.ContentBytes)),
-            Rules: rulePack.Rules);
+            Rules: rulePack.Rules,
+            CoverageDate: rulePack.CoverageDate);
     }
 
     /// <summary>Refuses a pack whose minimum engine version is newer than this build (IQ-24).</summary>
@@ -421,7 +425,7 @@ public static class PackLoader
         var packRecords = new Dictionary<string, LoadedPack>(StringComparer.Ordinal);
         foreach (var pack in packsInOrder)
         {
-            packRecords.Add(pack.Id, new LoadedPack(pack.Id, pack.VersionText, pack.Provenance, pack.ContentDigest));
+            packRecords.Add(pack.Id, new LoadedPack(pack.Id, pack.VersionText, pack.Provenance, pack.ContentDigest) { CoverageDate = pack.CoverageDate });
         }
 
         var rulesInOrder = new Dictionary<string, LoadedRule>(StringComparer.Ordinal);

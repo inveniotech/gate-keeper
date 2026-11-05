@@ -11,7 +11,7 @@ public sealed class RulePackSchemaTests
 
         var summary = RulePackTestSupport.Validate(instance);
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -21,7 +21,7 @@ public sealed class RulePackSchemaTests
 
         var summary = RulePackTestSupport.Validate(instance);
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     [Fact]
@@ -31,13 +31,13 @@ public sealed class RulePackSchemaTests
 
         var summary = RulePackTestSupport.Validate(instance);
 
-        Assert.False(summary.IsValid);
-        Assert.NotEmpty(summary.Errors);
+        summary.IsValid.Should().BeFalse();
+        summary.Errors.Should().NotBeEmpty();
         var message = string.Join(Environment.NewLine, summary.Errors);
 
         // The offending field is the shape part whose max is 65, so the message must point there and name the bound.
-        Assert.Contains("/rules/0/matcher/pattern/shape/0", message);
-        Assert.Contains("64", message);
+        message.Should().Contain("/rules/0/matcher/pattern/shape/0");
+        message.Should().Contain("64");
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class RulePackSchemaTests
     {
         var summary = RulePackTestSupport.Validate(PackWithShape("""[ { "min": 1, "max": 65, "class": "digit" } ]"""));
 
-        Assert.False(summary.IsValid);
+        summary.IsValid.Should().BeFalse();
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public sealed class RulePackSchemaTests
                 ]
                 """));
 
-        Assert.False(summary.IsValid);
+        summary.IsValid.Should().BeFalse();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class RulePackSchemaTests
     {
         var summary = RulePackTestSupport.Validate(PackWithShape("""[ { "min": 1, "max": 2, "oneOf": ["A", "B"] } ]"""));
 
-        Assert.False(summary.IsValid);
+        summary.IsValid.Should().BeFalse();
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public sealed class RulePackSchemaTests
     {
         var summary = RulePackTestSupport.Validate(PackWithShape("""[ { "min": 11, "max": 11, "class": "digit" } ]"""));
 
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
     /// <summary>Builds a minimal, otherwise-valid Invenio pack whose single rule uses the supplied shape.</summary>

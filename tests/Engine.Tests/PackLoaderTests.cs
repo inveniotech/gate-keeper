@@ -32,6 +32,7 @@ public sealed class PackLoaderTests
         var pack = load.Packs[0];
         pack.Id.Should().Be("invenio.ng.example.p1");
         pack.Version.Should().Be("2027.1.0");
+        pack.CoverageDate.Should().Be("2027-01-01");
         pack.Provenance.Should().Be(PackProvenance.Bundled);
         pack.ContentDigest.Should().Be(LowerHex(SHA256.HashData(PackTestSupport.ReadContent("pack"))));
         load.Rules.Should().ContainSingle();

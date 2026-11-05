@@ -11,10 +11,10 @@ public sealed class RulePackConsistencyTests
 
         // The document is schema-valid; only the consistency check rejects it.
         var summary = RulePackTestSupport.Validate(instance);
-        Assert.True(summary.IsValid, string.Join(Environment.NewLine, summary.Errors));
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
 
         var violations = RulePackTestSupport.CheckPackLineConsistency(instance);
-        Assert.Contains(violations, violation => violation.Contains("coverageDate"));
+        violations.Should().Contain(violation => violation.Contains("coverageDate"));
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public sealed class RulePackConsistencyTests
 
         var violations = RulePackTestSupport.CheckPackLineConsistency(instance);
 
-        Assert.Empty(violations);
+        violations.Should().BeEmpty();
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public sealed class RulePackConsistencyTests
     {
         var violations = RulePackTestSupport.CheckPackLineConsistency(PackWithBaseVersion("2027.1.1", "2027.2.0"));
 
-        Assert.Contains(violations, violation => violation.Contains("baseVersion"));
+        violations.Should().Contain(violation => violation.Contains("baseVersion"));
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public sealed class RulePackConsistencyTests
     {
         var violations = RulePackTestSupport.CheckPackLineConsistency(PackWithBaseVersion("2027.1.1", "2027.1.1"));
 
-        Assert.Contains(violations, violation => violation.Contains("patch 0"));
+        violations.Should().Contain(violation => violation.Contains("patch 0"));
     }
 
     private static string PackWithBaseVersion(string version, string baseVersion)
