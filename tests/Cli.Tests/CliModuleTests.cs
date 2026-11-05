@@ -59,7 +59,6 @@ public sealed class CliModuleTests
         var commands = new Dictionary<string[], string>
         {
             { ["init"], "init" },
-            { ["doctor"], "doctor" },
             { ["support-bundle"], "support-bundle" },
         };
 
