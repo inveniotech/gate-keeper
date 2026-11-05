@@ -40,7 +40,8 @@ jobs:
       - name: Publish musl in Alpine
         if: matrix.musl == true
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE:/src" -w /src mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24-aot \
+          mkdir -p artifacts/native artifacts/release
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp -e NUGET_PACKAGES=/tmp/nuget -v "$GITHUB_WORKSPACE:/src" -w /src mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24-aot \
             sh -c 'set -e; dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native'
       - name: Run the published binary over the corpus
         shell: pwsh
