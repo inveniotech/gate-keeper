@@ -1,6 +1,6 @@
-# Citation register for human review
+# Citation register: owner approval in principle
 
-P2-02 (issue #29) prepares the [machine-readable register](citations.json). **Every entry is draft. Nothing in this register is approved for a production rule.** Approval belongs to the owner and the legal reviewer under IQ-57. The draft explains why a detection signal merits review; it does not classify every identifier as sensitive personal data or establish a legal breach.
+The owner approved the current [machine-readable register](citations.json), including its mappings, wording and detection limits, **in principle on 5 November 2026**. This authorises use of the current citations in rule implementation. Legal counsel's review remains pending under IQ-57; this is not a record of completed legal review or final legal approval. The owner will introduce any changes counsel recommends. The mappings explain why a detection signal merits review; they do not classify every identifier as sensitive personal data or establish a legal breach.
 
 ## Primary sources and verification
 
@@ -24,6 +24,6 @@ Each JSON entry holds its proposed result title, one-sentence explanation and a 
 
 ## Review and use
 
-The reviewer checks the exact subsection and article mappings, proposed wording and limits against both pinned PDFs and any applicable later instrument, and records requested corrections before approval. Only the owner records approval by setting the register and accepted entries to `approved` and adding `reviewedBy` and `reviewedOn` (ISO civil date). Approval must reflect the required legal review; automated tests do not supply it. A new or materially changed mapping needs fresh review.
+The recorded status is `approved-in-principle`, with `reviewedBy: owner`, the approval date and `legalReview.status: pending`. It records the owner's explicit instruction to proceed with the current citations while counsel reviews them. Automated tests do not supply approval. A later completed review and any corrections must be recorded accurately; a new or materially changed mapping needs fresh owner review. The distinct `approved` status is reserved for a later recorded final approval.
 
-`approvedCitation` in `ci/rule-packs/citations.mjs` refuses draft or unknown categories and missing review metadata. Production rule generation must use that lookup; draft entries cannot be copied into shipping rules. Run `node --test ci/rule-packs/citations.test.mjs` to check completeness, source pins and refusal of unapproved wording. The module uses only Node.js 26 built-ins and changes no product dependency.
+`approvedCitation` in `ci/rule-packs/citations.mjs` recognises the owner's approval in principle only when both register and category carry that status, reviewer/date metadata exists and legal review is explicitly pending. It also supports recorded final approval. Draft or unknown categories and missing review metadata still fail. Rule generation must use that lookup; draft entries cannot be copied into shipping rules. Run `node --test ci/rule-packs/citations.test.mjs` to check completeness, source pins and both approval paths. The module uses only Node.js 26 built-ins and changes no product dependency.
