@@ -33,7 +33,7 @@ public sealed class CorpusGateTests
     [Fact]
     public void CorpusGate_Should_CountRejectedAndUnresolvedTriageAsFalse_When_TheirKeysMatch()
     {
-        var expected = new[] { Expected("local.a", 1), Expected("local.a", 2, "false-positive"), Expected("local.a", 3, "unresolved") };
+        var expected = new[] { Expected("local.a", 1), Expected("local.a", 2, CorpusTriage.FalsePositive), Expected("local.a", 3, CorpusTriage.Unresolved) };
         var run = CorpusMeasurements.PerRule([(new CorpusCase("synthetic", "unused", expected),
             new[] { Finding("local.a", 1), Finding("local.a", 2), Finding("local.a", 3) })]);
         run.Overall.ExpectedCount.Should().Be(1);
@@ -69,7 +69,7 @@ public sealed class CorpusGateTests
         duplicateFinding.Should().ThrowExactly<ArgumentException>();
     }
 
-    private static CorpusExpectedEntry Expected(string id, int line, string triage = "true-positive") => new() { RuleId = id, Path = "sample.txt", Line = line, Column = 1, Triage = triage };
+    private static CorpusExpectedEntry Expected(string id, int line, string triage = CorpusTriage.TruePositive) => new() { RuleId = id, Path = "sample.txt", Line = line, Column = 1, Triage = triage };
     private static Finding Finding(string id, int line, Severity severity = Severity.Error) => new(id, severity, "synthetic", "sample.txt", line, 1,
         LocationKind.Source, null, BaselineState.New, new Citation("Synthetic scoring acceptance.", null, null));
 }
