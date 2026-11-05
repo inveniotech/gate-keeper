@@ -18,3 +18,9 @@ From the repository root:
 ```powershell
 dotnet test
 ```
+
+## Measured corpus runs
+
+P2-07-01 (#98) lets `CorpusScanRunner` accept already loaded rules and execute the existing matcher and scan orchestrator over the copied case. That run returns sorted, content-free findings and sets `MatcherStagePresent` to true, including a measured clean result. Omitting rules performs enumeration only and keeps that flag false; an explicitly empty rule list is rejected. The harness applies no baseline, exceptions or severity overrides. Temporary copies are removed after failures; successful runs are owned by `CorpusScanScavenger`. Links remain links when cases are copied.
+
+Run `dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~CorpusMatcherTests` for live positive/near-miss, repeatability and failure-cleanup checks. These tests use a synthetic list rule with no legal claim. Production detection acceptance still requires the actual approved pack, but this harness capability has no dependency on that pack being authored.
