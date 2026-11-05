@@ -10,7 +10,7 @@ namespace InvenioTech.GateKeeper.Cli;
 /// The composition root of the command line: build the command tree with
 /// System.CommandLine, parse the arguments, and run the one command they name.
 /// Results go to the output writer and diagnostics to the error writer
-/// (rule 31). The version and baseline surfaces work in this build; every other
+/// (rule 31). The scan, version and baseline surfaces work in this build; each remaining
 /// command is honest about not being implemented yet and exits with a tool
 /// error, never pretending it scanned anything (rule 13, rule 23).
 ///
@@ -84,9 +84,11 @@ public static class CliModule
 
         ReplaceDefaultVersionOption(rootCommand, new PrintVersionAction(output));
 
-        rootCommand.SetAction(_ => NotYetImplemented("scan (the default)", errors));
+        ScanCli.Configure(rootCommand, output, errors, rootPath ?? Directory.GetCurrentDirectory());
 
-        rootCommand.Subcommands.Add(NotImplementedCommand("scan", "Scans a repository and writes the results files; not implemented in this build", errors));
+        var scan = new Command("scan", "Scans a repository and writes a console summary or evidence JSON");
+        ScanCli.Configure(scan, output, errors, rootPath ?? Directory.GetCurrentDirectory());
+        rootCommand.Subcommands.Add(scan);
         rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
         rootCommand.Subcommands.Add(BaselineCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(NotImplementedCommand("doctor", "Explains the configuration, the licence and the installation state; not implemented in this build", errors));
