@@ -16,3 +16,4 @@ foreach ($line in $expected) {
 if ($LASTEXITCODE -ne 0) { throw 'The measurement-only overlay does not match the baseline. Adapt and review the overlay before comparing this baseline.' }
 & git -C $root apply --unidiff-zero "$PSScriptRoot/baseline-instrumentation.patch"
 if ($LASTEXITCODE -ne 0) { throw 'The baseline measurement overlay could not be applied.' }
+Copy-Item -LiteralPath "$PSScriptRoot/../../src/Engine/BenchmarkMetrics.cs" -Destination (Join-Path $root 'src/Engine/BenchmarkMetrics.cs')

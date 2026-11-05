@@ -30,10 +30,10 @@ The owner selected provisional synthetic-pack benchmarks for the initial run. Th
 
 ## Instrumented baseline compatibility
 
-For a baseline that predates these counters, `Enable-BaselineInstrumentation.ps1` applies the committed measurement-only overlay after exact source-blob checks and `git apply --check`. A baseline that already has the instrumentation is left alone. A mismatched older source tree fails explicitly instead of being replaced with candidate implementation code. The overlay is generated from the instrumentation source change, not edited by hand:
+For a baseline that predates these counters, `Enable-BaselineInstrumentation.ps1` applies the committed measurement-only overlay after exact source-blob checks and `git apply --check`. A baseline that already has the instrumentation is left alone. The new counter types are copied from their ordinary C# source file after the overlay succeeds. A mismatched older source tree fails explicitly instead of being replaced with candidate implementation code. The overlay is generated from the instrumentation source change, not edited by hand:
 
 ```powershell
-git diff --unified=0 707df6d -- Directory.Build.props cli/ScanCli.cs src/Engine/BenchmarkMetrics.cs src/Engine/MatcherEngine.cs src/Engine/ScanOrchestrator.cs > ci/native-release/baseline-instrumentation.patch
+git diff --unified=0 707df6d -- Directory.Build.props cli/ScanCli.cs src/Engine/MatcherEngine.cs src/Engine/ScanOrchestrator.cs > ci/native-release/baseline-instrumentation.patch
 $paths = @('Directory.Build.props', 'cli/ScanCli.cs', 'src/Engine/MatcherEngine.cs', 'src/Engine/ScanOrchestrator.cs')
 $paths | ForEach-Object { "$(git rev-parse "707df6d:$_") $_" } > ci/native-release/baseline-instrumentation-base.txt
 ```
