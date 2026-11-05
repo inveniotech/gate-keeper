@@ -15,6 +15,11 @@ try {
   $unpacked = Join-Path $root 'unpacked'
   Expand-Archive -LiteralPath $archive -DestinationPath $unpacked
   if ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $unpacked 'gatekeeper-ndpa-check.exe'))) -cne [Convert]::ToBase64String([byte[]]@(1, 2, 3))) { throw 'The package changed the executable bytes.' }
+  [IO.File]::SetLastWriteTimeUtc($binary, [DateTime]::new(2025, 1, 1, 0, 0, 0, [DateTimeKind]::Utc))
+  $second = Join-Path $root 'second-package'
+  & "$PSScriptRoot/Pack-Native.ps1" -Binary $binary -RuntimeIdentifier win-x64 -Destination $second -ProductVersion 0.1.0
+  $secondRecord = Get-Content (Join-Path $second 'gatekeeper-ndpa-check-win-x64.json') -Raw | ConvertFrom-Json
+  if ($secondRecord.sha256 -cne $record.sha256) { throw 'Archive bytes must not depend on the input file timestamp.' }
   $stream = [IO.File]::OpenWrite($binary)
   try { $stream.SetLength(8MB + 1) } finally { $stream.Dispose() }
   $rejected = $false

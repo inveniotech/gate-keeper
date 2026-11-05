@@ -40,7 +40,9 @@ function Invoke-Measurement([string] $Binary, [string] $Directory, [string[]] $A
       if ($json.historyScanned -or $json.profile -cne 'default') { throw 'A benchmark invocation used the wrong profile or scanned history.' }
       if (@($json.packs).Count -eq 0) { throw 'A benchmark scan loaded no rule packs.' }
     } elseif ($process.ExitCode -ne 0) { throw 'The benchmark version invocation failed.' }
-    return $watch.Elapsed.TotalMilliseconds
+    $version = if ($Scan) { $json.engine.version } else { [regex]::Match($output, '(?m)^product version: ([^\r\n]+)').Groups[1].Value }
+    if (-not $version) { throw 'A measured invocation omitted its product version.' }
+    return [pscustomobject]@{ Milliseconds = $watch.Elapsed.TotalMilliseconds; Version = $version; Packs = $(if ($Scan) { @($json.packs) } else { @() }) }
   } finally { $process.Dispose() }
 }
 try {
@@ -62,6 +64,7 @@ try {
     $manifests[$files] = Get-Content -LiteralPath "$tree.manifest.json" -Raw | ConvertFrom-Json
   }
   $measurements = [ordered]@{}
+  $metadata = @{}
   foreach ($name in @('coldStartMilliseconds', 'scan10000Milliseconds', 'ci500Milliseconds')) {
     $values = @{ baseline = [Collections.Generic.List[double]]::new(); candidate = [Collections.Generic.List[double]]::new() }
     # One warm-up pair is discarded; three alternating pairs are measured.
@@ -72,7 +75,8 @@ try {
         $tree = if ($name -eq 'scan10000Milliseconds') { $trees[10000] } else { $trees[500] }
         $arguments = if ($isScan) { @('scan', '--json', '--evaluated-on', '2026-11-01') } else { @('--version') }
         $value = Invoke-Measurement $binary $tree $arguments $isScan
-        if ($pair -gt 0) { $values[$arm].Add($value) }
+        $metadata[$arm] = $value
+        if ($pair -gt 0) { $values[$arm].Add($value.Milliseconds) }
       }
     }
     $baseMedian = Get-Median $values.baseline.ToArray()
@@ -86,6 +90,10 @@ try {
     operatingSystem = [Runtime.InteropServices.RuntimeInformation]::OSDescription
     architecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
     logicalProcessors = [Environment]::ProcessorCount
+    runnerImageVersion = $env:ImageVersion
+    baselineProductVersion = $metadata.baseline.Version
+    candidateProductVersion = $metadata.candidate.Version
+    loadedPacks = @($metadata.candidate.Packs)
     baselineSha256 = (Get-FileHash -LiteralPath $baseline -Algorithm SHA256).Hash.ToLowerInvariant()
     candidateSha256 = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash.ToLowerInvariant()
     candidateBytes = (Get-Item -LiteralPath $candidate).Length
