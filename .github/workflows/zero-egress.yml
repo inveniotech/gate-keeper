@@ -1,0 +1,26 @@
+name: Zero-egress binary proof
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zero-egress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Test the proof rejects incomplete and differing scans
+        run: bash ci/zero-egress/Test-Harness.sh
+      - name: Publish the real Linux binary
+        run: dotnet publish cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -o artifacts/native
+      - name: Compare every corpus case with networking disabled
+        run: bash ci/zero-egress/Test-ZeroEgress.sh artifacts/native/gatekeeper-ndpa-check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zero-egress-proof
+          path: artifacts/zero-egress
+          if-no-files-found: error

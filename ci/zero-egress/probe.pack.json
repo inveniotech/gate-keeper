@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "local.egress",
+  "version": 1,
+  "minEngineVersion": "0.1.0",
+  "provenance": "local",
+  "rules": [{
+    "id": "local.egress.probe",
+    "severity": "error",
+    "category": "synthetic",
+    "citation": {"title": "Synthetic zero-egress probe."},
+    "sinceVersion": 1,
+    "matcher": {"list": {"package": ["gatekeeper-corpus-probe"]}}
+  }]
+}
