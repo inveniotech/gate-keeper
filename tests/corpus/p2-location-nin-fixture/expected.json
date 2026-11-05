@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nin",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 16,
+    "triage": "true-positive"
+  }
+]

@@ -176,3 +176,56 @@ Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify w
 | `p2-phone-validator-near-miss` | No finding |
 
 <!-- generated-identifier-cases:end -->
+
+<!-- generated-location-cases:start -->
+## Phase 2 location acceptance cases
+
+Regenerate with `node tests/corpus/New-LocationCases.mjs --write` and verify with `--check`. Literal identifiers reuse the documented generator. Field-handling cases contain no literal personal identifier. Rule identifiers are acceptance candidates pending the production rule cards; detection, severity and inventory-kind assertions remain unmeasured until the approved pack runs.
+
+| Case | Expected rule |
+|---|---|
+| `p2-field-bvn-api-dotnet` | `pii.bvn.field.api` |
+| `p2-field-bvn-api-jvm` | `pii.bvn.field.api` |
+| `p2-field-bvn-api-node` | `pii.bvn.field.api` |
+| `p2-field-bvn-log-dotnet` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-jvm` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-node` | `pii.bvn.field.log` |
+| `p2-field-bvn-migration-dotnet` | `pii.bvn.field.migration` |
+| `p2-field-bvn-migration-jvm` | `pii.bvn.field.migration` |
+| `p2-field-bvn-migration-node` | `pii.bvn.field.migration` |
+| `p2-field-nin-api-dotnet` | `pii.nin.field.api` |
+| `p2-field-nin-api-jvm` | `pii.nin.field.api` |
+| `p2-field-nin-api-node` | `pii.nin.field.api` |
+| `p2-field-nin-log-dotnet` | `pii.nin.field.log` |
+| `p2-field-nin-log-jvm` | `pii.nin.field.log` |
+| `p2-field-nin-log-node` | `pii.nin.field.log` |
+| `p2-field-nin-migration-dotnet` | `pii.nin.field.migration` |
+| `p2-field-nin-migration-jvm` | `pii.nin.field.migration` |
+| `p2-field-nin-migration-node` | `pii.nin.field.migration` |
+| `p2-location-bvn-api-model` | `pii.bvn` |
+| `p2-location-bvn-configuration` | `pii.bvn` |
+| `p2-location-bvn-fixture` | `pii.bvn` |
+| `p2-location-bvn-log` | `pii.bvn` |
+| `p2-location-bvn-migration` | `pii.bvn` |
+| `p2-location-email-api-model` | `pii.email` |
+| `p2-location-email-configuration` | `pii.email` |
+| `p2-location-email-fixture` | `pii.email` |
+| `p2-location-email-log` | `pii.email` |
+| `p2-location-email-migration` | `pii.email` |
+| `p2-location-nin-api-model` | `pii.nin` |
+| `p2-location-nin-configuration` | `pii.nin` |
+| `p2-location-nin-fixture` | `pii.nin` |
+| `p2-location-nin-log` | `pii.nin` |
+| `p2-location-nin-migration` | `pii.nin` |
+| `p2-location-nuban-api-model` | `pii.nuban` |
+| `p2-location-nuban-configuration` | `pii.nuban` |
+| `p2-location-nuban-fixture` | `pii.nuban` |
+| `p2-location-nuban-log` | `pii.nuban` |
+| `p2-location-nuban-migration` | `pii.nuban` |
+| `p2-location-phone-api-model` | `pii.phone` |
+| `p2-location-phone-configuration` | `pii.phone` |
+| `p2-location-phone-fixture` | `pii.phone` |
+| `p2-location-phone-log` | `pii.phone` |
+| `p2-location-phone-migration` | `pii.phone` |
+
+<!-- generated-location-cases:end -->

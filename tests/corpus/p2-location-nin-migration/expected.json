@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nin",
+    "path": "migrations/001_customer.sql",
+    "line": 1,
+    "column": 62,
+    "triage": "true-positive"
+  }
+]

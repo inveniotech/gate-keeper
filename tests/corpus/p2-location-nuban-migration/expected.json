@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nuban",
+    "path": "migrations/001_customer.sql",
+    "line": 1,
+    "column": 65,
+    "triage": "true-positive"
+  }
+]

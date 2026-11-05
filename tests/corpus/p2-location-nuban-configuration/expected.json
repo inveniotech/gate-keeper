@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nuban",
+    "path": "config/appsettings.json",
+    "line": 1,
+    "column": 19,
+    "triage": "true-positive"
+  }
+]

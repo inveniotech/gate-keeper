@@ -5,3 +5,5 @@ P2-02 provides an approval-aware lookup for the citation register. The owner app
 Run `node --test ci/rule-packs/citations.test.mjs` with Node.js 26. Tests use synthetic approval metadata to exercise the lookup; the committed status records the owner's instruction, not an automated approval. The [review page](../../rule-packs/CITATIONS.md) explains the official source pins and approval process. The register is not itself a rule pack.
 
 P2-03 adds `node --test ci/rule-packs/identifier-cases.test.mjs` for the corpus-first identifier matrix and byte-exact regeneration. Its generated inputs and pending production acceptance are documented in [IDENTIFIER-ACCEPTANCE.md](../../rule-packs/IDENTIFIER-ACCEPTANCE.md).
+
+P2-04 adds `node --test ci/rule-packs/location-cases.test.mjs` for the five-location matrix and field handling in every launch stack. Its generator reuses the identifier case builder and synchronisation function. [LOCATION-ACCEPTANCE.md](../../rule-packs/LOCATION-ACCEPTANCE.md) records severity and rule-composition decisions still needed before production acceptance.

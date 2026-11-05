@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nuban",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 19,
+    "triage": "true-positive"
+  }
+]

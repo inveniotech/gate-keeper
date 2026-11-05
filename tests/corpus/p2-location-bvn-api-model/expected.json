@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.bvn",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 60,
+    "triage": "true-positive"
+  }
+]

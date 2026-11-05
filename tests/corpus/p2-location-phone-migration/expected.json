@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.phone",
+    "path": "migrations/001_customer.sql",
+    "line": 1,
+    "column": 57,
+    "triage": "true-positive"
+  }
+]
