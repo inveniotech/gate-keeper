@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "local.privacy",
+  "version": 1,
+  "minEngineVersion": "0.1.0",
+  "provenance": "local",
+  "rules": [
+    {"id":"local.privacy.probe","severity":"error","category":"synthetic","citation":{"title":"Synthetic privacy probe."},"sinceVersion":1,"matcher":{"list":{"package":["gatekeeper-corpus-probe"]}}},
+    {"id":"local.privacy.digits","severity":"error","category":"synthetic","citation":{"title":"Synthetic privacy probe."},"sinceVersion":1,"matcher":{"pattern":{"shape":[{"class":"digit","min":10,"max":11}],"boundary":"digit"}}}
+  ]
+}

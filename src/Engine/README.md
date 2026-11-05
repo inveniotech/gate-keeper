@@ -91,3 +91,6 @@ LoadedPack retains the verified content issue date separately from its coverage 
 ## Optional benchmark instrumentation (P1-15)
 
 Only builds with BenchmarkInstrumentation=true include anonymous per-file matching times, per-thread allocation deltas and per-rule regex search counters. The counters retain no source path or matched value. Normal release builds contain neither these types nor their counters. The same existing matcher and orchestrator run in both modes, and instrumented tests prove exact regex call and input-byte counts while retaining identical findings. Input bytes count the UTF-16 searchable suffix for every search, including unsuccessful searches.
+## Installation Git checks (P1-13)
+
+RepositoryGitState reuses the local Git runner to check executable availability, work-tree membership and whether the index tracks the fingerprint key. It never reads key contents or contacts a remote. Tests exercise an indexed synthetic key and a plain directory.

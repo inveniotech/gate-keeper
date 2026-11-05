@@ -202,7 +202,9 @@ for (const [label, value] of Object.entries(table)) {
 }
 lines.push("");
 lines.push("documented examples verified: 3");
-if (process.argv[2] === "--benchmark") {
+if (process.argv[2] === "--values-json") {
+  console.log(JSON.stringify(Object.values(table), null, 2));
+} else if (process.argv[2] === "--benchmark") {
   const { mkdir, writeFile } = await import("node:fs/promises");
   const { join, resolve } = await import("node:path");
   const { createHash } = await import("node:crypto");
