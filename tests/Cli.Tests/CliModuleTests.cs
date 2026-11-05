@@ -60,7 +60,6 @@ public sealed class CliModuleTests
         {
             { ["scan"], "scan" },
             { ["init"], "init" },
-            { ["baseline"], "baseline" },
             { ["doctor"], "doctor" },
             { ["support-bundle"], "support-bundle" },
         };

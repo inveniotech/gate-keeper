@@ -2,4 +2,4 @@
 
 using InvenioTech.GateKeeper.Cli;
 
-return CliModule.Run(args);
+return await CliModule.RunAsync(args);

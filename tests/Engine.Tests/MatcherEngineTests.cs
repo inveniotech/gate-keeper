@@ -159,7 +159,7 @@ public sealed class MatcherEngineTests
             window: 8,
             kind: LocationKind.Configuration,
             paths: ["**/*.env"]);
-        var engine = new MatcherEngine([rule]);
+        var engine = CreateEngine([rule]);
 
         var kept = engine.Match("config/app.env", "BVN 32826314843");
         var skipped = engine.Match("src/App.cs", "BVN 32826314843");
@@ -184,7 +184,7 @@ public sealed class MatcherEngineTests
     {
         var first = Digits(id: "local.b", boundary: MatchBoundary.None);
         var second = Digits(id: "local.a", boundary: MatchBoundary.None);
-        var matches = new MatcherEngine([first, second]).Match("src/a.cs", "32826314843");
+        var matches = CreateEngine([first, second]).Match("src/a.cs", "32826314843");
 
         matches.Select(match => match.RuleId).Should().Equal("local.a", "local.b");
     }
@@ -283,7 +283,7 @@ public sealed class MatcherEngineTests
     public void MatcherEngine_Should_MatchTheExactPackage_When_ItIsAWholeToken()
     {
         var text = "dep com.example.processor-a\n";
-        var matches = new MatcherEngine([ListRule()]).Match("package.json", text);
+        var matches = CreateEngine([ListRule()]).Match("package.json", text);
 
         matches.Should().ContainSingle();
         matches[0].Column.Should().Be(ColumnOf(text, "com.example.processor-a"));
@@ -293,7 +293,7 @@ public sealed class MatcherEngineTests
     [Fact]
     public void MatcherEngine_Should_IgnoreAShorterPackage_When_ItSitsInsideALongerToken()
     {
-        var matches = new MatcherEngine([ListRule()]).Match("package.json", "dep com.example.processor-alpha\n");
+        var matches = CreateEngine([ListRule()]).Match("package.json", "dep com.example.processor-alpha\n");
 
         matches.Should().BeEmpty();
     }
@@ -302,7 +302,7 @@ public sealed class MatcherEngineTests
     public void MatcherEngine_Should_MatchAHostnameInsideAUrl_When_TheDelimitersBoundIt()
     {
         var text = "url https://processor-a.example.com/v1";
-        var matches = new MatcherEngine([ListRule()]).Match("config/hosts.env", text);
+        var matches = CreateEngine([ListRule()]).Match("config/hosts.env", text);
 
         matches.Should().ContainSingle();
         matches[0].Column.Should().Be(ColumnOf(text, "processor-a.example.com"));
@@ -312,7 +312,7 @@ public sealed class MatcherEngineTests
     public void MatcherEngine_Should_IgnoreAShorterHostname_When_ItSitsInsideALongerHostname()
     {
         var rule = ListRule(packages: null, hostnames: ["example.com"]);
-        var matches = new MatcherEngine([rule]).Match("config/hosts.env", "url https://processor-a.example.com/v1");
+        var matches = CreateEngine([rule]).Match("config/hosts.env", "url https://processor-a.example.com/v1");
 
         matches.Should().BeEmpty();
     }
@@ -322,7 +322,7 @@ public sealed class MatcherEngineTests
     {
         var text = "host example.com";
         var rule = ListRule(packages: null, hostnames: ["example.com"]);
-        var matches = new MatcherEngine([rule]).Match("config/hosts.env", text);
+        var matches = CreateEngine([rule]).Match("config/hosts.env", text);
 
         matches.Should().ContainSingle();
         matches[0].Column.Should().Be(ColumnOf(text, "example.com"));
@@ -332,7 +332,7 @@ public sealed class MatcherEngineTests
     public void MatcherEngine_Should_CarryTheHintOnAListMatch_When_TheRuleHasOne()
     {
         var rule = ListRule(hints: ["Confirm the transfer basis."]);
-        var matches = new MatcherEngine([rule]).Match("package.json", "dep com.example.processor-a");
+        var matches = CreateEngine([rule]).Match("package.json", "dep com.example.processor-a");
 
         matches.Should().ContainSingle();
         matches[0].SuppressionHints.Should().Equal("Confirm the transfer basis.");
@@ -343,7 +343,7 @@ public sealed class MatcherEngineTests
     {
         var rule = Digits(keywords: ["bvn"], window: null);
 
-        var act = () => new MatcherEngine([rule]);
+        var act = () => CreateEngine([rule]);
 
         act.Should().Throw<EngineToolException>().WithMessage("*window*");
     }
@@ -374,9 +374,13 @@ public sealed class MatcherEngineTests
         act.Should().Throw<EngineToolException>().WithMessage("*32 parts*");
     }
 
+    // Semantic tests isolate runner scheduling; ShapeCompilerTests verifies finite production deadlines.
+    private static MatcherEngine CreateEngine(IReadOnlyList<Rule> rules) =>
+        new(rules, shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan));
+
     private static IReadOnlyList<RuleMatch> Scan(string text, Rule rule)
     {
-        return new MatcherEngine([rule]).Match("src/a.cs", text);
+        return CreateEngine([rule]).Match("src/a.cs", text);
     }
 
     private static int ColumnOf(string text, string span)
