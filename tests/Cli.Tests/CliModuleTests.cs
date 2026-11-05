@@ -49,7 +49,7 @@ public sealed class CliModuleTests
         var exitCode = CliModule.Run([], output, errors);
 
         exitCode.Should().Be((int)ExitOutcome.ToolError);
-        errors.ToString().Should().Contain("The scan (the default) command is not in this build yet");
+        errors.ToString().Should().Contain("No rule pack is available for scan");
         output.ToString().Should().BeEmpty();
     }
 
@@ -58,7 +58,6 @@ public sealed class CliModuleTests
     {
         var commands = new Dictionary<string[], string>
         {
-            { ["scan"], "scan" },
             { ["init"], "init" },
             { ["doctor"], "doctor" },
             { ["support-bundle"], "support-bundle" },

@@ -79,3 +79,7 @@ Run `dotnet test --filter FullyQualifiedName~ResultsWriterTests` for empty and p
 `SeverityPolicy.RunAsync` wraps the host's asynchronous scan operation and returns a `ScanDecision`. Successful scans return pass or violations, mapping to process codes 0 or 1. Known tool or repository-access failures return code 2 and an actionable diagnostic, with no partial result to serialise. Cancellation propagates. Licence state is not an input to the decision. The command host writes diagnostics to standard error and passes only completed results to the writers. CLI scan-command wiring remains its separate card.
 
 Run `dotnet test tests/Engine.Tests --filter FullyQualifiedName~SeverityPolicyTests` for all 144 combinations of severity, threshold, baseline state, suppression, history and tool errors, plus cancellation, repository access errors, effective override order, invalid settings and evidence/SARIF exit-code agreement.
+
+## Repository metadata (P1-12)
+
+RepositoryMetadata reads local Git facts through the existing Git runner. It normalises remote identities under configuration section 10 and removes remote credentials before evidence is produced. Its pure normalisation tests cover HTTPS, SSH, SCP-style remotes and local paths. No remote objects are fetched.
