@@ -105,6 +105,13 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "gatekeeper-ndpa-check": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Engine": "[1.0.0, )",
+          "System.CommandLine": "[2.0.14, )"
+        }
+      },
       "inveniotech.gatekeeper.engine": {
         "type": "Project",
         "dependencies": {
@@ -130,6 +137,12 @@
         "requested": "[1.0.0, )",
         "resolved": "1.0.0",
         "contentHash": "CJH8MjgTGLqT1Uy7nJ4CZqVigk+5yMP+oQbJ9QucEZyxB4s8ybi8jvYXi+ZhGTV9hrdkUvuC6CYHLTonIJ33BQ=="
+      },
+      "System.CommandLine": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.14, )",
+        "resolved": "2.0.14",
+        "contentHash": "15fyVO4aG6poR6IKmhM74zf7PUzaU6FZAGm2d3SQSO9yIyGAeo44e6t9qeKjjaqyMEqYdqcb2G1B0gpLoDU2cA=="
       },
       "Tomlyn": {
         "type": "CentralTransitive",

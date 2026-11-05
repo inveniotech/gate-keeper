@@ -21,5 +21,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+    <ProjectReference Include="..\..\cli\InvenioTech.GateKeeper.Cli.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\corpus\synthetic-values.json" Link="synthetic-values.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="support-probe.pack.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

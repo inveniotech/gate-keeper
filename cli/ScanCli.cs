@@ -19,7 +19,8 @@ internal static class ScanCli
         {
             try
             {
-                var input = await PrepareAsync(root, parse.GetValue(date), token).ConfigureAwait(false);
+                var prepared = await PrepareAsync(root, parse.GetValue(date), token).ConfigureAwait(false);
+                var input = prepared.Results;
                 var outcome = SeverityPolicy.Evaluate(input.Policy, input.Settings.FailOn);
                 foreach (var warning in input.Policy.Warnings) await errors.WriteLineAsync(warning.Message).ConfigureAwait(false);
                 if (parse.GetValue(json))
@@ -40,7 +41,7 @@ internal static class ScanCli
         });
     }
 
-    internal static async Task<ResultsInput> PrepareAsync(string root, string? date, CancellationToken token)
+    internal static async Task<PreparedScan> PrepareAsync(string root, string? date, CancellationToken token)
     {
         var load = ConfigurationLoader.Load(root);
         if (load.Settings is not { } settings || load.Errors.Count > 0) throw new EngineToolException(string.Join(" ", load.Errors));
@@ -68,8 +69,8 @@ internal static class ScanCli
         var warnings = policy.Warnings.Concat(PackAgeWarning.Evaluate(packs.Packs, day)).Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();
         if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in ndpa-check.toml."));
         policy = policy with { Warnings = warnings.OrderBy(w => w.Code, StringComparer.Ordinal).ThenBy(w => w.Message, StringComparer.Ordinal).ToArray() };
-        return new(policy, settings, packs.Packs, metadata.Id, metadata.Revision,
-            settings.ScanHistory && scan.Enumeration.IsInsideGitWorkTree, SeverityPolicy.Evaluate(policy, settings.FailOn));
+        return new(new ResultsInput(policy, settings, packs.Packs, metadata.Id, metadata.Revision,
+            settings.ScanHistory && scan.Enumeration.IsInsideGitWorkTree, SeverityPolicy.Evaluate(policy, settings.FailOn)), packs);
     }
 
     internal static async Task<MergedRules> LoadPacksAsync(string root, ScanSettings settings, CancellationToken token)
@@ -116,3 +117,5 @@ internal static class ScanCli
         public bool TryGetWatermarkKey(string keyId, out byte[] publicKey) { publicKey = []; return false; }
     }
 }
+
+internal sealed record PreparedScan(ResultsInput Results, MergedRules Packs);

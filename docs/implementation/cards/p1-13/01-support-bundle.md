@@ -1,8 +1,8 @@
-# P1-13 support-bundle scope proposal
+# P1-13 support-bundle engineering scope
 
-Status: proposed for owner review under IQ-55. This document does not accept a specification or replace the unfinished support triage document.
+Implementation note for issue #23. IQ-55 concerns support and service-level agreements; channels, response times, retention and support policy remain open there. The engineering bundle follows the card without deciding those policies.
 
-## Recommended first version
+## First engineering version
 
 Create a local ZIP file at `.ndpa-check/support-bundle.zip`, with an optional repository-relative `--output` filename. Nothing is uploaded automatically. The user reviews the archive and chooses whether to send it through their support channel.
 
@@ -20,7 +20,7 @@ Never include source files, matched content, source paths, Git remotes, raw conf
 
 Build documents from this allow-list rather than copying and then redacting files. Use the loaded rules as an additional content check on retained identifiers and metadata. For this diagnostic check only, remove path and keyword restrictions, retaining shapes, validators and exclusions, so a source-specific rule cannot accidentally exempt metadata. Replace a metadata string that matches with `[masked]`. Check the final serialised documents again; a remaining match or a check failure prevents the archive from being written. Write the ZIP atomically and retain an existing archive on failure.
 
-Test every corpus repository through the real scan and bundle path, open every ZIP entry and assert that none of the values from the documented synthetic-value generator occurs. Add tests for hostile configuration strings, path traversal, deterministic bytes, fixed entry names, absence of keys and source content, and failure without a partial archive.
+The acceptance tests scan every corpus repository through the real scan and bundle path, open every ZIP entry and assert that none of the values from the documented synthetic-value generator occurs. Additional tests cover hostile configuration strings, path traversal, deterministic bytes, fixed entry names, absence of keys and source content, and failure without a partial archive.
 
 ## Trade-off and follow-ups
 

@@ -92,7 +92,7 @@ public static class CliModule
         rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
         rootCommand.Subcommands.Add(BaselineCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(DoctorCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
-        rootCommand.Subcommands.Add(NotImplementedCommand("support-bundle", "Creates the support bundle for a support request; not implemented in this build", errors));
+        rootCommand.Subcommands.Add(SupportBundleCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(new Command("version", "Prints the product version and the bundled pack version")
         {
             Action = new PrintVersionAction(output),
