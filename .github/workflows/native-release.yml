@@ -36,12 +36,12 @@ jobs:
           dotnet-version: '10.0.403'
       - name: Publish native and trimmed CLI
         if: matrix.musl == false
-        run: dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native
+        run: dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native
       - name: Publish musl in Alpine
         if: matrix.musl == true
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE:/src" -w /src mcr.microsoft.com/dotnet/sdk:10.0.403-alpine \
-            sh -c 'set -e; apk add --no-cache clang build-base zlib-dev; dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native'
+          docker run --rm -v "$GITHUB_WORKSPACE:/src" -w /src mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24-aot \
+            sh -c 'set -e; dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native'
       - name: Run the published binary over the corpus
         shell: pwsh
         env:
@@ -90,8 +90,8 @@ jobs:
           pwsh -File candidate/ci/native-release/Test-PackNative.ps1
       - name: Publish both comparison arms on the same runner
         run: |
-          dotnet publish baseline/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
-          dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/candidate
+          dotnet publish baseline/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
+          dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/candidate
       - name: Measure paired cold start, whole scan and added CI time
         shell: pwsh
         run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper-ndpa-check -CandidateBinary artifacts/candidate/gatekeeper-ndpa-check -Destination artifacts/benchmarks -ReferencePack candidate/ci/zero-egress/probe.pack.json

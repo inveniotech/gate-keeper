@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +33,7 @@ test('benchmark generator produces the same 500 eligible files and metadata twic
     const repeat = spawnSync(process.execPath, [fileURLToPath(generator), '--benchmark', join(root, 'first'), '--files', '500']);
     assert.notEqual(repeat.status, 0);
   } finally {
+    assert.equal(dirname(root), resolve(tmpdir()));
     await rm(root, { recursive: true, force: true });
   }
 });

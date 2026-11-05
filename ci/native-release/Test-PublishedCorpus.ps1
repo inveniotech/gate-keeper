@@ -44,3 +44,6 @@ try {
   if (-not $resolved.StartsWith($temporary, [StringComparison]::OrdinalIgnoreCase)) { throw 'The test cleanup path is outside the temporary directory.' }
   Remove-Item -LiteralPath $resolved -Recurse -Force
 }
+
+# Expected finding exits are verified above and must not become a workflow failure.
+exit 0

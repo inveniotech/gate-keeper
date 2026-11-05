@@ -1,13 +1,13 @@
 # Native release candidates and benchmarks
 
-P1-15 builds the real CLI for Windows, Linux and macOS on x64 and arm64, including both Alpine/musl Linux variants (IQ-59 and IQ-88). Each job publishes with NativeAOT and trimming, treats their warnings as errors, runs every corpus repository with the existing synthetic local probe, and enforces the unchanged 8 MiB executable budget (IQ-90). Size optimisation is the supported .NET `OptimizationPreference=Size` setting. Archives contain the binary, with SHA-256 sidecars and a combined `SHA256SUMS` review artefact. The workflow prepares artefacts and measured release-note inputs; publishing a release remains an owner action.
+P1-15 builds the real CLI for Windows, Linux and macOS on x64 and arm64, including both Alpine/musl Linux variants (IQ-59 and IQ-88). Each job publishes with NativeAOT and trimming, treats their warnings as errors, runs every corpus repository with the existing synthetic local probe, and enforces the unchanged 8 MiB executable budget (IQ-90). Size optimisation is the supported .NET `OptimizationPreference=Size` setting, with stack-trace metadata removed from release binaries through `StackTraceSupport=false`. User-facing diagnostics still describe failures; release binaries do not carry runtime stack traces. Archives contain the binary, with SHA-256 sidecars and a combined `SHA256SUMS` review artefact. The workflow prepares artefacts and measured release-note inputs; publishing a release remains an owner action.
 
 macOS binaries are unsigned and are not notarised. macOS may display an operating-system warning when a downloaded binary is opened. Windows signing and the fresh Windows 11 Smart App Control test remain owner release checks; this workflow does not claim either has been completed (IQ-18).
 
 ## Reproduce native validation
 
 ```powershell
-dotnet publish cli -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -o artifacts/native
+dotnet publish cli -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -o artifacts/native
 ./ci/native-release/Test-PublishedCorpus.ps1 -Binary artifacts/native/gatekeeper-ndpa-check.exe
 ./ci/native-release/Pack-Native.ps1 -Binary artifacts/native/gatekeeper-ndpa-check.exe -RuntimeIdentifier win-x64 -Destination artifacts/release -ProductVersion 0.1.0
 ```
