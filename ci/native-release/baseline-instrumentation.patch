@@ -1,0 +1,103 @@
+diff --git a/Directory.Build.props b/Directory.Build.props
+index dc7b412..76bab58 100644
+--- a/Directory.Build.props
++++ b/Directory.Build.props
+@@ -12,0 +13,3 @@
++  <PropertyGroup Condition="'$(BenchmarkInstrumentation)' == 'true'">
++    <DefineConstants>$(DefineConstants);GATEKEEPER_BENCHMARK</DefineConstants>
++  </PropertyGroup>
+diff --git a/cli/ScanCli.cs b/cli/ScanCli.cs
+index f52f1f3..49949cb 100644
+--- a/cli/ScanCli.cs
++++ b/cli/ScanCli.cs
+@@ -61,0 +62,4 @@ internal static class ScanCli
++#if GATEKEEPER_BENCHMARK
++        if (Environment.GetEnvironmentVariable("GATEKEEPER_BENCHMARK_OUTPUT") is { Length: > 0 } metricsPath)
++            await File.WriteAllBytesAsync(metricsPath, BenchmarkMetrics.Write(scan.Measurements), token).ConfigureAwait(false);
++#endif
+diff --git a/src/Engine/MatcherEngine.cs b/src/Engine/MatcherEngine.cs
+index 5d7e8dd..c08385d 100644
+--- a/src/Engine/MatcherEngine.cs
++++ b/src/Engine/MatcherEngine.cs
+@@ -92,0 +93,17 @@ public sealed class MatcherEngine
++        => MatchCore(relativePath, text, cancellationToken
++#if GATEKEEPER_BENCHMARK
++            , null
++#endif
++            );
++
++#if GATEKEEPER_BENCHMARK
++    /// <summary>Matches a file while recording search counters in the benchmark-only build.</summary>
++    public IReadOnlyList<RuleMatch> Match(string relativePath, string text, CancellationToken cancellationToken, BenchmarkRegexCounters measurements)
++        => MatchCore(relativePath, text, cancellationToken, measurements);
++#endif
++
++    private IReadOnlyList<RuleMatch> MatchCore(string relativePath, string text, CancellationToken cancellationToken
++#if GATEKEEPER_BENCHMARK
++        , BenchmarkRegexCounters? measurements
++#endif
++        )
+@@ -116 +133,5 @@ public sealed class MatcherEngine
+-                MatchPattern(prepared, relativePath, text, matches, cancellationToken);
++                MatchPattern(prepared, relativePath, text, matches, cancellationToken
++#if GATEKEEPER_BENCHMARK
++                    , measurements
++#endif
++                    );
+@@ -208 +229,5 @@ public sealed class MatcherEngine
+-        CancellationToken cancellationToken)
++        CancellationToken cancellationToken
++#if GATEKEEPER_BENCHMARK
++        , BenchmarkRegexCounters? measurements
++#endif
++        )
+@@ -225,0 +251,3 @@ public sealed class MatcherEngine
++#if GATEKEEPER_BENCHMARK
++                measurements?.Record(prepared.Rule.Id, (text.Length - searchFrom) * 2L);
++#endif
+diff --git a/src/Engine/ScanOrchestrator.cs b/src/Engine/ScanOrchestrator.cs
+index cc152a7..60527a7 100644
+--- a/src/Engine/ScanOrchestrator.cs
++++ b/src/Engine/ScanOrchestrator.cs
+@@ -9,0 +10,9 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
++#if GATEKEEPER_BENCHMARK
++    private readonly TimeProvider measurementClock = TimeProvider.System;
++
++    /// <summary>Creates the benchmark-only orchestrator with an injected monotonic clock.</summary>
++    public ScanOrchestrator(MatcherEngine matcher, TimeProvider clock) : this(matcher)
++    {
++        measurementClock = clock ?? throw new ArgumentNullException(nameof(clock));
++    }
++#endif
+@@ -30,0 +40,13 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
++#if GATEKEEPER_BENCHMARK
++        var measured = await BoundedWorkers.MapAsync(input.Files, (file, token) =>
++        {
++            var counters = new BenchmarkRegexCounters();
++            var allocated = GC.GetAllocatedBytesForCurrentThread();
++            var started = measurementClock.GetTimestamp();
++            var matches = this.matcher.Match(file.Path, file.Text, token, counters);
++            var elapsed = measurementClock.GetElapsedTime(started).TotalMilliseconds;
++            var allocationBytes = GC.GetAllocatedBytesForCurrentThread() - allocated;
++            return Task.FromResult((Matches: matches, Metric: new BenchmarkFileMetric(elapsed, allocationBytes, counters.Values)));
++        }, cancellationToken).ConfigureAwait(false);
++        var batches = measured.Select(b => b.Matches);
++#else
+@@ -32,0 +55 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
++#endif
+@@ -69 +92,5 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
+-        return new ScanMatchResult(findings.AsReadOnly(), history.AsReadOnly(), input);
++        return new ScanMatchResult(findings.AsReadOnly(), history.AsReadOnly(), input)
++#if GATEKEEPER_BENCHMARK
++        { Measurements = measured.Select(b => b.Metric).ToArray() }
++#endif
++        ;
+@@ -89 +116,7 @@ public sealed class ScanOrchestrator(MatcherEngine matcher)
+-public sealed record ScanMatchResult(IReadOnlyList<RuleMatch> Findings, IReadOnlyList<HistoryMatch> History, FileEnumerationResult Enumeration);
++public sealed record ScanMatchResult(IReadOnlyList<RuleMatch> Findings, IReadOnlyList<HistoryMatch> History, FileEnumerationResult Enumeration)
++{
++#if GATEKEEPER_BENCHMARK
++    /// <summary>Anonymous matching-stage measurements available only in instrumented benchmark builds.</summary>
++    public IReadOnlyList<BenchmarkFileMetric> Measurements { get; init; } = [];
++#endif
++}

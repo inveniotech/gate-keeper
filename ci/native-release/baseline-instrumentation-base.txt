@@ -1,0 +1,4 @@
+dc7b412b7b2dd1a4ee037d34b1fe313112a8e927 Directory.Build.props
+f52f1f3f149e96faa5cd766cc2ec1718ad64ade0 cli/ScanCli.cs
+5d7e8ddc3b385e45c76da6e32a8283b01ff4a563 src/Engine/MatcherEngine.cs
+cc152a7992268d80af1ada20adcdccfb85ec3d31 src/Engine/ScanOrchestrator.cs

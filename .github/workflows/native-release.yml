@@ -1,0 +1,134 @@
+name: Native release candidates
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'cli/**'
+      - 'src/**'
+      - 'ci/native-release/**'
+      - 'tests/corpus/New-CorpusValues.mjs'
+      - '.github/workflows/native-release.yml'
+      - 'Directory.*.props'
+      - 'global.json'
+permissions:
+  contents: read
+jobs:
+  publish:
+    name: Native ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { rid: win-x64, os: windows-latest, musl: false }
+          - { rid: win-arm64, os: windows-11-arm, musl: false }
+          - { rid: linux-x64, os: ubuntu-latest, musl: false }
+          - { rid: linux-arm64, os: ubuntu-24.04-arm, musl: false }
+          - { rid: linux-musl-x64, os: ubuntu-latest, musl: true }
+          - { rid: linux-musl-arm64, os: ubuntu-24.04-arm, musl: true }
+          - { rid: osx-arm64, os: macos-latest, musl: false }
+          - { rid: osx-x64, os: macos-26-intel, musl: false }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        if: matrix.musl == false
+        with:
+          dotnet-version: '10.0.403'
+      - name: Publish native and trimmed CLI
+        if: matrix.musl == false
+        run: dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native
+      - name: Publish musl in Alpine
+        if: matrix.musl == true
+        run: |
+          mkdir -p artifacts/native artifacts/release
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp -e NUGET_PACKAGES=/tmp/nuget -v "$GITHUB_WORKSPACE:/src" -w /src mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24-aot \
+            sh -c 'set -e; dotnet publish cli -c Release -r ${{ matrix.rid }} -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/native'
+      - name: Run the published binary over the corpus
+        shell: pwsh
+        env:
+          MUSL: ${{ matrix.musl }}
+        run: |
+          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper-ndpa-check.exe' } else { 'artifacts/native/gatekeeper-ndpa-check' }
+          if ($env:MUSL -eq 'true') {
+            ./ci/native-release/Test-PublishedCorpus.ps1 -Binary $binary -ContainerImage mcr.microsoft.com/dotnet/runtime-deps:10.0-alpine-extra
+          } else {
+            ./ci/native-release/Test-PublishedCorpus.ps1 -Binary $binary
+          }
+      - name: Enforce size budget and create archive and SHA-256 checksum
+        shell: pwsh
+        env:
+          RID: ${{ matrix.rid }}
+        run: |
+          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper-ndpa-check.exe' } else { 'artifacts/native/gatekeeper-ndpa-check' }
+          $version = [regex]::Match((Get-Content src/Engine/EngineProduct.cs -Raw), 'EngineVersion = "([^"]+)"').Groups[1].Value
+          if (-not $version) { throw 'The product version could not be read.' }
+          ./ci/native-release/Pack-Native.ps1 -Binary $binary -RuntimeIdentifier $env:RID -Destination artifacts/release -ProductVersion $version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: artifacts/release
+          if-no-files-found: error
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          path: baseline
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - name: Test the deterministic generator and regression arithmetic
+        run: |
+          node --test candidate/ci/native-release/benchmark-generator.test.mjs
+          pwsh -File candidate/ci/native-release/Test-BenchmarkMath.ps1
+          pwsh -File candidate/ci/native-release/Test-PackNative.ps1
+          dotnet test candidate/tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests --verbosity quiet
+          pwsh -File candidate/ci/native-release/Enable-BaselineInstrumentation.ps1 -BaselineRoot baseline
+      - name: Publish both comparison arms on the same runner
+        run: |
+          dotnet publish baseline/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
+          dotnet publish candidate/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/candidate
+      - name: Publish the release binary for the size measurement
+        run: dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/release-size
+      - name: Measure paired cold start, whole scan and added CI time
+        shell: pwsh
+        run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper-ndpa-check -CandidateBinary artifacts/candidate/gatekeeper-ndpa-check -Destination artifacts/benchmarks -ReferencePack candidate/ci/native-release/reference.pack.json -ReleaseBinary artifacts/release-size/gatekeeper-ndpa-check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-benchmarks
+          path: artifacts/benchmarks
+          if-no-files-found: error
+  release-notes:
+    needs: [publish, benchmarks]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: artifacts
+      - name: Collect checksums and measured release-note inputs
+        shell: pwsh
+        run: |
+          $checksums = Get-ChildItem artifacts -Recurse -Filter '*.sha256' | Sort-Object Name | ForEach-Object { [IO.File]::ReadAllText($_.FullName).TrimEnd() }
+          [IO.File]::WriteAllText('artifacts/SHA256SUMS', ($checksums -join "`n") + "`n")
+          $lines = @('# Native release candidate measurements', '', '| Runtime identifier | Binary bytes |', '|---|---:|')
+          foreach ($file in Get-ChildItem artifacts -Recurse -Filter 'gatekeeper-ndpa-check-*.json' | Sort-Object Name) {
+            $record = Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            $lines += "| $($record.runtimeIdentifier) | $($record.binaryBytes) |"
+          }
+          $lines += @('', 'macOS binaries are unsigned and are not notarised. The operating system may warn when they are opened.', '', [IO.File]::ReadAllText('artifacts/native-benchmarks/benchmark.md'))
+          [IO.File]::WriteAllText('artifacts/release-notes.md', ($lines -join "`n") + "`n")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-release-review
+          path: |
+            artifacts/SHA256SUMS
+            artifacts/release-notes.md

@@ -87,3 +87,7 @@ RepositoryMetadata reads local Git facts through the existing Git runner. It nor
 ## Rule-pack age (P1-14)
 
 LoadedPack retains the verified content issue date separately from its coverage date. PackAgeWarning.Evaluate compares the newest loaded content date with the declared evaluation date. It returns the existing pack.stale warning only after 90 civil days; undated local packs do not invent an age. The CLI includes this warning on standard error and in evidence JSON. Boundary tests use an injected clock and cover 89, 90 and 91 days, future dates and mixed pack dates.
+
+## Optional benchmark instrumentation (P1-15)
+
+Only builds with BenchmarkInstrumentation=true include anonymous per-file matching times, per-thread allocation deltas and per-rule regex search counters. The counters retain no source path or matched value. Normal release builds contain neither these types nor their counters. The same existing matcher and orchestrator run in both modes, and instrumented tests prove exact regex call and input-byte counts while retaining identical findings. Input bytes count the UTF-16 searchable suffix for every search, including unsuccessful searches.

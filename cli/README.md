@@ -29,3 +29,5 @@ dotnet run --project cli -- --help
 ```
 
 Pack-age diagnostics use the declared evaluation date. When the newest dated loaded pack is more than 90 days old, the existing pack.stale warning appears on standard error and in the evidence warnings array; it never changes the exit code. Local packs have no content issue date and do not raise this warning.
+
+A developer benchmark build can opt into matching-stage measurements with BenchmarkInstrumentation=true. In that build only, GATEKEEPER_BENCHMARK_OUTPUT supplies the separate anonymous metrics artefact path. The ordinary release binary compiles this path out, and neither console nor evidence output changes.
