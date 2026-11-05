@@ -100,6 +100,14 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for authoring checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Verify rule authoring checks and generated corpus
+        run: node --test ci/rule-packs/*.test.mjs
+
       - name: Validate rule packs
         shell: pwsh
         run: ./ci/guardrails/Invoke-PackSchemaLint.ps1
