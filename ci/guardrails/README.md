@@ -10,7 +10,7 @@ This folder contains the scripts and small tools that enforce the CI guard-rails
 | Build and test matrix | `dotnet build` / `dotnet test` | The solution builds and tests pass on Windows and Linux, x64 and arm64. |
 | AOT and trim warnings | `dotnet publish -p:PublishAot=true` | The CLI publishes under NativeAOT with zero trim/AOT warnings. |
 | Zero-egress banned-API check | `BannedApiCheck` | No built assembly references `System.Net.*` types except in an allowed sink assembly. |
-| Pack-schema lint | `Invoke-PackSchemaLint.ps1` | Every file in `rule-packs/` is valid JSON and, once `schemas/rulepack.schema.json` exists, validates against it. |
+| Pack-schema lint | `Invoke-PackSchemaLint.ps1` | Every content pack, including nested templates, validates against the complete rule-pack JSON Schema. The named citation metadata file and schema itself are not content packs. |
 | Banned-terms lint | `../glossary/Invoke-GlossaryLint.ps1` | Prose and identifiers conform to `docs/glossary.json`. |
 | en-GB spelling lint | `Invoke-SpellingLint.ps1` | Markdown, source and configuration files spell-check with an en-GB dictionary. |
 | Dependency licence check | `Invoke-DependencyLicenceCheck.ps1` | Every package declared in `Directory.Packages.props` is in the allow-list and does not carry a denied licence. |
@@ -34,3 +34,7 @@ All scripts follow the convention used elsewhere in the repository:
 - `0` — check passed.
 - `1` — check failed (a rule was broken).
 - `2` — tool error (missing file, malformed input, etc.).
+
+P2-11-01 (#102) replaces the pack lint's syntax-only placeholder with PowerShell's existing `Test-Json` schema validation, without a new dependency. Absolute or repository-relative pack/schema paths work from any current directory. Pack paths are checked in ordinal order. Invalid packs produce exit 1, with every invalid file reported by relative path; input content and parser exceptions are never printed. Missing directories, missing schemas and unreadable or malformed schema inputs fail with exit 2. An empty existing pack directory is valid. `citations.json` is explicitly metadata and is checked by its own authoring tests rather than misclassified as a rule pack.
+
+Run `pwsh ./ci/guardrails/Test-PackSchemaLint.ps1` for the offline acceptance harness covering valid content, schema-invalid JSON, malformed JSON, over-bound shapes, metadata exclusion, empty directories and missing schemas. It runs before the real pack lint in the existing CI job. This strengthens the existing gate; it changes no coverage or performance threshold.
