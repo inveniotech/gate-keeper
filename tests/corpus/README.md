@@ -54,6 +54,8 @@ These three assumptions are the part of the corpus the rule-pack work packages c
 
 ## The case inventory
 
+The detection authoring modules add context positives and near-misses through `node ci/rule-packs/build-detection.mjs --write`; use `--check` to verify them. Their generated rule reference pages under `docs-data/rules/` list each case. All values come from the documented generator. The long-line BVN case includes an adjacent `bvn=` label so its expectation obeys IQ-12 while retaining a line longer than 100,000 characters.
+
 **Positives** — one finding each, in the storage contexts the card fixes from day one:
 
 | Case | Rule | Context |
