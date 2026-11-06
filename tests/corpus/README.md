@@ -178,3 +178,16 @@ Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify w
 | `p2-phone-validator-near-miss` | No finding |
 
 <!-- generated-identifier-cases:end -->
+
+<!-- generated-detection-cases:start -->
+## Authored detection acceptance cases
+
+Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Every case uses the documented synthetic generator or processor tokens without personal data.
+
+| Case | Expected rule |
+|---|---|
+| `p2-bvn-distant-label` | No finding |
+| `p2-bvn-label-after-value` | `pii.bvn` |
+| `p2-bvn-without-label` | No finding |
+
+<!-- generated-detection-cases:end -->

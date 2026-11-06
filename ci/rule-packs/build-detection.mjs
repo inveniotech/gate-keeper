@@ -8,6 +8,7 @@ import { packVersion, packDate } from './detection-authoring.mjs';
 /** Generates release-source content, reference pages and synthetic cases; never signs or publishes. */
 export async function detectionFiles() {
   const result = new Map();
+  const inventory = [];
   const sources = new URL('./rules/', import.meta.url);
   for (const file of readdirSync(sources).filter(name => name.endsWith('.mjs')).sort()) {
     const { default: source } = await import(new URL(file, sources));
@@ -19,6 +20,7 @@ export async function detectionFiles() {
     const { content } = assemblePack([input], metadata);
     result.set(`rule-packs/${source.family}.pack.json`, content);
     for (const item of source.cases ?? []) {
+      inventory.push(item);
       result.set(`tests/corpus/${item.name}/repo/${item.path}`, Buffer.from(item.text));
       result.set(`tests/corpus/${item.name}/expected.json`, Buffer.from(JSON.stringify(item.expected, null, 2) + '\n'));
     }
@@ -34,6 +36,20 @@ export async function detectionFiles() {
       ...(source.sources ? ['## Technical sources', '', ...source.sources.map(url => `- ${url}`), ''] : [])];
     result.set(`docs-data/rules/${source.family}.md`, Buffer.from(lines.join('\n')));
   }
+  const readmePath = new URL('../../tests/corpus/README.md', import.meta.url);
+  const readme = readFileSync(readmePath, 'utf8');
+  const startMarker = '<!-- generated-detection-cases:start -->';
+  const endMarker = '<!-- generated-detection-cases:end -->';
+  const start = readme.indexOf(startMarker);
+  const end = readme.indexOf(endMarker);
+  if ((start === -1) !== (end === -1) || (start !== -1 && end < start)) throw new Error('The detection inventory markers are malformed.');
+  const section = [startMarker, '## Authored detection acceptance cases', '',
+    'Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Every case uses the documented synthetic generator or processor tokens without personal data.', '',
+    '| Case | Expected rule |', '|---|---|', ...inventory.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0)
+      .map(item => `| \`${item.name}\` | ${item.expected.length ? item.expected.map(entry => `\`${entry.ruleId}\``).join(', ') : 'No finding'} |`), '', endMarker].join('\n');
+  const updated = start === -1 ? readme.trimEnd() + '\n\n' + section + '\n'
+    : readme.slice(0, start) + section + readme.slice(end + endMarker.length);
+  result.set('tests/corpus/README.md', Buffer.from(updated));
   return result;
 }
 
