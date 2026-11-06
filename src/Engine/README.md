@@ -48,7 +48,7 @@ The pack loader's tests (`PackLoaderTests`) read the committed vectors under `te
 
 ## Scan orchestration (P1-07)
 
-The matcher conformance-vector tests explicitly disable the regular-expression deadline: they check exact semantic outcomes independently of runner scheduling and cold-start time. Production keeps its 100 ms default deadline. `ShapeCompilerTests` verifies that the default and explicitly configured timeouts are carried by the compiled regular expression. `NonBacktracking` enforces finite deadlines even though its matching algorithm is linear.
+The matcher conformance-vector tests and shape-compiler tests that execute matches explicitly disable the regular-expression deadline: they check exact semantic outcomes independently of runner scheduling and cold-start time. Production keeps its 100 ms default deadline. Separate `ShapeCompilerTests` assert that the production default is exactly 100 ms and that default and explicitly configured timeouts are carried by the compiled regular expression. `NonBacktracking` enforces finite deadlines even though its matching algorithm is linear. Semantic tests still assert exact alternatives, case folding, literal repetition and emitting spans; their results do not depend on hosted-runner timing.
 
 `ScanOrchestrator` accepts a prepared `MatcherEngine` and scans either `FileEnumerationOptions` or an existing `FileEnumerationResult`. File selection and decoding remain with `FileEnumerator`. Work-tree reads and matching use at most `Environment.ProcessorCount` workers. Each worker owns its collections; the caller merges them only after all workers finish. History blob reads retain the enumerator's serial Git batch protocol.
 
