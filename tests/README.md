@@ -32,4 +32,3 @@ P2-07-02 (#99) extends the existing `CorpusMeasurements` scorer. Only `error` fi
 The gate uses `20 × false positives <= true positives + false positives`, per rule and overall, with integer arithmetic. Reports keep deterministic rule/location ordering and display the gate as unmeasured when matching did not run. Run `dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~CorpusGateTests` for exact-boundary, severity, triage and duplicate-key checks. This scorer is test infrastructure with no dependency on production rule wording or owner triage being available; fabricated safe findings exercise the complete arithmetic now.
 
 `CorpusTriage` defines the JSON triage labels once for structural validation, scoring and test inputs. Report markers and formatting use named constants in `CorpusMeasurements`, preserving the existing report text and policy values.
-
