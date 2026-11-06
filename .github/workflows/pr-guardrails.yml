@@ -100,6 +100,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Test full rule-pack schema validation
+        shell: pwsh
+        run: ./ci/guardrails/Test-PackSchemaLint.ps1
+
       - name: Validate rule packs
         shell: pwsh
         run: ./ci/guardrails/Invoke-PackSchemaLint.ps1
