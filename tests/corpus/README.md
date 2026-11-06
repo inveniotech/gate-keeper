@@ -189,5 +189,9 @@ Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Eve
 | `p2-bvn-distant-label` | No finding |
 | `p2-bvn-label-after-value` | `pii.bvn` |
 | `p2-bvn-without-label` | No finding |
+| `p2-nin-distant-label` | No finding |
+| `p2-nin-incidental-keyword` | No finding |
+| `p2-nin-label-after-value` | `pii.nin` |
+| `p2-nin-without-label` | No finding |
 
 <!-- generated-detection-cases:end -->
