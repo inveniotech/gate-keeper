@@ -1,0 +1,187 @@
+{
+  "contentIssuedAt": "2026-11-06",
+  "coverageDate": "2026-11-06",
+  "id": "invenio.processors",
+  "minEngineVersion": "0.1.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.aws",
+      "matcher": {
+        "list": {
+          "hostname": [
+            "s3.amazonaws.com",
+            "s3.eu-west-1.amazonaws.com",
+            "s3.af-south-1.amazonaws.com"
+          ],
+          "package": [
+            "AWSSDK.S3",
+            "@aws-sdk/client-s3",
+            "boto3",
+            "software.amazon.awssdk"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "application-defined stored data"
+        ],
+        "usualRegion": "Deployment-dependent; confirm the contracted processing and storage regions."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    },
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.aws.bucket",
+      "matcher": {
+        "list": {
+          "package": [
+            "aws_s3_bucket",
+            "AWS::S3::Bucket"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "application-defined stored data"
+        ],
+        "usualRegion": "Deployment-dependent; confirm the contracted processing and storage regions."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    },
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.aws.capetown",
+      "matcher": {
+        "list": {
+          "package": [
+            "af-south-1"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "application-defined data"
+        ],
+        "usualRegion": "Africa (Cape Town); confirm that this configuration is used."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    },
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.aws.ireland",
+      "matcher": {
+        "list": {
+          "package": [
+            "eu-west-1"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "application-defined data"
+        ],
+        "usualRegion": "Europe (Ireland); confirm that this configuration is used."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    },
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.flutterwave",
+      "matcher": {
+        "list": {
+          "hostname": [
+            "api.flutterwave.com"
+          ],
+          "package": [
+            "flutterwave-node-v3"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "customer contact details",
+          "payment and transaction details"
+        ],
+        "usualRegion": "Deployment-dependent; confirm the contracted processing and storage regions."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    },
+    {
+      "category": "transfer.processor",
+      "citation": {
+        "gaid": "Articles 34 and 45; Schedule 5",
+        "ndpa": "Sections 29 and 41-43",
+        "title": "Confirm processor safeguards and any cross-border transfer basis."
+      },
+      "id": "transfer.processor.paystack",
+      "matcher": {
+        "list": {
+          "hostname": [
+            "api.paystack.co"
+          ]
+        }
+      },
+      "processor": {
+        "dataCategories": [
+          "customer contact details",
+          "payment and transaction details"
+        ],
+        "usualRegion": "Deployment-dependent; confirm the contracted processing and storage regions."
+      },
+      "severity": "note",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Confirm processor safeguards, the actual data categories and regions, and any applicable transfer basis. A reference alone does not establish a transfer."
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2026.11.0"
+}

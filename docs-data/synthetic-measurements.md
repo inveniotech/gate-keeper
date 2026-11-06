@@ -9,13 +9,20 @@ The error-level gate is `20 × false positives <= true positives + false positiv
 - `invenio.bvn` version `2026.11.0`, SHA-256 `da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe`.
 - `invenio.nin` version `2026.11.0`, SHA-256 `ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c`.
 - `invenio.phone` version `2026.11.0`, SHA-256 `70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19`.
+- `invenio.processors` version `2026.11.0`, SHA-256 `0af7e2f0e1b419a97255454b05ddd8435094fa8a87a8d37b1eed768447cbbfd2`.
 
-Scanned 74 synthetic repositories. Rates are percentages; `n/a` means no denominator.
+Scanned 108 synthetic repositories. Rates are percentages; `n/a` means no denominator.
 
 rule id | expected | produced | matched | unexpected | precision | recall | error true positives | error false positives | warnings | notes | gate | error false-positive rate
 --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-(overall) | 29 | 29 | 29 | 0 | 100 | 100 | 29 | 0 | 0 | 0 | pass | 0
+(overall) | 48 | 48 | 48 | 0 | 100 | 100 | 29 | 0 | 0 | 19 | pass | 0
 pii.bvn | 11 | 11 | 11 | 0 | 100 | 100 | 11 | 0 | 0 | 0 | pass | 0
 pii.nin | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
 pii.phone | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
 pii.phone.international | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+transfer.processor.aws | 10 | 10 | 10 | 0 | 100 | 100 | 0 | 0 | 0 | 10 | pass | 0
+transfer.processor.aws.bucket | 3 | 3 | 3 | 0 | 100 | 100 | 0 | 0 | 0 | 3 | pass | 0
+transfer.processor.aws.capetown | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
+transfer.processor.aws.ireland | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
+transfer.processor.flutterwave | 3 | 3 | 3 | 0 | 100 | 100 | 0 | 0 | 0 | 3 | pass | 0
+transfer.processor.paystack | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0

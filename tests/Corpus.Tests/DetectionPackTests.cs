@@ -17,6 +17,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     [InlineData("bvn")]
     [InlineData("nin")]
     [InlineData("phone")]
+    [InlineData("processors")]
     public async Task DetectionPack_Should_MatchExactExpectations_When_RunAgainstEverySyntheticCase(string family)
     {
         var rules = Load(family);
@@ -32,6 +33,17 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
             diff.Unexpected.Should().BeEmpty(item.Name);
             diff.MatchedCount.Should().Be(diff.ExpectedCount, item.Name);
             scan.Findings.Should().OnlyContain(finding => finding.Fingerprint == null);
+            if (family == "processors")
+            {
+                scan.Findings.Should().OnlyContain(finding => finding.Severity == Severity.Note);
+                foreach (var finding in scan.Findings)
+                {
+                    var processor = rules.Single(rule => rule.Id == finding.RuleId).Processor;
+                    processor.Should().NotBeNull();
+                    processor!.DataCategories.Should().NotBeEmpty();
+                    processor.UsualRegion.Should().NotBeNullOrWhiteSpace();
+                }
+            }
             runs.Add((selected, scan.Findings));
         }
         var measurements = CorpusMeasurements.PerRule(runs);
