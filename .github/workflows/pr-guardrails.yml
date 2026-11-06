@@ -100,10 +100,13 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Set up Node.js for correction checks
+      - name: Set up Node.js for pack checks
         uses: actions/setup-node@v4
         with:
           node-version: 26
+
+      - name: Verify rule authoring checks and generated corpus
+        run: node --test ci/rule-packs/*.test.mjs
 
       - name: Test correction-release constraints
         run: node --test ci/pack-release/corrections/check.test.mjs

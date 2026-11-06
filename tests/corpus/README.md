@@ -141,3 +141,38 @@ The same generator also supports benchmark mode: pass --benchmark followed by a 
 ## Support-bundle privacy inventory (P1-13)
 
 Regenerate the synthetic-value inventory with: node tests/corpus/New-CorpusValues.mjs --values-json > tests/corpus/synthetic-values.json. The privacy-inventory workflow fails if this generated file differs from the documented generator. CorpusSupportBundleTests runs the real scan and bundle command for every case, opens every archive entry and rejects any generated identifier or fingerprint key. A mandatory synthetic finding prevents an empty scan from passing the test. This validates privacy independently of Phase 2 detection recall.
+
+<!-- generated-identifier-cases:start -->
+## Phase 2 identifier acceptance cases
+
+Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify with `--check`. All personal identifiers come from the documented generator above. These inputs establish expectations before production rules; their existence does not claim measured recall or precision.
+
+| Case | Expected rule |
+|---|---|
+| `p2-bvn-dotnet-source` | `pii.bvn` |
+| `p2-bvn-jvm-source` | `pii.bvn` |
+| `p2-bvn-node-source` | `pii.bvn` |
+| `p2-bvn-shape-near-miss` | No finding |
+| `p2-bvn-validator-near-miss` | No finding |
+| `p2-email-dotnet-source` | `pii.email` |
+| `p2-email-jvm-source` | `pii.email` |
+| `p2-email-node-source` | `pii.email` |
+| `p2-email-shape-near-miss` | No finding |
+| `p2-email-validator-near-miss` | No finding |
+| `p2-nin-dotnet-source` | `pii.nin` |
+| `p2-nin-jvm-source` | `pii.nin` |
+| `p2-nin-node-source` | `pii.nin` |
+| `p2-nin-shape-near-miss` | No finding |
+| `p2-nin-validator-near-miss` | No finding |
+| `p2-nuban-dotnet-source` | `pii.nuban` |
+| `p2-nuban-jvm-source` | `pii.nuban` |
+| `p2-nuban-node-source` | `pii.nuban` |
+| `p2-nuban-shape-near-miss` | No finding |
+| `p2-nuban-validator-near-miss` | No finding |
+| `p2-phone-dotnet-source` | `pii.phone` |
+| `p2-phone-jvm-source` | `pii.phone` |
+| `p2-phone-node-source` | `pii.phone` |
+| `p2-phone-shape-near-miss` | No finding |
+| `p2-phone-validator-near-miss` | No finding |
+
+<!-- generated-identifier-cases:end -->
