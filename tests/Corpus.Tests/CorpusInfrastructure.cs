@@ -50,7 +50,7 @@ public static class CorpusPaths
 public static class CorpusCaseValidator
 {
     /// <summary>Gets the triage labels the policy closes the set on (the quality-budgets specification, section 3.2).</summary>
-    public static readonly string[] TriageLabels = ["true-positive", "false-positive", "unresolved"];
+    public static readonly string[] TriageLabels = [CorpusTriage.TruePositive, CorpusTriage.FalsePositive, CorpusTriage.Unresolved];
 
     /// <summary>
     /// Validates one case and returns every problem found, in the order the

@@ -111,6 +111,10 @@ jobs:
       - name: Test pack assembly and fixture reproducibility
         run: node --test ci/pack-release/assembly/build.test.mjs
 
+      - name: Test full rule-pack schema validation
+        shell: pwsh
+        run: ./ci/guardrails/Test-PackSchemaLint.ps1
+
       - name: Validate rule packs
         shell: pwsh
         run: ./ci/guardrails/Invoke-PackSchemaLint.ps1

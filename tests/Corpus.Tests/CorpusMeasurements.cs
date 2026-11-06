@@ -15,6 +15,16 @@ namespace InvenioTech.GateKeeper.Corpus.Tests;
 /// </summary>
 public static class CorpusMeasurements
 {
+    private const string OverallRuleId = "(overall)";
+    private const string NotApplicableRate = "n/a";
+    private const string UnmeasuredStatus = "unmeasured";
+    private const string PassingGateStatus = "pass";
+    private const string FailingGateStatus = "fail";
+    private const string RateFormat = "0.#";
+    private const string ReportHeader = "rule id | expected | produced | matched | unexpected | precision | recall | error true positives | error false positives | warnings | notes | gate | error false-positive rate";
+    private const string PerRuleSectionHeader = "-- per rule, in rule-identifier order --";
+    private const string ReportRowFormat = "{0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} | {8} | {9} | {10} | {11} | {12}";
+
     /// <summary>
     /// Diffs one scan's findings against one case's expected entries. A
     /// produced finding is a match when a same-key expected entry exists:
@@ -29,16 +39,29 @@ public static class CorpusMeasurements
         ArgumentNullException.ThrowIfNull(expected);
         ArgumentNullException.ThrowIfNull(findings);
 
-        var expectedKeys = expected
-            .Select(entry => new CorpusKey(entry.RuleId, entry.Path, entry.Line, entry.Column))
-            .ToHashSet();
+        var expectedKeys = new Dictionary<CorpusKey, string?>();
+        foreach (var entry in expected)
+        {
+            if (entry.Triage is not (null or CorpusTriage.TruePositive or CorpusTriage.FalsePositive or CorpusTriage.Unresolved))
+                throw new ArgumentException("A corpus triage label is invalid.", nameof(expected));
+            if (!expectedKeys.TryAdd(new CorpusKey(entry.RuleId, entry.Path, entry.Line, entry.Column), entry.Triage))
+                throw new ArgumentException("Duplicate corpus expectation keys cannot be scored.", nameof(expected));
+        }
 
         var unexpected = new List<CorpusDiff.UnexpectedFinding>();
         var matched = 0;
+        var errorTruePositives = 0;
+        var errorFalsePositives = 0;
+        var warnings = 0;
+        var notes = 0;
+        var seen = new HashSet<CorpusKey>();
 
         foreach (var finding in findings)
         {
-            if (expectedKeys.Contains(new CorpusKey(finding.RuleId, finding.Path, finding.Line, finding.Column)))
+            var key = new CorpusKey(finding.RuleId, finding.Path, finding.Line, finding.Column);
+            if (!seen.Add(key)) throw new ArgumentException("Duplicate finding keys cannot be scored.", nameof(findings));
+            var accepted = expectedKeys.TryGetValue(key, out var triage) && triage is null or CorpusTriage.TruePositive;
+            if (accepted)
             {
                 matched += 1;
             }
@@ -47,9 +70,20 @@ public static class CorpusMeasurements
                 unexpected.Add(new CorpusDiff.UnexpectedFinding(
                     finding.RuleId, finding.Path, finding.Line, finding.Column));
             }
+            switch (finding.Severity)
+            {
+                case Severity.Error:
+                    if (accepted) errorTruePositives++; else errorFalsePositives++;
+                    break;
+                case Severity.Warning: warnings++; break;
+                case Severity.Note: notes++; break;
+                default: throw new ArgumentException("A finding severity is invalid.", nameof(findings));
+            }
         }
 
-        return new CorpusDiff(expected.Count, findings.Count, matched, unexpected);
+        return new CorpusDiff(expected.Count(entry => entry.Triage is null or CorpusTriage.TruePositive), findings.Count, matched,
+            unexpected.OrderBy(item => item.Path, StringComparer.Ordinal).ThenBy(item => item.Line).ThenBy(item => item.Column)
+                .ThenBy(item => item.RuleId, StringComparer.Ordinal).ToArray(), errorTruePositives, errorFalsePositives, warnings, notes);
     }
 
     /// <summary>
@@ -62,65 +96,19 @@ public static class CorpusMeasurements
     {
         ArgumentNullException.ThrowIfNull(runs);
 
-        var perRule = new Dictionary<string, (int Expected, int Produced, int Matched, List<CorpusDiff.UnexpectedFinding> Unexpected)>(StringComparer.Ordinal);
-
-        foreach (var run in runs)
-        {
-            var expectedKeys = run.Case.Expected
-                .Select(entry => new CorpusKey(entry.RuleId, entry.Path, entry.Line, entry.Column))
-                .ToHashSet();
-
-            foreach (var entry in run.Case.Expected)
-            {
-                var slot = GetSlot(perRule, entry.RuleId);
-                perRule[entry.RuleId] = (slot.Expected + 1, slot.Produced, slot.Matched, slot.Unexpected);
-            }
-
-            foreach (var finding in run.Findings)
-            {
-                var slot = GetSlot(perRule, finding.RuleId);
-
-                if (expectedKeys.Contains(new CorpusKey(finding.RuleId, finding.Path, finding.Line, finding.Column)))
-                {
-                    perRule[finding.RuleId] = (slot.Expected, slot.Produced + 1, slot.Matched + 1, slot.Unexpected);
-                }
-                else
-                {
-                    slot.Unexpected.Add(new CorpusDiff.UnexpectedFinding(
-                        finding.RuleId, finding.Path, finding.Line, finding.Column));
-                    perRule[finding.RuleId] = (slot.Expected, slot.Produced + 1, slot.Matched, slot.Unexpected);
-                }
-            }
-        }
-
-        var measurements = perRule
-            .Select(pair => new CorpusRuleMeasurement(
-                pair.Key,
-                pair.Value.Expected,
-                pair.Value.Produced,
-                pair.Value.Matched,
-                pair.Value.Unexpected))
-            .OrderBy(measurement => measurement.RuleId, StringComparer.Ordinal)
-            .ToArray();
-
-        var overall = new CorpusRuleMeasurement(
-            "(overall)",
-            measurements.Sum(measurement => measurement.ExpectedCount),
-            measurements.Sum(measurement => measurement.ProducedCount),
-            measurements.Sum(measurement => measurement.MatchedCount),
-            [.. measurements.SelectMany(measurement => measurement.Unexpected)]);
-
-        return new CorpusRunMeasurements(measurements, overall);
+        var ids = runs.SelectMany(run => run.Case.Expected.Select(entry => entry.RuleId).Concat(run.Findings.Select(finding => finding.RuleId)))
+            .Distinct(StringComparer.Ordinal).OrderBy(id => id, StringComparer.Ordinal);
+        var measurements = ids.Select(id => Aggregate(id, runs.Select(run => Score(
+            run.Case.Expected.Where(entry => entry.RuleId == id).ToArray(), run.Findings.Where(finding => finding.RuleId == id).ToArray())).ToArray())).ToArray();
+        return new CorpusRunMeasurements(measurements, Aggregate(OverallRuleId, runs.Select(run => Score(run.Case.Expected, run.Findings)).ToArray()));
     }
 
-    private static (int Expected, int Produced, int Matched, List<CorpusDiff.UnexpectedFinding> Unexpected) GetSlot(
-        Dictionary<string, (int Expected, int Produced, int Matched, List<CorpusDiff.UnexpectedFinding> Unexpected)> perRule,
-        string ruleId)
-    {
-        return perRule.TryGetValue(ruleId, out var slot)
-            ? slot
-            : (0, 0, 0, []);
-    }
+    private static CorpusRuleMeasurement Aggregate(string id, IReadOnlyList<CorpusDiff> diffs) => new(id,
+        diffs.Sum(diff => diff.ExpectedCount), diffs.Sum(diff => diff.ProducedCount), diffs.Sum(diff => diff.MatchedCount),
+        diffs.SelectMany(diff => diff.Unexpected).OrderBy(item => item.Path, StringComparer.Ordinal).ThenBy(item => item.Line)
+            .ThenBy(item => item.Column).ThenBy(item => item.RuleId, StringComparer.Ordinal).ToArray(),
+        diffs.Sum(diff => diff.ErrorTruePositiveCount), diffs.Sum(diff => diff.ErrorFalsePositiveCount),
+        diffs.Sum(diff => diff.WarningCount), diffs.Sum(diff => diff.NoteCount));
 
     /// <summary>
     /// Prints the per-rule report the harness hands to the test's output:
@@ -134,9 +122,9 @@ public static class CorpusMeasurements
     /// <param name="matcherStagePresent">Whether the build carries the engine's matching stage.</param>
     public static void WriteReport(TextWriter writer, CorpusRunMeasurements runMeasurements, bool matcherStagePresent)
     {
-        writer.WriteLine("rule id | expected | produced | matched | unexpected | precision | recall");
+        writer.WriteLine(ReportHeader);
         WriteRow(writer, runMeasurements.Overall, matcherStagePresent);
-        writer.WriteLine("-- per rule, in rule-identifier order --");
+        writer.WriteLine(PerRuleSectionHeader);
 
         foreach (var measurement in runMeasurements.PerRule)
         {
@@ -148,35 +136,39 @@ public static class CorpusMeasurements
     {
         var precision = measurement.ProducedCount > 0
             ? FormatRate(100d * measurement.MatchedCount / measurement.ProducedCount)
-            : "n/a";
+            : NotApplicableRate;
 
         string recall;
         if (measurement.ExpectedCount == 0)
         {
-            recall = "n/a";
+            recall = NotApplicableRate;
         }
         else if (!matcherStagePresent)
         {
-            recall = "unmeasured";
+            recall = UnmeasuredStatus;
         }
         else
         {
             recall = FormatRate(100d * measurement.MatchedCount / measurement.ExpectedCount);
         }
 
+        var errorCount = (long)measurement.ErrorTruePositiveCount + measurement.ErrorFalsePositiveCount;
+        var errorRate = errorCount == 0 ? FormatRate(0) : FormatRate(100d * measurement.ErrorFalsePositiveCount / errorCount);
         writer.WriteLine(string.Format(
             CultureInfo.InvariantCulture,
-            "{0} | {1} | {2} | {3} | {4} | {5} | {6}",
+            ReportRowFormat,
             measurement.RuleId,
             measurement.ExpectedCount,
             measurement.ProducedCount,
             measurement.MatchedCount,
             measurement.Unexpected.Count,
             precision,
-            recall));
+            recall, measurement.ErrorTruePositiveCount, measurement.ErrorFalsePositiveCount, measurement.WarningCount, measurement.NoteCount,
+            !matcherStagePresent ? UnmeasuredStatus : measurement.FalsePositiveGatePassed ? PassingGateStatus : FailingGateStatus,
+            matcherStagePresent ? errorRate : UnmeasuredStatus));
     }
 
-    private static string FormatRate(double rate) => rate.ToString("0.#", CultureInfo.InvariantCulture);
+    private static string FormatRate(double rate) => rate.ToString(RateFormat, CultureInfo.InvariantCulture);
 
     private readonly record struct CorpusKey(string RuleId, string Path, int Line, int Column);
 }
@@ -190,11 +182,19 @@ public static class CorpusMeasurements
 /// <param name="ProducedCount">The number of findings the scan produced.</param>
 /// <param name="MatchedCount">The number of produced findings that also sit in the expected list.</param>
 /// <param name="Unexpected">The produced findings no expected entry names, each with its location.</param>
+/// <param name="ErrorTruePositiveCount">Accepted findings at error severity.</param>
+/// <param name="ErrorFalsePositiveCount">Rejected, unresolved or unexpected findings at error severity.</param>
+/// <param name="WarningCount">Findings at warning severity, outside the gate.</param>
+/// <param name="NoteCount">Findings at note severity, outside the gate.</param>
 public sealed record CorpusDiff(
     int ExpectedCount,
     int ProducedCount,
     int MatchedCount,
-    IReadOnlyList<CorpusDiff.UnexpectedFinding> Unexpected)
+    IReadOnlyList<CorpusDiff.UnexpectedFinding> Unexpected,
+    int ErrorTruePositiveCount = 0,
+    int ErrorFalsePositiveCount = 0,
+    int WarningCount = 0,
+    int NoteCount = 0)
 {
     /// <summary>Gets the number of produced findings that carry no match.</summary>
     public int UnexpectedCount => this.Unexpected.Count;
@@ -221,15 +221,26 @@ public sealed record CorpusDiff(
 /// <param name="ProducedCount">The number of findings produced.</param>
 /// <param name="MatchedCount">The number of produced findings that matched an expected entry.</param>
 /// <param name="Unexpected">The produced findings no expected entry names.</param>
+/// <param name="ErrorTruePositiveCount">Accepted findings at error severity.</param>
+/// <param name="ErrorFalsePositiveCount">Rejected, unresolved or unexpected findings at error severity.</param>
+/// <param name="WarningCount">Findings at warning severity, outside the gate.</param>
+/// <param name="NoteCount">Findings at note severity, outside the gate.</param>
 public sealed record CorpusRuleMeasurement(
     string RuleId,
     int ExpectedCount,
     int ProducedCount,
     int MatchedCount,
-    IReadOnlyList<CorpusDiff.UnexpectedFinding> Unexpected)
+    IReadOnlyList<CorpusDiff.UnexpectedFinding> Unexpected,
+    int ErrorTruePositiveCount = 0,
+    int ErrorFalsePositiveCount = 0,
+    int WarningCount = 0,
+    int NoteCount = 0)
 {
     /// <summary>Gets the number of produced findings that carry no match.</summary>
     public int UnexpectedCount => this.Unexpected.Count;
+
+    /// <summary>Gets whether the failing-finding rate is at most five per cent, using exact integer arithmetic.</summary>
+    public bool FalsePositiveGatePassed => 20L * ErrorFalsePositiveCount <= (long)ErrorTruePositiveCount + ErrorFalsePositiveCount;
 }
 
 /// <summary>
@@ -240,4 +251,8 @@ public sealed record CorpusRuleMeasurement(
 /// <param name="Overall">The totals across all rules.</param>
 public sealed record CorpusRunMeasurements(
     IReadOnlyList<CorpusRuleMeasurement> PerRule,
-    CorpusRuleMeasurement Overall);
+    CorpusRuleMeasurement Overall)
+{
+    /// <summary>Gets whether both every rule and the overall total meet the exact false-positive bound.</summary>
+    public bool FalsePositiveGatePassed => Overall.FalsePositiveGatePassed && PerRule.All(rule => rule.FalsePositiveGatePassed);
+}
