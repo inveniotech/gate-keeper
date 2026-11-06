@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "local.authoring",
+  "version": 1,
+  "minEngineVersion": "0.1.0",
+  "provenance": "local",
+  "rules": [
+    {
+      "id": "local.authoring.marker",
+      "severity": "error",
+      "category": "synthetic",
+      "citation": { "title": "Synthetic authoring demonstration; no legal claim." },
+      "sinceVersion": 1,
+      "matcher": { "list": { "package": ["gatekeeper-authoring-probe"] } }
+    }
+  ]
+}
