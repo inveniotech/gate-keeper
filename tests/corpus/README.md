@@ -247,6 +247,13 @@ Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Eve
 | `p2-processor-monnify-hostname-1-near-miss` | No finding |
 | `p2-processor-nibss-hostname-0` | `transfer.processor.nibss` |
 | `p2-processor-nibss-hostname-0-near-miss` | No finding |
+| `p2-processor-nibss-hostname-1` | `transfer.processor.nibss` |
+| `p2-processor-nibss-hostname-1-near-miss` | No finding |
+| `p2-processor-nibss-java-manifest` | `transfer.processor.nibss` |
+| `p2-processor-nibss-package-0` | `transfer.processor.nibss` |
+| `p2-processor-nibss-package-0-near-miss` | No finding |
+| `p2-processor-nibss-portal-only` | No finding |
+| `p2-processor-nibss-public-api` | `transfer.processor.nibss` |
 | `p2-processor-node-manifest` | `transfer.processor.flutterwave` |
 | `p2-processor-opay-hostname-0` | `transfer.processor.opay` |
 | `p2-processor-opay-hostname-0-near-miss` | No finding |

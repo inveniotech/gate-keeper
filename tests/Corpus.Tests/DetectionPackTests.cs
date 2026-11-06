@@ -17,7 +17,8 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     [InlineData("transfer.processor.interswitch", "api.interswitchng.com")]
     [InlineData("transfer.processor.palmpay", "open-gw-prod.palmpay-inc.com")]
     [InlineData("transfer.processor.opay", "payapi.opayweb.com")]
-    [InlineData("transfer.processor.nibss", "devportal.nibss-plc.com.ng")]
+    [InlineData("transfer.processor.nibss", "api-ninvoicex.nibss-plc.com.ng")]
+    [InlineData("transfer.processor.nibss", "ninvoicex-sdk")]
     [InlineData("transfer.processor.monnify", "api.monnify.com")]
     [InlineData("transfer.processor.remita", "demo.remita.net")]
     [InlineData("transfer.processor.korapay", "api.korapay.com")]
@@ -38,6 +39,13 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
         rules.Single(rule => rule.Id == id).Processor!.UsualRegion.Should().Contain("confirm");
         matcher.Match("src/integration.ts", $"prefix-{token}-suffix").Should().BeEmpty();
         matcher.Match("src/integration.ts", token + ".example.invalid").Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ProcessorCatalogue_Should_NotReportAnApiIntegration_When_OnlyTheNibssDeveloperPortalIsReferenced()
+    {
+        new MatcherEngine(Load("processors")).Match("docs/integrations.md", "https://devportal.nibss-plc.com.ng/")
+            .Should().BeEmpty();
     }
 
     [Theory]
