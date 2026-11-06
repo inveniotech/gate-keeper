@@ -54,6 +54,8 @@ These three assumptions are the part of the corpus the rule-pack work packages c
 
 ## The case inventory
 
+The detection authoring modules add context positives and near-misses through `node ci/rule-packs/build-detection.mjs --write`; use `--check` to verify them. Their generated rule reference pages under `docs-data/rules/` list each case. All values come from the documented generator. The long-line BVN case includes an adjacent `bvn=` label so its expectation obeys IQ-12 while retaining a line longer than 100,000 characters.
+
 **Positives** — one finding each, in the storage contexts the card fixes from day one:
 
 | Case | Rule | Context |
@@ -176,3 +178,16 @@ Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify w
 | `p2-phone-validator-near-miss` | No finding |
 
 <!-- generated-identifier-cases:end -->
+
+<!-- generated-detection-cases:start -->
+## Authored detection acceptance cases
+
+Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Every case uses the documented synthetic generator or processor tokens without personal data.
+
+| Case | Expected rule |
+|---|---|
+| `p2-bvn-distant-label` | No finding |
+| `p2-bvn-label-after-value` | `pii.bvn` |
+| `p2-bvn-without-label` | No finding |
+
+<!-- generated-detection-cases:end -->

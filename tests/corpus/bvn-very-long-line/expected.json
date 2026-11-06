@@ -1,6 +1,6 @@
 [
   {
-    "column": 104001,
+    "column": 104005,
     "line": 1,
     "path": "data/reference-indexes.txt",
     "ruleId": "pii.bvn",
