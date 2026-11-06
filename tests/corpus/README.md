@@ -193,5 +193,11 @@ Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Eve
 | `p2-nin-incidental-keyword` | No finding |
 | `p2-nin-label-after-value` | `pii.nin` |
 | `p2-nin-without-label` | No finding |
+| `p2-phone-embedded-in-token` | No finding |
+| `p2-phone-international` | `pii.phone.international` |
+| `p2-phone-international-overlong` | No finding |
+| `p2-phone-international-plus` | `pii.phone.international` |
+| `p2-phone-international-truncated` | No finding |
+| `p2-phone-national-overlong` | No finding |
 
 <!-- generated-detection-cases:end -->

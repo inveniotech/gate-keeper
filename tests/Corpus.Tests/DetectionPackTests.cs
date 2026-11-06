@@ -14,6 +14,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     [Theory]
     [InlineData("bvn")]
     [InlineData("nin")]
+    [InlineData("phone")]
     public async Task DetectionPack_Should_MatchExactExpectations_When_RunAgainstEverySyntheticCase(string family)
     {
         var rules = Load(family);
