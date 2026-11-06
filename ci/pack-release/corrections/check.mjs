@@ -3,10 +3,11 @@ import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-function version(value) {
+/** Parses numeric calendar components; malformed or out-of-range components throw. */
+export function parseCalendarVersion(value) {
   if (typeof value !== 'string' || !/^\d{4}\.\d{1,2}\.\d+$/.test(value)) throw new Error('Use a calendar pack version.');
   const parts = value.split('.').map(Number);
-  if (!parts.every(Number.isSafeInteger) || parts[1] < 1 || parts[1] > 12) throw new Error('The calendar pack version is invalid.');
+  if (!parts.every(Number.isSafeInteger) || parts[0] < 1 || parts[1] < 1 || parts[1] > 12) throw new Error('The calendar pack version is invalid.');
   return parts;
 }
 
@@ -29,9 +30,9 @@ export function checkCorrection(base, correction) {
     || !['bundled', 'plan-gated'].includes(base.provenance) || correction.provenance !== base.provenance) {
     throw new Error('A correction must retain the content-pack identity, schema and provenance.');
   }
-  const original = version(base.version);
-  const candidate = version(correction.version);
-  const declared = version(correction.baseVersion);
+  const original = parseCalendarVersion(base.version);
+  const candidate = parseCalendarVersion(correction.version);
+  const declared = parseCalendarVersion(correction.baseVersion);
   if (original[2] !== 0 || candidate[2] <= original[2] || declared[2] !== 0
     || original[0] !== candidate[0] || original[1] !== candidate[1]
     || original[0] !== declared[0] || original[1] !== declared[1]) {
