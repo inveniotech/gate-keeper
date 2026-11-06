@@ -279,13 +279,18 @@
       "matcher": {
         "list": {
           "hostname": [
-            "devportal.nibss-plc.com.ng"
+            "api-ninvoicex.nibss-plc.com.ng",
+            "api-ninvoicex-sandbox.nibss-plc.com.ng"
+          ],
+          "package": [
+            "ninvoicex-sdk"
           ]
         }
       },
       "processor": {
         "dataCategories": [
-          "identity verification and banking-service references"
+          "invoice party contact and tax details",
+          "invoice and transaction details"
         ],
         "usualRegion": "Deployment-dependent; confirm the contracted processing and storage regions."
       },

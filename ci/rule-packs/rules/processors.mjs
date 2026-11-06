@@ -26,8 +26,9 @@ const additionalEntries = [
     categories: ['customer contact details', 'wallet, bank account and transaction details'], region: deploymentDependent },
   { id: 'transfer.processor.opay', tokens: { hostname: ['payapi.opayweb.com'] },
     categories: ['customer contact details', 'wallet and transaction details'], region: deploymentDependent },
-  { id: 'transfer.processor.nibss', tokens: { hostname: ['devportal.nibss-plc.com.ng'] },
-    categories: ['identity verification and banking-service references'], region: deploymentDependent },
+  { id: 'transfer.processor.nibss', tokens: { package: ['ninvoicex-sdk'],
+    hostname: ['api-ninvoicex.nibss-plc.com.ng', 'api-ninvoicex-sandbox.nibss-plc.com.ng'] },
+    categories: ['invoice party contact and tax details', 'invoice and transaction details'], region: deploymentDependent },
   { id: 'transfer.processor.monnify', tokens: { hostname: ['api.monnify.com', 'sandbox.monnify.com'] },
     categories: ['customer contact details', 'bank account and transaction details'], region: deploymentDependent },
   { id: 'transfer.processor.remita', tokens: { hostname: ['demo.remita.net', 'login.remita.net', 'remitademo.net', 'api-demo.systemspecsng.com'] },
@@ -60,13 +61,16 @@ for (const [name, path, text, token, ruleId] of [
   ['jvm-manifest', 'pom.xml', '<project><dependencies><dependency><groupId>software.amazon.awssdk</groupId></dependency></dependencies></project>', 'software.amazon.awssdk', 'transfer.processor.aws'],
   ['python-manifest', 'requirements.txt', 'boto3', 'boto3', 'transfer.processor.aws'],
   ['infrastructure', 'infra/storage.tf', 'resource "aws_s3_bucket" "synthetic_archive" {}', 'aws_s3_bucket', 'transfer.processor.aws.bucket'],
+  ['nibss-public-api', 'config/nibss.json', '{"apiBaseUrl":"https://api-ninvoicex.nibss-plc.com.ng/e-invoice/v1"}', 'api-ninvoicex.nibss-plc.com.ng', 'transfer.processor.nibss'],
+  ['nibss-java-manifest', 'pom.xml', '<project><dependencies><dependency><groupId>uk.co.avidroneconsulting</groupId><artifactId>ninvoicex-sdk</artifactId></dependency></dependencies></project>', 'ninvoicex-sdk', 'transfer.processor.nibss'],
 ]) addCase(name, path, text, token, ruleId);
 addCase('lock-file', 'package-lock.json', '{"dependencies":{"flutterwave-node-v3":"1.0.0"}}', '', '', false);
+addCase('nibss-portal-only', 'docs/integrations.md', 'Documentation: https://devportal.nibss-plc.com.ng/', '', '', false);
 
 export default {
   family: 'processors', title: 'Processor and transfer catalogue data',
   description: 'Exact-token catalogue rules identify Paystack, Flutterwave, Interswitch, PalmPay, OPay, NIBSS integration references, Monnify, Remita, Korapay, Dojah and Youverify, alongside AWS SDK/S3 infrastructure and two explicit AWS region settings. Every finding is a note asking the organisation to confirm processor safeguards and any transfer basis. No personal-data values are required by these cases.',
-  limits: 'Tokens indicate a reference, not actual network activity, processing, recipient role or a transfer. SDKs can be unused; region strings can occur in unrelated text. Matching is exact and case-sensitive, and does not resolve aliases or recognise arbitrary S3 virtual-hosted bucket names. Lock files stay excluded. A provider name or a Nigerian service does not establish the actual processing region: deployment and contractual arrangements require confirmation. Sandbox references also produce notes and do not establish production use. NIBSS coverage is explicitly its publicly documented developer portal reference; customer-specific API/VPN hosts, private addresses and unpublished SDK names are outside this snapshot. A portal link alone does not establish that customer data reaches that portal. OPay coverage uses the Nigerian business documentation at opayweb.com; similarly named unrelated services are excluded. The catalogue is bounded to the sourced entries below, reviewed on 6 November 2026. Processor metadata is retained in loaded rules and this reference; the existing v1 results contract reports the rule identifier and approved citation only. User-facing metadata output remains separate work under #64.',
+  limits: 'Tokens indicate a reference, not actual network activity, processing, recipient role or a transfer. SDKs can be unused; region strings can occur in unrelated text. Matching is exact and case-sensitive, and does not resolve aliases or recognise arbitrary S3 virtual-hosted bucket names. Lock files stay excluded. A provider name or a Nigerian service does not establish the actual processing region: deployment and contractual arrangements require confirmation. Sandbox references also produce notes and do not establish production use. NIBSS coverage uses its publicly documented e-invoicing production/sandbox API hosts and Java SDK artefact. Its developer portal alone does not trigger a finding. Other payment/identity APIs, customer-specific VPN hosts, private addresses and unpublished SDK names are outside this snapshot. OPay coverage uses the Nigerian business documentation at opayweb.com; similarly named unrelated services are excluded. The catalogue is bounded to the sourced entries below, reviewed on 6 November 2026. Processor metadata is retained in loaded rules and this reference; the existing v1 results contract reports the rule identifier and approved citation only. User-facing metadata output remains separate work under #64.',
   fix: 'Review the referenced integration and applicable contracts, record the actual data categories and processing regions, and confirm safeguards and any applicable transfer basis. Use the existing justified-exception configuration when a deliberately retained reference does not need further action.',
   rules: [...entries, ...additionalEntries].map(entry => {
     const { matcher: unused, ...rule } = detectionRule(entry.id, processorCategory, {}, 'note');
@@ -79,8 +83,8 @@ export default {
     'https://docs.palmpay.com/#/en-us/basics-of-access/interface-domain-name',
     'https://docs.palmpay.com/en-us/basics-of-access/interface-domain-name.md',
     'https://documentation.opayweb.com/doc/offline/api-basics.html',
-    'https://contactcentre.nibss-plc.com.ng/support/solutions/articles/47001271523-how-flexible-is-the-cba-in-implementing-apis-i-e-connecting-with-other-platforms-that-the-bank-s-a',
-    'https://devportal.nibss-plc.com.ng/', 'https://developers.monnify.com/docs/collections/quickstart',
+    'https://docs-ninvoicex.nibss-plc.com.ng/guides/test-data',
+    'https://docs-ninvoicex.nibss-plc.com.ng/sdks/java', 'https://developers.monnify.com/docs/collections/quickstart',
     'https://api.remita.net/', 'https://github.com/RemitaNet/Remita-Commerce7',
     'https://developers.korapay.com/docs/nigerian-bank-account-verification',
     'https://docs.dojah.io/api-reference/endpoint/general_service/resolve_nuban',

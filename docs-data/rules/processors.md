@@ -28,7 +28,7 @@ The citation register records owner approval in principle; legal review remains 
 
 ## Limits
 
-Tokens indicate a reference, not actual network activity, processing, recipient role or a transfer. SDKs can be unused; region strings can occur in unrelated text. Matching is exact and case-sensitive, and does not resolve aliases or recognise arbitrary S3 virtual-hosted bucket names. Lock files stay excluded. A provider name or a Nigerian service does not establish the actual processing region: deployment and contractual arrangements require confirmation. Sandbox references also produce notes and do not establish production use. NIBSS coverage is explicitly its publicly documented developer portal reference; customer-specific API/VPN hosts, private addresses and unpublished SDK names are outside this snapshot. A portal link alone does not establish that customer data reaches that portal. OPay coverage uses the Nigerian business documentation at opayweb.com; similarly named unrelated services are excluded. The catalogue is bounded to the sourced entries below, reviewed on 6 November 2026. Processor metadata is retained in loaded rules and this reference; the existing v1 results contract reports the rule identifier and approved citation only. User-facing metadata output remains separate work under #64.
+Tokens indicate a reference, not actual network activity, processing, recipient role or a transfer. SDKs can be unused; region strings can occur in unrelated text. Matching is exact and case-sensitive, and does not resolve aliases or recognise arbitrary S3 virtual-hosted bucket names. Lock files stay excluded. A provider name or a Nigerian service does not establish the actual processing region: deployment and contractual arrangements require confirmation. Sandbox references also produce notes and do not establish production use. NIBSS coverage uses its publicly documented e-invoicing production/sandbox API hosts and Java SDK artefact. Its developer portal alone does not trigger a finding. Other payment/identity APIs, customer-specific VPN hosts, private addresses and unpublished SDK names are outside this snapshot. OPay coverage uses the Nigerian business documentation at opayweb.com; similarly named unrelated services are excluded. The catalogue is bounded to the sourced entries below, reviewed on 6 November 2026. Processor metadata is retained in loaded rules and this reference; the existing v1 results contract reports the rule identifier and approved citation only. User-facing metadata output remains separate work under #64.
 
 ## Remediation and exceptions
 
@@ -86,6 +86,13 @@ Positive and near-miss examples are generated from the documented synthetic valu
 - [p2-processor-monnify-hostname-1-near-miss](../../tests/corpus/p2-processor-monnify-hostname-1-near-miss/repo/config/processor.json): no finding expected.
 - [p2-processor-nibss-hostname-0](../../tests/corpus/p2-processor-nibss-hostname-0/repo/config/processor.json): finding expected.
 - [p2-processor-nibss-hostname-0-near-miss](../../tests/corpus/p2-processor-nibss-hostname-0-near-miss/repo/config/processor.json): no finding expected.
+- [p2-processor-nibss-hostname-1](../../tests/corpus/p2-processor-nibss-hostname-1/repo/config/processor.json): finding expected.
+- [p2-processor-nibss-hostname-1-near-miss](../../tests/corpus/p2-processor-nibss-hostname-1-near-miss/repo/config/processor.json): no finding expected.
+- [p2-processor-nibss-java-manifest](../../tests/corpus/p2-processor-nibss-java-manifest/repo/pom.xml): finding expected.
+- [p2-processor-nibss-package-0](../../tests/corpus/p2-processor-nibss-package-0/repo/src/integration.ts): finding expected.
+- [p2-processor-nibss-package-0-near-miss](../../tests/corpus/p2-processor-nibss-package-0-near-miss/repo/src/integration.ts): no finding expected.
+- [p2-processor-nibss-portal-only](../../tests/corpus/p2-processor-nibss-portal-only/repo/docs/integrations.md): no finding expected.
+- [p2-processor-nibss-public-api](../../tests/corpus/p2-processor-nibss-public-api/repo/config/nibss.json): finding expected.
 - [p2-processor-node-manifest](../../tests/corpus/p2-processor-node-manifest/repo/package.json): finding expected.
 - [p2-processor-opay-hostname-0](../../tests/corpus/p2-processor-opay-hostname-0/repo/config/processor.json): finding expected.
 - [p2-processor-opay-hostname-0-near-miss](../../tests/corpus/p2-processor-opay-hostname-0-near-miss/repo/config/processor.json): no finding expected.
@@ -124,7 +131,7 @@ Positive and near-miss examples are generated from the documented synthetic valu
 | `transfer.processor.interswitch` | customer contact details; payment and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
 | `transfer.processor.palmpay` | customer contact details; wallet, bank account and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
 | `transfer.processor.opay` | customer contact details; wallet and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
-| `transfer.processor.nibss` | identity verification and banking-service references | Deployment-dependent; confirm the contracted processing and storage regions. |
+| `transfer.processor.nibss` | invoice party contact and tax details; invoice and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
 | `transfer.processor.monnify` | customer contact details; bank account and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
 | `transfer.processor.remita` | payer contact details; bank account, mandate and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
 | `transfer.processor.korapay` | identity and bank account details; payment and transaction details | Deployment-dependent; confirm the contracted processing and storage regions. |
@@ -146,8 +153,8 @@ These are unsigned release-source packs. Tests sign only in memory with the labe
 - https://docs.palmpay.com/#/en-us/basics-of-access/interface-domain-name
 - https://docs.palmpay.com/en-us/basics-of-access/interface-domain-name.md
 - https://documentation.opayweb.com/doc/offline/api-basics.html
-- https://contactcentre.nibss-plc.com.ng/support/solutions/articles/47001271523-how-flexible-is-the-cba-in-implementing-apis-i-e-connecting-with-other-platforms-that-the-bank-s-a
-- https://devportal.nibss-plc.com.ng/
+- https://docs-ninvoicex.nibss-plc.com.ng/guides/test-data
+- https://docs-ninvoicex.nibss-plc.com.ng/sdks/java
 - https://developers.monnify.com/docs/collections/quickstart
 - https://api.remita.net/
 - https://github.com/RemitaNet/Remita-Commerce7

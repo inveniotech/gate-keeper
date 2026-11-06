@@ -9,13 +9,13 @@ The error-level gate is `20 × false positives <= true positives + false positiv
 - `invenio.bvn` version `2026.11.0`, SHA-256 `da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe`.
 - `invenio.nin` version `2026.11.0`, SHA-256 `ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c`.
 - `invenio.phone` version `2026.11.0`, SHA-256 `70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19`.
-- `invenio.processors` version `2026.11.0`, SHA-256 `d9b435b05563380db20f3d91808b0810d5de6a3bd6d1a9825ee7c7fd896fc100`.
+- `invenio.processors` version `2026.11.0`, SHA-256 `bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636`.
 
-Scanned 146 synthetic repositories. Rates are percentages; `n/a` means no denominator.
+Scanned 153 synthetic repositories. Rates are percentages; `n/a` means no denominator.
 
 rule id | expected | produced | matched | unexpected | precision | recall | error true positives | error false positives | warnings | notes | gate | error false-positive rate
 --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-(overall) | 67 | 67 | 67 | 0 | 100 | 100 | 29 | 0 | 0 | 38 | pass | 0
+(overall) | 71 | 71 | 71 | 0 | 100 | 100 | 29 | 0 | 0 | 42 | pass | 0
 pii.bvn | 11 | 11 | 11 | 0 | 100 | 100 | 11 | 0 | 0 | 0 | pass | 0
 pii.nin | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
 pii.phone | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
@@ -29,7 +29,7 @@ transfer.processor.flutterwave | 3 | 3 | 3 | 0 | 100 | 100 | 0 | 0 | 0 | 3 | pas
 transfer.processor.interswitch | 4 | 4 | 4 | 0 | 100 | 100 | 0 | 0 | 0 | 4 | pass | 0
 transfer.processor.korapay | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
 transfer.processor.monnify | 2 | 2 | 2 | 0 | 100 | 100 | 0 | 0 | 0 | 2 | pass | 0
-transfer.processor.nibss | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
+transfer.processor.nibss | 5 | 5 | 5 | 0 | 100 | 100 | 0 | 0 | 0 | 5 | pass | 0
 transfer.processor.opay | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
 transfer.processor.palmpay | 2 | 2 | 2 | 0 | 100 | 100 | 0 | 0 | 0 | 2 | pass | 0
 transfer.processor.paystack | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0
