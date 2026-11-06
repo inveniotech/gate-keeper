@@ -18,10 +18,13 @@ internal sealed class CorpusScanRunner
     private const string ScannerRootMarker = "corpus-harness";
 
     private readonly CorpusCase @case;
+    private readonly IReadOnlyList<Rule>? rules;
 
-    public CorpusScanRunner(CorpusCase @case)
+    public CorpusScanRunner(CorpusCase @case, IReadOnlyList<Rule>? rules = null)
     {
         this.@case = @case;
+        if (rules is { Count: 0 }) throw new ArgumentException("A measured corpus run needs at least one supplied rule.", nameof(rules));
+        this.rules = rules?.ToArray();
     }
 
     /// <summary>
@@ -36,22 +39,28 @@ internal sealed class CorpusScanRunner
             Path.GetTempPath(),
             ScannerRootMarker,
             $"{this.@case.Name}-{Guid.NewGuid():N}");
-        CopyRepository(copyRoot);
-
-        var enumeration = await new FileEnumerator().EnumerateAsync(
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CopyRepository(copyRoot);
+            var enumeration = await new FileEnumerator().EnumerateAsync(
             new FileEnumerationOptions
             {
                 Root = copyRoot,
             },
             cancellationToken).ConfigureAwait(true);
 
-        // The matcher engine (P1-06) can run rules. This harness still reports
-        // an empty findings list: the scan orchestrator (P1-07) is what runs
-        // the matcher over the enumeration, and the cited rule pack is later
-        // work (P2). The scorers treat every expected finding as unmeasured
-        // rather than missed, because a scan that is not yet given those
-        // rules proves nothing about detection.
-        return new CorpusScan(this.@case, copyRoot, enumeration, Findings: []);
+            if (rules is null) return new CorpusScan(this.@case, copyRoot, enumeration, Findings: []);
+            var result = await new ScanOrchestrator(new MatcherEngine(rules)).ScanAsync(enumeration, cancellationToken).ConfigureAwait(true);
+            var findings = result.Findings.Select(match => new Finding(match.RuleId, match.Severity, match.Category, match.Path,
+                match.Line, match.Column, match.LocationKind, null, BaselineState.New, match.Citation)).ToArray();
+            return new CorpusScan(this.@case, copyRoot, enumeration, findings, MatcherStagePresent: true);
+        }
+        catch
+        {
+            if (Directory.Exists(copyRoot)) Directory.Delete(copyRoot, recursive: true);
+            throw;
+        }
     }
 
     private void CopyRepository(string copyRoot)
@@ -100,17 +109,12 @@ internal sealed record CorpusScan(
     CorpusCase Case,
     string CopyRoot,
     FileEnumerationResult Enumeration,
-    IReadOnlyList<Finding> Findings)
+    IReadOnlyList<Finding> Findings,
+    bool MatcherStagePresent = false)
 {
     /// <summary>Gets the scanned work-tree files, in ordinal path order.</summary>
     public IReadOnlyList<EnumeratedFile> Files => this.Enumeration.Files;
 
-    /// <summary>
-    /// Gets whether this harness ran the matcher over a rule pack. The matcher
-    /// exists (P1-06); the orchestrator and the pack do not, so recall stays
-    /// unmeasured.
-    /// </summary>
-    public bool MatcherStagePresent => false;
 }
 
 /// <summary>
