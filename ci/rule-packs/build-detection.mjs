@@ -31,6 +31,8 @@ export async function detectionFiles() {
       '## Limits', '', source.limits, '', '## Remediation and exceptions', '', source.fix, '',
       '## Synthetic examples', '', 'Positive and near-miss examples are generated from the documented synthetic values. Their expected files contain locations only.', '',
       ...(source.cases ?? []).map(item => `- [${item.name}](../../tests/corpus/${item.name}/repo/${item.path}): ${item.expected.length ? 'finding expected' : 'no finding expected'}.`), '',
+      ...(source.rules.some(rule => rule.processor) ? ['## Processor metadata', '', '| Rule | Data categories | Usual region |', '|---|---|---|',
+        ...source.rules.filter(rule => rule.processor).map(rule => `| \`${rule.id}\` | ${rule.processor.dataCategories.join('; ')} | ${rule.processor.usualRegion} |`), ''] : []),
       '## Verification', '', `Run \`dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~DetectionPackTests\` for exact locations and measured synthetic precision/recall.`, '',
       'These are unsigned release-source packs. Tests sign only in memory with the labelled development key. Production signing, embedding and publication are separate release operations; no development signature is shipped.', '',
       ...(source.sources ? ['## Technical sources', '', ...source.sources.map(url => `- ${url}`), ''] : [])];

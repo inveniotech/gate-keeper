@@ -199,5 +199,77 @@ Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Eve
 | `p2-phone-international-plus` | `pii.phone.international` |
 | `p2-phone-international-truncated` | No finding |
 | `p2-phone-national-overlong` | No finding |
+| `p2-processor-aws-bucket-package-0` | `transfer.processor.aws.bucket` |
+| `p2-processor-aws-bucket-package-0-near-miss` | No finding |
+| `p2-processor-aws-bucket-package-1` | `transfer.processor.aws.bucket` |
+| `p2-processor-aws-bucket-package-1-near-miss` | No finding |
+| `p2-processor-aws-capetown-package-0` | `transfer.processor.aws.capetown` |
+| `p2-processor-aws-capetown-package-0-near-miss` | No finding |
+| `p2-processor-aws-hostname-0` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-0-near-miss` | No finding |
+| `p2-processor-aws-hostname-1` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-1-near-miss` | No finding |
+| `p2-processor-aws-hostname-2` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-2-near-miss` | No finding |
+| `p2-processor-aws-ireland-package-0` | `transfer.processor.aws.ireland` |
+| `p2-processor-aws-ireland-package-0-near-miss` | No finding |
+| `p2-processor-aws-package-0` | `transfer.processor.aws` |
+| `p2-processor-aws-package-0-near-miss` | No finding |
+| `p2-processor-aws-package-1` | `transfer.processor.aws` |
+| `p2-processor-aws-package-1-near-miss` | No finding |
+| `p2-processor-aws-package-2` | `transfer.processor.aws` |
+| `p2-processor-aws-package-2-near-miss` | No finding |
+| `p2-processor-aws-package-3` | `transfer.processor.aws` |
+| `p2-processor-aws-package-3-near-miss` | No finding |
+| `p2-processor-dojah-hostname-0` | `transfer.processor.dojah` |
+| `p2-processor-dojah-hostname-0-near-miss` | No finding |
+| `p2-processor-dotnet-manifest` | `transfer.processor.aws` |
+| `p2-processor-flutterwave-hostname-0` | `transfer.processor.flutterwave` |
+| `p2-processor-flutterwave-hostname-0-near-miss` | No finding |
+| `p2-processor-flutterwave-package-0` | `transfer.processor.flutterwave` |
+| `p2-processor-flutterwave-package-0-near-miss` | No finding |
+| `p2-processor-infrastructure` | `transfer.processor.aws.bucket` |
+| `p2-processor-interswitch-hostname-0` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-0-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-1` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-1-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-2` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-2-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-3` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-3-near-miss` | No finding |
+| `p2-processor-jvm-manifest` | `transfer.processor.aws` |
+| `p2-processor-korapay-hostname-0` | `transfer.processor.korapay` |
+| `p2-processor-korapay-hostname-0-near-miss` | No finding |
+| `p2-processor-lock-file` | No finding |
+| `p2-processor-monnify-hostname-0` | `transfer.processor.monnify` |
+| `p2-processor-monnify-hostname-0-near-miss` | No finding |
+| `p2-processor-monnify-hostname-1` | `transfer.processor.monnify` |
+| `p2-processor-monnify-hostname-1-near-miss` | No finding |
+| `p2-processor-nibss-hostname-0` | `transfer.processor.nibss` |
+| `p2-processor-nibss-hostname-0-near-miss` | No finding |
+| `p2-processor-node-manifest` | `transfer.processor.flutterwave` |
+| `p2-processor-opay-hostname-0` | `transfer.processor.opay` |
+| `p2-processor-opay-hostname-0-near-miss` | No finding |
+| `p2-processor-palmpay-hostname-0` | `transfer.processor.palmpay` |
+| `p2-processor-palmpay-hostname-0-near-miss` | No finding |
+| `p2-processor-palmpay-hostname-1` | `transfer.processor.palmpay` |
+| `p2-processor-palmpay-hostname-1-near-miss` | No finding |
+| `p2-processor-paystack-hostname-0` | `transfer.processor.paystack` |
+| `p2-processor-paystack-hostname-0-near-miss` | No finding |
+| `p2-processor-python-manifest` | `transfer.processor.aws` |
+| `p2-processor-remita-hostname-0` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-0-near-miss` | No finding |
+| `p2-processor-remita-hostname-1` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-1-near-miss` | No finding |
+| `p2-processor-remita-hostname-2` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-2-near-miss` | No finding |
+| `p2-processor-remita-hostname-3` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-3-near-miss` | No finding |
+| `p2-processor-youverify-hostname-0` | `transfer.processor.youverify` |
+| `p2-processor-youverify-hostname-0-near-miss` | No finding |
+| `p2-processor-youverify-hostname-1` | `transfer.processor.youverify` |
+| `p2-processor-youverify-hostname-1-near-miss` | No finding |
+| `p2-processor-youverify-package-0` | `transfer.processor.youverify` |
+| `p2-processor-youverify-package-0-near-miss` | No finding |
 
 <!-- generated-detection-cases:end -->

@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.aws",
+    "path": "app.csproj",
+    "line": 1,
+    "column": 48,
+    "triage": "true-positive"
+  }
+]

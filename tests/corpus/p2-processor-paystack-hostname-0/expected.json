@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.paystack",
+    "path": "config/processor.json",
+    "line": 1,
+    "column": 20,
+    "triage": "true-positive"
+  }
+]

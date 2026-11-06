@@ -14,9 +14,37 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     private const string WriteReportEnvironmentVariable = "GATEKEEPER_WRITE_SYNTHETIC_REPORT";
 
     [Theory]
+    [InlineData("transfer.processor.interswitch", "api.interswitchng.com")]
+    [InlineData("transfer.processor.palmpay", "open-gw-prod.palmpay-inc.com")]
+    [InlineData("transfer.processor.opay", "payapi.opayweb.com")]
+    [InlineData("transfer.processor.nibss", "devportal.nibss-plc.com.ng")]
+    [InlineData("transfer.processor.monnify", "api.monnify.com")]
+    [InlineData("transfer.processor.remita", "demo.remita.net")]
+    [InlineData("transfer.processor.korapay", "api.korapay.com")]
+    [InlineData("transfer.processor.dojah", "api.dojah.io")]
+    [InlineData("transfer.processor.youverify", "youverify-web-sdk")]
+    public void ProcessorCatalogue_Should_ReportTheNamedProvider_When_AnIntegrationTokenIsReferenced(string id, string token)
+    {
+        var rules = Load("processors");
+        var matcher = new MatcherEngine(rules);
+        var text = $"const provider = \"{token}\";";
+        var findings = matcher.Match("src/integration.ts", text);
+        findings.Should().ContainSingle();
+        var finding = findings.Single();
+        finding.RuleId.Should().Be(id);
+        finding.Severity.Should().Be(Severity.Note);
+        finding.Line.Should().Be(1);
+        finding.Column.Should().Be(text.IndexOf(token, StringComparison.Ordinal) + 1);
+        rules.Single(rule => rule.Id == id).Processor!.UsualRegion.Should().Contain("confirm");
+        matcher.Match("src/integration.ts", $"prefix-{token}-suffix").Should().BeEmpty();
+        matcher.Match("src/integration.ts", token + ".example.invalid").Should().BeEmpty();
+    }
+
+    [Theory]
     [InlineData("bvn")]
     [InlineData("nin")]
     [InlineData("phone")]
+    [InlineData("processors")]
     public async Task DetectionPack_Should_MatchExactExpectations_When_RunAgainstEverySyntheticCase(string family)
     {
         var rules = Load(family);
@@ -32,6 +60,17 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
             diff.Unexpected.Should().BeEmpty(item.Name);
             diff.MatchedCount.Should().Be(diff.ExpectedCount, item.Name);
             scan.Findings.Should().OnlyContain(finding => finding.Fingerprint == null);
+            if (family == "processors")
+            {
+                scan.Findings.Should().OnlyContain(finding => finding.Severity == Severity.Note);
+                foreach (var finding in scan.Findings)
+                {
+                    var processor = rules.Single(rule => rule.Id == finding.RuleId).Processor;
+                    processor.Should().NotBeNull();
+                    processor!.DataCategories.Should().NotBeEmpty();
+                    processor.UsualRegion.Should().NotBeNullOrWhiteSpace();
+                }
+            }
             runs.Add((selected, scan.Findings));
         }
         var measurements = CorpusMeasurements.PerRule(runs);

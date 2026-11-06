@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.aws",
+    "path": "pom.xml",
+    "line": 1,
+    "column": 45,
+    "triage": "true-positive"
+  }
+]

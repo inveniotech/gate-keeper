@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.youverify",
+    "path": "src/integration.ts",
+    "line": 1,
+    "column": 20,
+    "triage": "true-positive"
+  }
+]
