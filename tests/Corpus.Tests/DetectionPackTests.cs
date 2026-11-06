@@ -14,6 +14,33 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     private const string WriteReportEnvironmentVariable = "GATEKEEPER_WRITE_SYNTHETIC_REPORT";
 
     [Theory]
+    [InlineData("transfer.processor.interswitch", "api.interswitchng.com")]
+    [InlineData("transfer.processor.palmpay", "open-gw-prod.palmpay-inc.com")]
+    [InlineData("transfer.processor.opay", "payapi.opayweb.com")]
+    [InlineData("transfer.processor.nibss", "devportal.nibss-plc.com.ng")]
+    [InlineData("transfer.processor.monnify", "api.monnify.com")]
+    [InlineData("transfer.processor.remita", "demo.remita.net")]
+    [InlineData("transfer.processor.korapay", "api.korapay.com")]
+    [InlineData("transfer.processor.dojah", "api.dojah.io")]
+    [InlineData("transfer.processor.youverify", "youverify-web-sdk")]
+    public void ProcessorCatalogue_Should_ReportTheNamedProvider_When_AnIntegrationTokenIsReferenced(string id, string token)
+    {
+        var rules = Load("processors");
+        var matcher = new MatcherEngine(rules);
+        var text = $"const provider = \"{token}\";";
+        var findings = matcher.Match("src/integration.ts", text);
+        findings.Should().ContainSingle();
+        var finding = findings.Single();
+        finding.RuleId.Should().Be(id);
+        finding.Severity.Should().Be(Severity.Note);
+        finding.Line.Should().Be(1);
+        finding.Column.Should().Be(text.IndexOf(token, StringComparison.Ordinal) + 1);
+        rules.Single(rule => rule.Id == id).Processor!.UsualRegion.Should().Contain("confirm");
+        matcher.Match("src/integration.ts", $"prefix-{token}-suffix").Should().BeEmpty();
+        matcher.Match("src/integration.ts", token + ".example.invalid").Should().BeEmpty();
+    }
+
+    [Theory]
     [InlineData("bvn")]
     [InlineData("nin")]
     [InlineData("phone")]
