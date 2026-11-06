@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "status": "approved-in-principle",
+  "reviewedBy": "owner",
+  "reviewedOn": "2026-11-05",
+  "approvalScope": "Current citation mappings, wording and detection limits, approved in principle by the owner.",
+  "legalReview": {
+    "status": "pending",
+    "followUp": "The owner will introduce any changes recommended by legal counsel."
+  },
+  "sources": [
+    {
+      "id": "ndpa-2023",
+      "title": "Nigeria Data Protection Act 2023, Act No. 37",
+      "url": "https://ndpc.gov.ng/wp-content/uploads/2024/03/Nigeria_Data_Protection_Act_2023.pdf",
+      "sha256": "5bfb22cf7b344e92ecca9b80decf73db694a0d1000c4f42188f46e047d8df075"
+    },
+    {
+      "id": "gaid-2025",
+      "title": "NDP Act General Application and Implementation Directive, 20 March 2025",
+      "url": "https://ndpc.gov.ng/wp-content/uploads/2025/03/NDP-ACT-GAID-2025-MARCH-20TH.pdf",
+      "sha256": "e4359e90c9a11cd772f9605c797d6f36af000c58a27bfba251fa37a89824cc5a"
+    }
+  ],
+  "entries": [
+    {
+      "category": "consent.missing",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review the applicable lawful basis and consent evidence.", "ndpa": "Sections 25 and 26", "gaid": "Articles 17 and 18" },
+      "explanation": "Consent requirements depend on the processing and its lawful basis.",
+      "limit": "Reserved for P3-09 at note severity; absence of a code pattern does not establish missing consent."
+    },
+    {
+      "category": "pii.account",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review protection of account identifiers.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "An identifiable person's account information warrants proportionate safeguards.",
+      "limit": "A valid account-number check digit neither identifies a person nor proves unlawful processing."
+    },
+    {
+      "category": "pii.bvn",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review protection of bank verification identifiers.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "Identification numbers linked to individuals require appropriate protection.",
+      "limit": "Eleven digits alone do not establish a BVN, sensitive biometric data or a legal breach."
+    },
+    {
+      "category": "pii.email",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review protection of identifying email addresses.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "An email address may identify an individual and need protection.",
+      "limit": "A role mailbox, example address or public contact is not automatically an unlawful disclosure."
+    },
+    {
+      "category": "pii.in-api-models",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review personal-data exposure in response models.", "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39", "gaid": "Article 29(2)(h)" },
+      "explanation": "Response fields warrant review for necessity and authorised disclosure.",
+      "limit": "A model declaration alone cannot prove that a field is returned or lacks authorisation."
+    },
+    {
+      "category": "pii.in-configuration",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review personal identifiers stored in configuration.", "ndpa": "Sections 24(1)(c), 24(1)(f) and 39", "gaid": "Article 29(1)-(2)" },
+      "explanation": "Configuration can expose identifiers beyond their intended processing purpose.",
+      "limit": "A configuration value may be synthetic; finding it does not prove an actual disclosure."
+    },
+    {
+      "category": "pii.in-fixtures",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review personal identifiers in fixtures and seed data.", "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39", "gaid": "Article 29(2)(h)" },
+      "explanation": "Test data warrants checks for unnecessary use of personal identifiers.",
+      "limit": "A plausible identifier is not proof that a fixture contains real personal data."
+    },
+    {
+      "category": "pii.in-logs",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review personal identifiers exposed to logging.", "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39", "gaid": "Article 29(1)-(2)" },
+      "explanation": "Logging can extend access and retention beyond the original purpose.",
+      "limit": "A source pattern does not establish deployed logging, retention duration or a legal breach."
+    },
+    {
+      "category": "pii.in-migrations",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review safeguards for identifier storage.", "ndpa": "Sections 24(1)(f) and 39(1)-(2)", "gaid": "Article 29(2)(g)-(h)" },
+      "explanation": "Database design warrants proportionate security and encryption review.",
+      "limit": "A migration alone cannot establish encryption at rest; section 39 does not mandate blanket column encryption."
+    },
+    {
+      "category": "pii.ng-11-digit-id",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review the context of a possible personal identifier.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "Context determines whether an eleven-digit value relates to an individual.",
+      "limit": "Keep at note severity; the value may be neither a BVN nor a NIN."
+    },
+    {
+      "category": "pii.nin",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review protection of national identity identifiers.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "Identification numbers linked to individuals require appropriate protection.",
+      "limit": "A labelled value is a detection signal, not verification of an issued NIN or proof of a breach."
+    },
+    {
+      "category": "pii.phone",
+      "status": "approved-in-principle",
+      "citation": { "title": "Review protection of identifying telephone numbers.", "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65", "gaid": "Article 29(1)-(2)" },
+      "explanation": "A telephone number may identify an individual and need protection.",
+      "limit": "A recognised prefix does not prove a number is assigned or that processing is unlawful."
+    },
+    {
+      "category": "transfer.processor",
+      "status": "approved-in-principle",
+      "citation": { "title": "Confirm processor safeguards and any cross-border transfer basis.", "ndpa": "Sections 29 and 41-43", "gaid": "Articles 34 and 45; Schedule 5" },
+      "explanation": "Processor engagements and international transfers warrant documented safeguards and an applicable basis.",
+      "limit": "A package, hostname or region setting does not establish a transfer, recipient role, adequacy or unlawfulness."
+    }
+  ]
+}
