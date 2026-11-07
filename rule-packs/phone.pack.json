@@ -1,0 +1,185 @@
+{
+  "contentIssuedAt": "2026-11-06",
+  "coverageDate": "2026-11-06",
+  "id": "invenio.phone",
+  "minEngineVersion": "0.1.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "pii.phone",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65",
+        "title": "Review protection of identifying telephone numbers."
+      },
+      "id": "pii.phone",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.phone",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65",
+        "title": "Review protection of identifying telephone numbers."
+      },
+      "id": "pii.phone.international",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2026.11.0"
+}

@@ -22,6 +22,8 @@ dotnet test
 
 ## Measured corpus runs
 
+`DetectionPackTests` loads each authored detection source through `PackLoader` with a signature created only in memory from the existing labelled development seed. Every synthetic repository is scanned with the real matcher. Expectations are filtered to that pack's identifiers while every unexpected finding remains a failure. Exact locations, complete synthetic recall and the error-level false-positive gate are asserted; the test output prints the measured report. This does not replace owner triage on the pinned real-repository corpus. Run `dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~DetectionPackTests`.
+
 P2-07-01 (#98) lets `CorpusScanRunner` accept already loaded rules and execute the existing matcher and scan orchestrator over the copied case. That run returns sorted, content-free findings and sets `MatcherStagePresent` to true, including a measured clean result. Omitting rules performs enumeration only and keeps that flag false; an explicitly empty rule list is rejected. The harness applies no baseline, exceptions or severity overrides. Temporary copies are removed after failures; successful runs are owned by `CorpusScanScavenger`. Links remain links when cases are copied.
 
 Run `dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~CorpusMatcherTests` for live positive/near-miss, repeatability and failure-cleanup checks. These tests use a synthetic list rule with no legal claim. Production detection acceptance still requires the actual approved pack, but this harness capability has no dependency on that pack being authored.

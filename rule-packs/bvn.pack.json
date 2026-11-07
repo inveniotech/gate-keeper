@@ -1,0 +1,59 @@
+{
+  "contentIssuedAt": "2026-11-06",
+  "coverageDate": "2026-11-06",
+  "id": "invenio.bvn",
+  "minEngineVersion": "0.1.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "pii.bvn",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65",
+        "title": "Review protection of bank verification identifiers."
+      },
+      "id": "pii.bvn",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "bvn",
+            "bankVerification",
+            "bank_verification",
+            "bank verification"
+          ],
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2026.11.0"
+}

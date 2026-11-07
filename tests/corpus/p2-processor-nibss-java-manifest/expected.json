@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.nibss",
+    "path": "pom.xml",
+    "line": 1,
+    "column": 91,
+    "triage": "true-positive"
+  }
+]
