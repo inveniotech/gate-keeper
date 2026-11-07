@@ -1,0 +1,40 @@
+name: Validation corpus snapshots
+on:
+  schedule:
+    - cron: '20 5 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validation-corpus-snapshots
+  cancel-in-progress: true
+jobs:
+  snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Test pin validation
+        run: node --test ci/validation-corpus/validation.test.mjs
+      - name: Build the existing-enumerator inspector
+        run: dotnet build ci/validation-corpus/Inspect -c Release -p:RestoreLockedMode=true
+      - name: Test the real inspector without network access
+        run: node --test ci/validation-corpus/inspector.test.mjs
+      - name: Verify immutable checkout and licence pins
+        run: node ci/validation-corpus/validation.mjs tests/corpus/validation/repos.json ci/validation-corpus/Inspect/bin/Release/net10.0/Inspect.dll validation-preparation.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: validation-preparation
+          path: validation-preparation.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Record pending detection acceptance
+        run: echo 'Repository snapshots and licences verified. Production detection and owner triage remain pending; no precision result is claimed.' >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "status": "proposed-for-owner-review",
+  "repositories": [
+    { "repository": "JetBrains/Exposed", "revision": "0957638c87e7a6ffae3835b0e11414ab2c8c65ac", "licence": "Apache-2.0", "licencePath": "LICENSE.txt", "licenceSha256": "86464d52caaea8fd1515c42229ffdda86a786e7b5152fee74cec7cfcff24918a", "pinnedOn": "2026-11-05", "stack": "jvm", "role": "data-access", "triage": "pending" },
+    { "repository": "PaystackOSS/openapi", "revision": "07c5abc8c34536e98a7755a5338178b4f430b09b", "licence": "MIT", "licencePath": "LICENSE", "licenceSha256": "1edd6ae0b9bf7f622c83dea2121e4343654d4a1cd932a9ff46eac2d8a45b3920", "pinnedOn": "2026-11-05", "stack": "node", "role": "nigerian-company", "triage": "pending" },
+    { "repository": "StackExchange/StackExchange.Redis", "revision": "9d17974fcade6c89b29b233030fe281e75f9ab1c", "licence": "MIT", "licencePath": "LICENSE", "licenceSha256": "aff822ccad8471872583ee65eef83ed29212c636606fe0db8ddc637180e6224d", "pinnedOn": "2026-11-05", "stack": "dotnet", "role": "client-library", "triage": "pending" },
+    { "repository": "fastify/fastify", "revision": "1b954e5602261115b67708c73a9729231d70d2a0", "licence": "MIT", "licencePath": "LICENSE", "licenceSha256": "23c91863859171455a536380991b4160fee4e19e2d8dc353ecf7143cc4e53ca2", "pinnedOn": "2026-11-05", "stack": "node", "role": "framework", "triage": "pending" }
+  ]
+}
