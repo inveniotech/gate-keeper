@@ -5,5 +5,12 @@
     "line": 1,
     "column": 48,
     "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.nin.api",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 48,
+    "triage": "true-positive"
   }
 ]

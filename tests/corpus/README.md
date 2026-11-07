@@ -56,7 +56,7 @@ These three assumptions are the part of the corpus the rule-pack work packages c
 
 The detection authoring modules add context positives and near-misses through `node ci/rule-packs/build-detection.mjs --write`; use `--check` to verify them. Their generated rule reference pages under `docs-data/rules/` list each case. All values come from the documented generator. The long-line BVN case includes an adjacent `bvn=` label so its expectation obeys IQ-12 while retaining a line longer than 100,000 characters.
 
-**Positives** — one finding each, in the storage contexts the card fixes from day one:
+**Positives** — the base identifier expectations below now have additional location observations where P2-04 supplies a scope. Counts represent findings rather than unique identifiers. The storage contexts are:
 
 | Case | Rule | Context |
 |---|---|---|
@@ -182,53 +182,136 @@ Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify w
 <!-- generated-location-cases:start -->
 ## Phase 2 location acceptance cases
 
-Regenerate with `node tests/corpus/New-LocationCases.mjs --write` and verify with `--check`. Literal identifiers reuse the documented generator. Field-handling cases contain no literal personal identifier. Rule identifiers are acceptance candidates pending the production rule cards; detection, severity and inventory-kind assertions remain unmeasured until the approved pack runs.
+Regenerate with `node tests/corpus/New-LocationCases.mjs --write` and verify with `--check`. Literal identifiers reuse the documented generator. Field-handling cases contain no literal personal identifier. Base and location findings are intentional separate observations. Detection tests verify exact locations, severity and inventory kinds through the loaded source packs.
 
 | Case | Expected rule |
 |---|---|
 | `p2-field-bvn-api-dotnet` | `pii.bvn.field.api` |
 | `p2-field-bvn-api-jvm` | `pii.bvn.field.api` |
 | `p2-field-bvn-api-node` | `pii.bvn.field.api` |
+| `p2-field-bvn-different-statement` | No finding |
 | `p2-field-bvn-log-dotnet` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-dotnet-variable` | `pii.bvn.field.log` |
 | `p2-field-bvn-log-jvm` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-jvm-variable` | `pii.bvn.field.log` |
 | `p2-field-bvn-log-node` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-node-variable` | `pii.bvn.field.log` |
+| `p2-field-bvn-masked` | No finding |
 | `p2-field-bvn-migration-dotnet` | `pii.bvn.field.migration` |
 | `p2-field-bvn-migration-jvm` | `pii.bvn.field.migration` |
 | `p2-field-bvn-migration-node` | `pii.bvn.field.migration` |
+| `p2-field-bvn-ordinary-source` | No finding |
+| `p2-field-bvn-protected-column` | No finding |
+| `p2-field-bvn-unrelated-field` | No finding |
+| `p2-field-bvn-unrelated-response` | No finding |
 | `p2-field-nin-api-dotnet` | `pii.nin.field.api` |
 | `p2-field-nin-api-jvm` | `pii.nin.field.api` |
 | `p2-field-nin-api-node` | `pii.nin.field.api` |
+| `p2-field-nin-different-statement` | No finding |
 | `p2-field-nin-log-dotnet` | `pii.nin.field.log` |
+| `p2-field-nin-log-dotnet-variable` | `pii.nin.field.log` |
 | `p2-field-nin-log-jvm` | `pii.nin.field.log` |
+| `p2-field-nin-log-jvm-variable` | `pii.nin.field.log` |
 | `p2-field-nin-log-node` | `pii.nin.field.log` |
+| `p2-field-nin-log-node-variable` | `pii.nin.field.log` |
+| `p2-field-nin-masked` | No finding |
 | `p2-field-nin-migration-dotnet` | `pii.nin.field.migration` |
 | `p2-field-nin-migration-jvm` | `pii.nin.field.migration` |
 | `p2-field-nin-migration-node` | `pii.nin.field.migration` |
-| `p2-location-bvn-api-model` | `pii.bvn` |
-| `p2-location-bvn-configuration` | `pii.bvn` |
-| `p2-location-bvn-fixture` | `pii.bvn` |
-| `p2-location-bvn-log` | `pii.bvn` |
-| `p2-location-bvn-migration` | `pii.bvn` |
-| `p2-location-email-api-model` | `pii.email` |
-| `p2-location-email-configuration` | `pii.email` |
-| `p2-location-email-fixture` | `pii.email` |
-| `p2-location-email-log` | `pii.email` |
-| `p2-location-email-migration` | `pii.email` |
-| `p2-location-nin-api-model` | `pii.nin` |
-| `p2-location-nin-configuration` | `pii.nin` |
-| `p2-location-nin-fixture` | `pii.nin` |
-| `p2-location-nin-log` | `pii.nin` |
-| `p2-location-nin-migration` | `pii.nin` |
-| `p2-location-nuban-api-model` | `pii.nuban` |
-| `p2-location-nuban-configuration` | `pii.nuban` |
-| `p2-location-nuban-fixture` | `pii.nuban` |
-| `p2-location-nuban-log` | `pii.nuban` |
-| `p2-location-nuban-migration` | `pii.nuban` |
-| `p2-location-phone-api-model` | `pii.phone` |
-| `p2-location-phone-configuration` | `pii.phone` |
-| `p2-location-phone-fixture` | `pii.phone` |
-| `p2-location-phone-log` | `pii.phone` |
-| `p2-location-phone-migration` | `pii.phone` |
+| `p2-field-nin-ordinary-source` | No finding |
+| `p2-field-nin-protected-column` | No finding |
+| `p2-field-nin-unrelated-field` | No finding |
+| `p2-field-nin-unrelated-response` | No finding |
+| `p2-international-phone-api-model-international` | `pii.phone.international`, `pii.phone.international.api` |
+| `p2-international-phone-api-model-international-plus` | `pii.phone.international`, `pii.phone.international.api` |
+| `p2-international-phone-api-model-overlong` | No finding |
+| `p2-international-phone-configuration-international` | `pii.phone.international`, `pii.phone.international.configuration` |
+| `p2-international-phone-configuration-international-plus` | `pii.phone.international`, `pii.phone.international.configuration` |
+| `p2-international-phone-configuration-overlong` | No finding |
+| `p2-international-phone-fixture-international` | `pii.phone.international`, `pii.phone.international.fixture` |
+| `p2-international-phone-fixture-international-plus` | `pii.phone.international`, `pii.phone.international.fixture` |
+| `p2-international-phone-fixture-overlong` | No finding |
+| `p2-international-phone-log-international` | `pii.phone.international`, `pii.phone.international.log` |
+| `p2-international-phone-log-international-plus` | `pii.phone.international`, `pii.phone.international.log` |
+| `p2-international-phone-log-overlong` | No finding |
+| `p2-international-phone-migration-international` | `pii.phone.international`, `pii.phone.international.migration` |
+| `p2-international-phone-migration-international-plus` | `pii.phone.international`, `pii.phone.international.migration` |
+| `p2-international-phone-migration-overlong` | No finding |
+| `p2-location-bvn-api-model` | `pii.bvn`, `pii.bvn.api` |
+| `p2-location-bvn-api-model-shape-near-miss` | No finding |
+| `p2-location-bvn-api-model-validator-near-miss` | No finding |
+| `p2-location-bvn-configuration` | `pii.bvn`, `pii.bvn.configuration` |
+| `p2-location-bvn-configuration-shape-near-miss` | No finding |
+| `p2-location-bvn-configuration-validator-near-miss` | No finding |
+| `p2-location-bvn-fixture` | `pii.bvn`, `pii.bvn.fixture` |
+| `p2-location-bvn-fixture-shape-near-miss` | No finding |
+| `p2-location-bvn-fixture-validator-near-miss` | No finding |
+| `p2-location-bvn-log` | `pii.bvn`, `pii.bvn.log` |
+| `p2-location-bvn-log-shape-near-miss` | No finding |
+| `p2-location-bvn-log-validator-near-miss` | No finding |
+| `p2-location-bvn-migration` | `pii.bvn`, `pii.bvn.migration` |
+| `p2-location-bvn-migration-shape-near-miss` | No finding |
+| `p2-location-bvn-migration-validator-near-miss` | No finding |
+| `p2-location-email-api-model` | `pii.email`, `pii.email.api` |
+| `p2-location-email-api-model-shape-near-miss` | No finding |
+| `p2-location-email-api-model-validator-near-miss` | No finding |
+| `p2-location-email-configuration` | `pii.email`, `pii.email.configuration` |
+| `p2-location-email-configuration-shape-near-miss` | No finding |
+| `p2-location-email-configuration-validator-near-miss` | No finding |
+| `p2-location-email-fixture` | `pii.email`, `pii.email.fixture` |
+| `p2-location-email-fixture-shape-near-miss` | No finding |
+| `p2-location-email-fixture-validator-near-miss` | No finding |
+| `p2-location-email-log` | `pii.email`, `pii.email.log` |
+| `p2-location-email-log-shape-near-miss` | No finding |
+| `p2-location-email-log-validator-near-miss` | No finding |
+| `p2-location-email-migration` | `pii.email`, `pii.email.migration` |
+| `p2-location-email-migration-shape-near-miss` | No finding |
+| `p2-location-email-migration-validator-near-miss` | No finding |
+| `p2-location-nin-api-model` | `pii.nin`, `pii.nin.api` |
+| `p2-location-nin-api-model-shape-near-miss` | No finding |
+| `p2-location-nin-api-model-validator-near-miss` | No finding |
+| `p2-location-nin-configuration` | `pii.nin`, `pii.nin.configuration` |
+| `p2-location-nin-configuration-shape-near-miss` | No finding |
+| `p2-location-nin-configuration-validator-near-miss` | No finding |
+| `p2-location-nin-fixture` | `pii.nin`, `pii.nin.fixture` |
+| `p2-location-nin-fixture-shape-near-miss` | No finding |
+| `p2-location-nin-fixture-validator-near-miss` | No finding |
+| `p2-location-nin-log` | `pii.nin`, `pii.nin.log` |
+| `p2-location-nin-log-shape-near-miss` | No finding |
+| `p2-location-nin-log-validator-near-miss` | No finding |
+| `p2-location-nin-migration` | `pii.nin`, `pii.nin.migration` |
+| `p2-location-nin-migration-shape-near-miss` | No finding |
+| `p2-location-nin-migration-validator-near-miss` | No finding |
+| `p2-location-nuban-api-model` | `pii.nuban`, `pii.nuban.api` |
+| `p2-location-nuban-api-model-shape-near-miss` | No finding |
+| `p2-location-nuban-api-model-validator-near-miss` | No finding |
+| `p2-location-nuban-configuration` | `pii.nuban`, `pii.nuban.configuration` |
+| `p2-location-nuban-configuration-shape-near-miss` | No finding |
+| `p2-location-nuban-configuration-validator-near-miss` | No finding |
+| `p2-location-nuban-fixture` | `pii.nuban`, `pii.nuban.fixture` |
+| `p2-location-nuban-fixture-shape-near-miss` | No finding |
+| `p2-location-nuban-fixture-validator-near-miss` | No finding |
+| `p2-location-nuban-log` | `pii.nuban`, `pii.nuban.log` |
+| `p2-location-nuban-log-shape-near-miss` | No finding |
+| `p2-location-nuban-log-validator-near-miss` | No finding |
+| `p2-location-nuban-migration` | `pii.nuban`, `pii.nuban.migration` |
+| `p2-location-nuban-migration-shape-near-miss` | No finding |
+| `p2-location-nuban-migration-validator-near-miss` | No finding |
+| `p2-location-phone-api-model` | `pii.phone`, `pii.phone.api` |
+| `p2-location-phone-api-model-shape-near-miss` | No finding |
+| `p2-location-phone-api-model-validator-near-miss` | No finding |
+| `p2-location-phone-configuration` | `pii.phone`, `pii.phone.configuration` |
+| `p2-location-phone-configuration-shape-near-miss` | No finding |
+| `p2-location-phone-configuration-validator-near-miss` | No finding |
+| `p2-location-phone-fixture` | `pii.phone`, `pii.phone.fixture` |
+| `p2-location-phone-fixture-shape-near-miss` | No finding |
+| `p2-location-phone-fixture-validator-near-miss` | No finding |
+| `p2-location-phone-log` | `pii.phone`, `pii.phone.log` |
+| `p2-location-phone-log-shape-near-miss` | No finding |
+| `p2-location-phone-log-validator-near-miss` | No finding |
+| `p2-location-phone-migration` | `pii.phone`, `pii.phone.migration` |
+| `p2-location-phone-migration-shape-near-miss` | No finding |
+| `p2-location-phone-migration-validator-near-miss` | No finding |
 
 <!-- generated-location-cases:end -->
 <!-- generated-detection-cases:start -->

@@ -49,7 +49,7 @@ export function synchroniseCases(cases, marker, title, description, mode) {
   const ending = `<!-- generated-${marker}-cases:end -->`;
   const section = [heading, `## ${title}`, '', description, '',
     '| Case | Expected rule |', '|---|---|',
-    ...cases.map(item => `| \`${item.name}\` | ${item.expected.length ? `\`${item.expected[0].ruleId}\`` : 'No finding'} |`), '', ending].join('\n');
+    ...cases.map(item => `| \`${item.name}\` | ${item.expected.length ? item.expected.map(entry => `\`${entry.ruleId}\``).join(', ') : 'No finding'} |`), '', ending].join('\n');
   const readmePath = join(root, 'README.md');
   const current = readFileSync(readmePath, 'utf8');
   const start = current.indexOf(heading);
@@ -59,7 +59,7 @@ export function synchroniseCases(cases, marker, title, description, mode) {
     : current.slice(0, start) + section + current.slice(end + ending.length);
   if (mode === '--write') writeFileSync(readmePath, updated);
   else if (current !== updated) throw new Error('The corpus README differs. Regenerate identifier cases with --write.');
-  console.log(`Verified ${cases.length} synthetic ${marker} acceptance cases; detection remains pending the approved pack.`);
+  console.log(`Verified ${cases.length} synthetic ${marker} cases and their recorded expectations.`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

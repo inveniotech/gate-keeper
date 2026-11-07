@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.phone.international",
+    "path": "src/logging.ts",
+    "line": 1,
+    "column": 23,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.phone.international.log",
+    "path": "src/logging.ts",
+    "line": 1,
+    "column": 23,
+    "triage": "true-positive"
+  }
+]

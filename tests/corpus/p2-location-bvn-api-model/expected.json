@@ -5,5 +5,12 @@
     "line": 1,
     "column": 60,
     "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.bvn.api",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 60,
+    "triage": "true-positive"
   }
 ]

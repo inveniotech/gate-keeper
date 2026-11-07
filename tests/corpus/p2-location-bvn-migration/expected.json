@@ -5,5 +5,12 @@
     "line": 1,
     "column": 74,
     "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.bvn.migration",
+    "path": "migrations/001_customer.sql",
+    "line": 1,
+    "column": 74,
+    "triage": "true-positive"
   }
 ]

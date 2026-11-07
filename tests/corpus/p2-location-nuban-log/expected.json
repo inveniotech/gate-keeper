@@ -5,5 +5,12 @@
     "line": 1,
     "column": 31,
     "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.nuban.log",
+    "path": "src/logging.ts",
+    "line": 1,
+    "column": 31,
+    "triage": "true-positive"
   }
 ]

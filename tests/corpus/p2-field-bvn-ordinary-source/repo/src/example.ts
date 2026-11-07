@@ -1,0 +1,1 @@
+const bvn = customer.bvn;

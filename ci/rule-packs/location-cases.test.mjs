@@ -12,14 +12,14 @@ test('location acceptance covers every identifier in each inventory context', ()
     for (const kind of ['log', 'fixture', 'configuration', 'migration', 'api-model']) {
       const item = cases.find(entry => entry.name === `p2-location-${family}-${kind}`);
       assert.equal(item.kind, kind);
-      assert.equal(item.expected.length, 1);
+      assert.equal(item.expected.length, 2);
       assert.equal(item.expected[0].ruleId, `pii.${family}`);
     }
   }
 });
 test('unsafe BVN and NIN field cases cover all launch stacks without literal identifiers', () => {
   const cases = buildLocationCases().filter(item => item.mode === 'field');
-  assert.equal(cases.length, 18);
+  assert.equal(cases.length, 24);
   for (const item of cases) {
     assert.doesNotMatch(item.text, /\d{10,11}/);
     assert.equal(item.expected.length, 1);

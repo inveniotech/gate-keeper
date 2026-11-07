@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.phone.international",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.phone.international.fixture",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  }
+]
