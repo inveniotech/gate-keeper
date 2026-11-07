@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nin.field.migration",
+    "path": "migrations/example.kt",
+    "line": 1,
+    "column": 20,
+    "triage": "true-positive"
+  }
+]

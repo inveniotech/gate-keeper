@@ -5,5 +5,12 @@
     "path": "src/support/CallbackLog.cs",
     "ruleId": "pii.phone",
     "triage": "true-positive"
+  },
+  {
+    "column": 49,
+    "line": 17,
+    "path": "src/support/CallbackLog.cs",
+    "ruleId": "pii.phone.log",
+    "triage": "true-positive"
   }
 ]

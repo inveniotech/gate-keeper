@@ -5,5 +5,12 @@
     "path": "api/models/CustomerProfile.cs",
     "ruleId": "pii.bvn",
     "triage": "true-positive"
+  },
+  {
+    "column": 44,
+    "line": 9,
+    "path": "api/models/CustomerProfile.cs",
+    "ruleId": "pii.bvn.api",
+    "triage": "true-positive"
   }
 ]

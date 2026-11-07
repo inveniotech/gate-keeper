@@ -7,19 +7,56 @@ These measurements cover synthetic repositories only. Real-repository findings a
 The error-level gate is `20 × false positives <= true positives + false positives`, per rule and overall. Warning and note counts are separate. Recall includes only the currently authored rules; other planned rules remain outside this measurement.
 
 - `invenio.bvn` version `2026.11.0`, SHA-256 `da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe`.
+- `invenio.locations` version `2026.11.0`, SHA-256 `5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663`.
 - `invenio.nin` version `2026.11.0`, SHA-256 `ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c`.
 - `invenio.phone` version `2026.11.0`, SHA-256 `70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19`.
 - `invenio.processors` version `2026.11.0`, SHA-256 `bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636`.
 
-Scanned 153 synthetic repositories. Rates are percentages; `n/a` means no denominator.
+Scanned 279 synthetic repositories. Rates are percentages; `n/a` means no denominator.
 
 rule id | expected | produced | matched | unexpected | precision | recall | error true positives | error false positives | warnings | notes | gate | error false-positive rate
 --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-(overall) | 71 | 71 | 71 | 0 | 100 | 100 | 29 | 0 | 0 | 42 | pass | 0
-pii.bvn | 11 | 11 | 11 | 0 | 100 | 100 | 11 | 0 | 0 | 0 | pass | 0
-pii.nin | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
-pii.phone | 8 | 8 | 8 | 0 | 100 | 100 | 8 | 0 | 0 | 0 | pass | 0
-pii.phone.international | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+(overall) | 171 | 171 | 171 | 0 | 100 | 100 | 129 | 0 | 0 | 42 | pass | 0
+pii.bvn | 16 | 16 | 16 | 0 | 100 | 100 | 16 | 0 | 0 | 0 | pass | 0
+pii.bvn.api | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.bvn.configuration | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
+pii.bvn.field.api | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
+pii.bvn.field.log | 6 | 6 | 6 | 0 | 100 | 100 | 6 | 0 | 0 | 0 | pass | 0
+pii.bvn.field.migration | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
+pii.bvn.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.bvn.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.bvn.migration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.email.api | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.email.configuration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.email.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.email.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.email.migration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nin | 13 | 13 | 13 | 0 | 100 | 100 | 13 | 0 | 0 | 0 | pass | 0
+pii.nin.api | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nin.configuration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.nin.field.api | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
+pii.nin.field.log | 6 | 6 | 6 | 0 | 100 | 100 | 6 | 0 | 0 | 0 | pass | 0
+pii.nin.field.migration | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
+pii.nin.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.nin.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.nin.migration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nuban.api | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nuban.configuration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.nuban.fixture | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nuban.log | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.nuban.migration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone | 13 | 13 | 13 | 0 | 100 | 100 | 13 | 0 | 0 | 0 | pass | 0
+pii.phone.api | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.configuration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.phone.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.international | 12 | 12 | 12 | 0 | 100 | 100 | 12 | 0 | 0 | 0 | pass | 0
+pii.phone.international.api | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.international.configuration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.international.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.international.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.international.migration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
+pii.phone.migration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
 transfer.processor.aws | 10 | 10 | 10 | 0 | 100 | 100 | 0 | 0 | 0 | 10 | pass | 0
 transfer.processor.aws.bucket | 3 | 3 | 3 | 0 | 100 | 100 | 0 | 0 | 0 | 3 | pass | 0
 transfer.processor.aws.capetown | 1 | 1 | 1 | 0 | 100 | 100 | 0 | 0 | 0 | 1 | pass | 0

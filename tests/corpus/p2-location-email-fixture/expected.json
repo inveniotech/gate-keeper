@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.email",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.email.fixture",
+    "path": "fixtures/customer.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  }
+]

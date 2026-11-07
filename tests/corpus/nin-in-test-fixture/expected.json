@@ -5,5 +5,12 @@
     "path": "tests/fixtures/kyc-queue.json",
     "ruleId": "pii.nin",
     "triage": "true-positive"
+  },
+  {
+    "column": 15,
+    "line": 5,
+    "path": "tests/fixtures/kyc-queue.json",
+    "ruleId": "pii.nin.fixture",
+    "triage": "true-positive"
   }
 ]

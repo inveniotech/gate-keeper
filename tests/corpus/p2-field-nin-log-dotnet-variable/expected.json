@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nin.field.log",
+    "path": "src/example.cs",
+    "line": 1,
+    "column": 26,
+    "triage": "true-positive"
+  }
+]

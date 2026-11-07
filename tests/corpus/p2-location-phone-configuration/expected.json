@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.phone",
+    "path": "config/appsettings.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.phone.configuration",
+    "path": "config/appsettings.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  }
+]

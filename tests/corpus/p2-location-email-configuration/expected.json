@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.email",
+    "path": "config/appsettings.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.email.configuration",
+    "path": "config/appsettings.json",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  }
+]

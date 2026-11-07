@@ -34,10 +34,9 @@ export function buildIdentifierCases() {
   return result.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
 }
 
-function main() {
-  const mode = process.argv[2];
-  if (!['--write', '--check'].includes(mode) || process.argv.length !== 3) throw new Error('Use --write to regenerate or --check to verify identifier acceptance cases.');
-  const cases = buildIdentifierCases();
+/** Writes or checks generated case files and the generator's marked corpus README section. */
+export function synchroniseCases(cases, marker, title, description, mode) {
+  if (!['--write', '--check'].includes(mode)) throw new Error('Use --write to regenerate or --check to verify acceptance cases.');
   for (const item of cases) {
     const files = [[join(root, item.name, 'repo', item.path), item.text],
       [join(root, item.name, 'expected.json'), JSON.stringify(item.expected, null, 2) + '\n']];
@@ -46,12 +45,11 @@ function main() {
       else if (readFileSync(path, 'utf8') !== text) throw new Error(`Generated identifier case differs: ${item.name}. Regenerate it with --write.`);
     }
   }
-  const heading = '<!-- generated-identifier-cases:start -->';
-  const ending = '<!-- generated-identifier-cases:end -->';
-  const section = [heading, '## Phase 2 identifier acceptance cases', '',
-    'Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify with `--check`. All personal identifiers come from the documented generator above. These inputs establish expectations before production rules; their existence does not claim measured recall or precision.', '',
+  const heading = `<!-- generated-${marker}-cases:start -->`;
+  const ending = `<!-- generated-${marker}-cases:end -->`;
+  const section = [heading, `## ${title}`, '', description, '',
     '| Case | Expected rule |', '|---|---|',
-    ...cases.map(item => `| \`${item.name}\` | ${item.expected.length ? `\`${item.expected[0].ruleId}\`` : 'No finding'} |`), '', ending].join('\n');
+    ...cases.map(item => `| \`${item.name}\` | ${item.expected.length ? item.expected.map(entry => `\`${entry.ruleId}\``).join(', ') : 'No finding'} |`), '', ending].join('\n');
   const readmePath = join(root, 'README.md');
   const current = readFileSync(readmePath, 'utf8');
   const start = current.indexOf(heading);
@@ -61,7 +59,11 @@ function main() {
     : current.slice(0, start) + section + current.slice(end + ending.length);
   if (mode === '--write') writeFileSync(readmePath, updated);
   else if (current !== updated) throw new Error('The corpus README differs. Regenerate identifier cases with --write.');
-  console.log(`Verified ${cases.length} synthetic identifier acceptance cases; detection remains pending the approved pack.`);
+  console.log(`Verified ${cases.length} synthetic ${marker} cases and their recorded expectations.`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  if (process.argv.length !== 3) throw new Error('Supply one generation mode.');
+  synchroniseCases(buildIdentifierCases(), 'identifier', 'Phase 2 identifier acceptance cases',
+    'Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify with `--check`. All personal identifiers come from the documented generator above. These inputs establish expectations before production rules; their existence does not claim measured recall or precision.', process.argv[2]);
+}

@@ -53,6 +53,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     [InlineData("nin")]
     [InlineData("phone")]
     [InlineData("processors")]
+    [InlineData("locations")]
     public async Task DetectionPack_Should_MatchExactExpectations_When_RunAgainstEverySyntheticCase(string family)
     {
         var rules = Load(family);
@@ -132,6 +133,99 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
             File.WriteAllText(target, report.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         File.ReadAllText(target).Should().Be(report.ToString(), "the committed report must be regenerated after a pack or corpus change");
         output.WriteLine(report.ToString());
+    }
+
+    [Fact]
+    public void LocationPack_Should_LabelEachIdentifier_When_InEveryInventoryContext()
+    {
+        var matcher = new MatcherEngine(Load("locations"));
+        var cases = CorpusCase.LoadAll(CorpusPaths.Root).Where(item => item.Name.StartsWith("p2-location-", StringComparison.Ordinal) && item.Expected.Count > 0).ToArray();
+        cases.Should().HaveCount(25);
+        foreach (var item in cases)
+        {
+            var expected = item.Expected.First();
+            var finding = matcher.Match(expected.Path, File.ReadAllText(Path.Combine(item.RepositoryRoot, expected.Path))).Single();
+            finding.RuleId.Should().Be(expected.RuleId + "." + (item.Name.EndsWith("-api-model", StringComparison.Ordinal) ? "api" : item.Name.Split('-')[3]));
+            finding.Line.Should().Be(expected.Line);
+            finding.Column.Should().Be(expected.Column);
+            finding.Severity.Should().Be(Severity.Error);
+            finding.LocationKind.Should().Be(item.Name.EndsWith("-api-model", StringComparison.Ordinal) ? LocationKind.ApiModel
+                : item.Name.EndsWith("-configuration", StringComparison.Ordinal) ? LocationKind.Configuration
+                : item.Name.EndsWith("-fixture", StringComparison.Ordinal) ? LocationKind.Fixture
+                : item.Name.EndsWith("-migration", StringComparison.Ordinal) ? LocationKind.Migration : LocationKind.Log);
+        }
+    }
+
+    [Theory]
+    [InlineData("fixture", "__tests__/customer.ts")]
+    [InlineData("fixture", "src/customer.spec.ts")]
+    [InlineData("fixture", "db/seeds/customer.json")]
+    [InlineData("fixture", "db/seed.sql")]
+    [InlineData("configuration", ".env")]
+    [InlineData("configuration", "env/.env.local")]
+    [InlineData("configuration", "appsettings.Development.json")]
+    [InlineData("configuration", "src/application-prod.yml")]
+    [InlineData("configuration", "src/application.yaml")]
+    [InlineData("configuration", "src/customer.properties")]
+    [InlineData("migration", "Migrations/customer.sql")]
+    [InlineData("api-model", "Models/customer.cs")]
+    [InlineData("api-model", "api/responses/customer.ts")]
+    public void LocationPack_Should_ApplyPackPathScopes_When_AnAliasContainsAnIdentifier(string kind, string path)
+    {
+        var matcher = new MatcherEngine(Load("locations"));
+        foreach (var family in new[] { "bvn", "nin", "nuban", "phone", "email" })
+        {
+            var item = CorpusCase.LoadAll(CorpusPaths.Root).Single(item => item.Name == $"p2-location-{family}-{kind}");
+            var expected = item.Expected.First();
+            var text = File.ReadAllText(Path.Combine(item.RepositoryRoot, expected.Path));
+            var finding = matcher.Match(path, text).Single();
+            finding.RuleId.Should().Be($"pii.{family}.{(kind == "api-model" ? "api" : kind)}");
+            finding.Severity.Should().Be(Severity.Error);
+            finding.Line.Should().Be(expected.Line);
+            finding.Column.Should().Be(expected.Column);
+            matcher.Match("src/ordinary.ts", text).Should().BeEmpty();
+        }
+    }
+
+    [Theory]
+    [InlineData("logger.info(")]
+    [InlineData("Log.Information(")]
+    [InlineData("print(")]
+    [InlineData("logger.LogWarning(")]
+    public void LocationPack_Should_RecogniseCallSpellings_When_ALiteralIsNearALogCall(string call)
+    {
+        var matcher = new MatcherEngine(Load("locations"));
+        foreach (var family in new[] { "bvn", "nin", "nuban", "phone", "email" })
+        {
+            var item = CorpusCase.LoadAll(CorpusPaths.Root).Single(item => item.Name == $"p2-location-{family}-log");
+            var expected = item.Expected.First();
+            var text = File.ReadAllText(Path.Combine(item.RepositoryRoot, expected.Path));
+            var finding = matcher.Match("src/ordinary.ts", text.Replace("console.log(", call, StringComparison.Ordinal)).Single();
+            finding.RuleId.Should().Be($"pii.{family}.log");
+            finding.LocationKind.Should().Be(LocationKind.Log);
+            matcher.Match("src/ordinary.ts", text.Replace("console.log(", "process(", StringComparison.Ordinal)).Should().BeEmpty();
+        }
+    }
+
+    [Fact]
+    public void LocationPack_Should_ReportUnsafeFields_When_NoLiteralIdentifierIsPresent()
+    {
+        var matcher = new MatcherEngine(Load("locations"));
+        var cases = CorpusCase.LoadAll(CorpusPaths.Root).Where(item => item.Name.StartsWith("p2-field-", StringComparison.Ordinal) && item.Expected.Count > 0).ToArray();
+        cases.Should().HaveCount(24);
+        foreach (var item in cases)
+        {
+            var expected = item.Expected.Single();
+            var findings = matcher.Match(expected.Path, File.ReadAllText(Path.Combine(item.RepositoryRoot, expected.Path)));
+            findings.Should().ContainSingle(item.Name);
+            var finding = findings.Single();
+            finding.RuleId.Should().Be(expected.RuleId, item.Name);
+            finding.Line.Should().Be(expected.Line);
+            finding.Column.Should().Be(expected.Column);
+            finding.Severity.Should().Be(Severity.Error);
+            finding.LocationKind.Should().Be(item.Name.Contains("-migration-", StringComparison.Ordinal) ? LocationKind.Migration
+                : item.Name.Contains("-api-", StringComparison.Ordinal) ? LocationKind.ApiModel : LocationKind.Log);
+        }
     }
 
     // This signs only in-memory test inputs with the existing labelled development seed.

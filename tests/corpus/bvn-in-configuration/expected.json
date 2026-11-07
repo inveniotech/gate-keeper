@@ -5,5 +5,12 @@
     "path": "config/identity.toml",
     "ruleId": "pii.bvn",
     "triage": "true-positive"
+  },
+  {
+    "column": 8,
+    "line": 4,
+    "path": "config/identity.toml",
+    "ruleId": "pii.bvn.configuration",
+    "triage": "true-positive"
   }
 ]

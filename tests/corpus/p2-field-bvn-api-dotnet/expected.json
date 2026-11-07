@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.bvn.field.api",
+    "path": "api/example.cs",
+    "line": 1,
+    "column": 27,
+    "triage": "true-positive"
+  }
+]

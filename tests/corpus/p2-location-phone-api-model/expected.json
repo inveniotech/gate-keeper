@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.phone",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 43,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.phone.api",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 43,
+    "triage": "true-positive"
+  }
+]

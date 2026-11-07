@@ -5,5 +5,12 @@
     "path": "src/payments/BvnVerificationLog.cs",
     "ruleId": "pii.bvn",
     "triage": "true-positive"
+  },
+  {
+    "column": 52,
+    "line": 17,
+    "path": "src/payments/BvnVerificationLog.cs",
+    "ruleId": "pii.bvn.log",
+    "triage": "true-positive"
   }
 ]
