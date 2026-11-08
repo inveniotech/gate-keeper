@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using InvenioTech.GateKeeper.Engine;
 
@@ -28,7 +29,7 @@ public sealed class ConformanceExportTests
             .ToArray();
         samples.Should().NotBeEmpty();
         using var stream = new MemoryStream();
-        using (var json = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+        using (var json = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
         {
             json.WriteStartObject();
             json.WriteNumber("version", 1);
@@ -105,7 +106,7 @@ public sealed class ConformanceExportTests
         {
             RuleValidatorRegistry.Default.TryGet(parameters.Name, out var validator).Should().BeTrue();
             using var validatorStream = new MemoryStream();
-            using (var json = new Utf8JsonWriter(validatorStream, new JsonWriterOptions { Indented = true }))
+            using (var json = new Utf8JsonWriter(validatorStream, new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))
             {
                 json.WriteStartObject();
                 json.WriteString("validator", name);
