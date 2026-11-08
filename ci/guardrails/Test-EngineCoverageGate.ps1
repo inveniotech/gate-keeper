@@ -33,3 +33,5 @@ finally {
     if ((Split-Path $temporary -Parent) -ne [IO.Path]::GetTempPath().TrimEnd('\', '/')) { throw 'Unsafe temporary path.' }
     Remove-Item -LiteralPath $temporary -Recurse -Force
 }
+# Expected child failures must not become the workflow step's process status.
+exit 0
