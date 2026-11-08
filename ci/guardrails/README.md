@@ -26,7 +26,7 @@ testing is optional and is not introduced here.
 The initial Windows baseline covered 4,118 of 7,371 distinct engine source
 lines (55.9 per cent). Snapshot round-trip and behavioural tests exposed and
 fixed the value-object JSON name collision and exercise the previously unused
-generated rule/pack serialisers. The full suite now covers 6,381 of 7,185 lines
+generated rule/pack serialisation paths. The full suite now covers 6,381 of 7,185 lines
 (88.8 per cent), with no coverage exclusion or threshold reduction. The source
 line count changes because explicit value-object converters replace invalid
 generated metadata; the gate still measures every engine line.
