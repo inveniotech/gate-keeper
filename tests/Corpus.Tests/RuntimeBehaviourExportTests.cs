@@ -63,11 +63,12 @@ public sealed partial class ConformanceExportTests
             json.WriteStartArray("cases");
             foreach (var sample in ResponseSamples())
             {
-                var body = JsonNode.Parse(sample.Body)!; var filter = new ResponseFilter(runtime, sample.Paths);
+                var body = JsonNode.Parse(sample.Body); var filter = new ResponseFilter(runtime, sample.Paths);
                 JsonNode? result = null; var failed = false; var abort = false;
                 try { result = filter.Transform(body, sample.Known, sample.Committed, sample.ContentType); }
                 catch (ResponseFilterException error) { failed = true; abort = error.AbortRequired; }
-                json.WriteStartObject(); json.WriteString("name", sample.Name); json.WritePropertyName("body"); body.WriteTo(json);
+                json.WriteStartObject(); json.WriteString("name", sample.Name); json.WritePropertyName("body");
+                if (body is null) json.WriteNullValue(); else body.WriteTo(json);
                 json.WriteStartArray("paths"); foreach (var path in sample.Paths) json.WriteStringValue(path); json.WriteEndArray();
                 json.WriteBoolean("lengthKnown", sample.Known); json.WriteBoolean("headersCommitted", sample.Committed); json.WriteString("contentType", sample.ContentType);
                 json.WriteBoolean("failed", failed); json.WriteBoolean("abortRequired", abort); json.WritePropertyName("expected");
@@ -96,6 +97,9 @@ public sealed partial class ConformanceExportTests
         yield return ("wrong-content-type-fails", customers, ["/customers/*/phone"], true, false, "text/plain");
         yield return ("unprotected-pass-through", customers, [], false, true, "application/octet-stream");
         yield return ("root-string", "\"marker\"", [""], true, false, "application/json");
+        yield return ("null-root-protected", "null", [""], true, false, "application/json");
+        yield return ("null-root-committed", "null", [""], true, true, "application/json");
+        yield return ("null-root-unprotected", "null", [], false, true, "application/octet-stream");
     }
     private sealed class VectorProvider(Func<ConsentState> answer) : IConsentProvider
     {

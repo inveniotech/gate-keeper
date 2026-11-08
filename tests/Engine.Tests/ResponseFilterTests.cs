@@ -12,7 +12,7 @@ public sealed class ResponseFilterTests
     {
         var body = JsonNode.Parse("""{"customers":[{"phone":"marker"},{"phone":"marker"}],"other":"unchanged"}""")!;
         var filter = new ResponseFilter(Runtime(), ["/customers/*/phone"]);
-        var result = filter.Transform(body);
+        var result = filter.Transform(body)!;
         result["customers"]![0]!["phone"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["customers"]![1]!["phone"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["other"]!.GetValue<string>().Should().Be("unchanged");
@@ -37,11 +37,19 @@ public sealed class ResponseFilterTests
     }
 
     [Fact]
+    public void Response_Should_UseTheProtectedFailureTypeAndAbortSignal_When_TheRootIsJsonNull()
+    {
+        var filter = new ResponseFilter(Runtime(), [""]);
+        Action transform = () => filter.Transform(null, headersCommitted: true);
+        transform.Should().ThrowExactly<ResponseFilterException>().Which.AbortRequired.Should().BeTrue();
+    }
+
+    [Fact]
     public void Response_Should_SupportNestedWildcardsAndLiteralEscapes_When_PathsAreExplicit()
     {
         var body = JsonNode.Parse("""{"a/b":{"~":{"*":"marker"}},"groups":[[{"value":"marker"}]]}""")!;
         var filter = new ResponseFilter(Runtime(), ["/a~1b/~0/~2", "/groups/*/*/value"]);
-        var result = filter.Transform(body);
+        var result = filter.Transform(body)!;
         result["a/b"]!["~"]!["*"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["groups"]![0]![0]!["value"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
     }

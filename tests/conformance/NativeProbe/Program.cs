@@ -14,7 +14,7 @@ if (finding is null || finding.Start != 2 || finding.Length != 6) return 1;
 var consent = new ConsentCheck(new Provider(), _ => { });
 if (!await consent.IsGrantedAsync("synthetic-subject", "acme.marketing-sms")) return 1;
 var body = JsonNode.Parse("""{"customers":[{"phone":"marker"},{"phone":"marker"}]}""")!;
-var response = new ResponseFilter(runtime, ["/customers/*/phone"]).Transform(body);
+var response = new ResponseFilter(runtime, ["/customers/*/phone"]).Transform(body)!;
 if (response["customers"]![1]!["phone"]!.GetValue<string>() != "[REDACTED:local.marker]") return 1;
 if (body["customers"]![1]!["phone"]!.GetValue<string>() != "marker") return 1;
 if (runtime.Versions().Packs[0].ContentDigest != new string('a', 64)) return 1;

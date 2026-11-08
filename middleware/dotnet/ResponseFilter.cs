@@ -35,15 +35,14 @@ public sealed class ResponseFilter
     /// <param name="lengthKnown">False means streaming and must fail when protected.</param>
     /// <param name="headersCommitted">True requires the host to abort on failure.</param>
     /// <param name="contentType">Only application/json or application/*+json is supported.</param>
-    public JsonNode Transform(JsonNode body, bool lengthKnown = true, bool headersCommitted = false, string contentType = "application/json")
+    public JsonNode? Transform(JsonNode? body, bool lengthKnown = true, bool headersCommitted = false, string? contentType = "application/json")
     {
-        ArgumentNullException.ThrowIfNull(body);
-        if (paths.Length == 0) return body.DeepClone();
-        var media = contentType.Split(';')[0].Trim();
+        if (paths.Length == 0) return body?.DeepClone();
+        var media = (contentType ?? "").Split(';')[0].Trim();
         if (!lengthKnown || headersCommitted || !(media.Equals("application/json", StringComparison.OrdinalIgnoreCase)
             || media.StartsWith("application/", StringComparison.OrdinalIgnoreCase) && media.EndsWith("+json", StringComparison.OrdinalIgnoreCase)))
             throw new ResponseFilterException(headersCommitted);
-        var holder = new JsonObject { ["body"] = body.DeepClone() };
+        var holder = new JsonObject { ["body"] = body?.DeepClone() };
         var selected = new HashSet<(JsonNode Parent, string Key)>();
         foreach (var path in paths) Select(holder, "body", path, 0);
         try
@@ -57,7 +56,7 @@ public sealed class ResponseFilter
         }
         catch (Exception error) when (error is ArgumentException or InputLimitException)
         { throw new ResponseFilterException(headersCommitted); }
-        return holder["body"]!.DeepClone();
+        return holder["body"]?.DeepClone();
 
         void Select(JsonNode parent, string key, Segment[] path, int depth)
         {

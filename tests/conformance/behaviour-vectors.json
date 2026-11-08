@@ -473,6 +473,43 @@
         "failed": false,
         "abortRequired": false,
         "expected": "[REDACTED:local.marker]"
+      },
+      {
+        "name": "null-root-protected",
+        "body": null,
+        "paths": [
+          ""
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "null-root-committed",
+        "body": null,
+        "paths": [
+          ""
+        ],
+        "lengthKnown": true,
+        "headersCommitted": true,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": true,
+        "expected": null
+      },
+      {
+        "name": "null-root-unprotected",
+        "body": null,
+        "paths": [],
+        "lengthKnown": false,
+        "headersCommitted": true,
+        "contentType": "application/octet-stream",
+        "failed": false,
+        "abortRequired": false,
+        "expected": null
       }
     ]
   }
