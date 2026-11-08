@@ -4,10 +4,11 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using InvenioTech.GateKeeper.Engine;
+using InvenioTech.GateKeeper.Middleware;
 
 namespace InvenioTech.GateKeeper.Corpus.Tests;
 
-public sealed class ConformanceExportTests
+public sealed partial class ConformanceExportTests
 {
     [Fact]
     public void Conformance_Should_MatchCommittedVectors_When_CurrentSourcePacksAreLoaded()
@@ -20,12 +21,16 @@ public sealed class ConformanceExportTests
             .OrderBy(rule => rule.Id, StringComparer.Ordinal).ToArray();
         rules.Select(rule => rule.Id).Should().OnlyHaveUniqueItems();
         var matcher = new MatcherEngine(rules, shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan));
+        var loads = paths.Select(path => DetectionPackTests.LoadMerged(Path.GetFileName(path)[..^".pack.json".Length])).ToArray();
+        var runtime = new RuntimeMatcher(new MergedRules(loads.SelectMany(load => load.Packs).ToArray(),
+            loads.SelectMany(load => load.Rules).ToArray()), shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan));
         var samples = CorpusCase.LoadAll(CorpusPaths.Root)
             .Where(item => item.Name.StartsWith("p2-", StringComparison.Ordinal))
             .OrderBy(item => item.Name, StringComparer.Ordinal)
             .SelectMany(item => Directory.GetFiles(item.RepositoryRoot, "*", SearchOption.AllDirectories)
                 .OrderBy(path => path, StringComparer.Ordinal)
                 .Select(path => (Name: item.Name, Path: Path.GetRelativePath(item.RepositoryRoot, path).Replace('\\', '/'), Text: File.ReadAllText(path))))
+            .Append((Name: "astral-before-bvn", Path: "src/astral.ts", Text: "😀 bvn 32826314843"))
             .ToArray();
         samples.Should().NotBeEmpty();
         using var stream = new MemoryStream();
@@ -34,12 +39,19 @@ public sealed class ConformanceExportTests
             json.WriteStartObject();
             json.WriteNumber("version", 1);
             json.WriteString("scope", "Authored unsigned source packs loaded with in-memory development signatures; not a published bundled pack.");
-            json.WriteString("redactionStatus", "Pending accepted P3-01 contract and reference redactor; no redaction expectation is fabricated.");
+            json.WriteString("redactionStatus", "Executable reference core; contract acceptance and framework integration remain separate.");
+            json.WriteStartArray("rules");
+            foreach (var rule in rules) JsonSerializer.Serialize(json, rule, EngineJsonSerializerContext.Default.Rule);
+            json.WriteEndArray();
             json.WriteStartArray("packs");
             foreach (var path in paths)
             {
                 json.WriteStartObject();
                 json.WriteString("path", "rule-packs/" + Path.GetFileName(path));
+                using var pack = JsonDocument.Parse(File.ReadAllBytes(path));
+                json.WriteString("id", pack.RootElement.GetProperty("id").GetString());
+                json.WriteString("version", pack.RootElement.GetProperty("version").GetString());
+                json.WriteString("contentDigest", Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))));
                 json.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))));
                 json.WriteEndObject();
             }
@@ -66,9 +78,26 @@ public sealed class ConformanceExportTests
                     json.WriteEndObject();
                 }
                 json.WriteEndArray();
+                WriteRuntime(json, runtime, sample.Text);
                 json.WriteEndObject();
             }
             count.Should().BeGreaterThan(0);
+            json.WriteEndArray();
+            json.WriteStartArray("syntheticRuntimeCases");
+            foreach (var sample in RuntimeSamples())
+            {
+                var pack = new LoadedPack("synthetic.runtime", "2026.11.0", PackProvenance.Bundled, new string('a', 64));
+                var syntheticRuntime = new RuntimeMatcher(new MergedRules([pack], sample.Rules.Select(rule => new LoadedRule(rule, pack)).ToArray()),
+                    shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan));
+                json.WriteStartObject();
+                json.WriteString("name", sample.Name);
+                json.WriteString("text", sample.Text);
+                json.WriteStartArray("rules");
+                foreach (var rule in sample.Rules) JsonSerializer.Serialize(json, rule, EngineJsonSerializerContext.Default.Rule);
+                json.WriteEndArray();
+                WriteRuntime(json, syntheticRuntime, sample.Text);
+                json.WriteEndObject();
+            }
             json.WriteEndArray();
             json.WriteEndObject();
         }
@@ -135,7 +164,45 @@ public sealed class ConformanceExportTests
 
     private static string Base64(string value) => Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
 
-    private static void Verify(string root, string name, string content)
+    private static void WriteRuntime(Utf8JsonWriter json, RuntimeMatcher runtime, string text)
+    {
+        json.WriteStartArray("runtimeExpected");
+        foreach (var finding in runtime.Matches(text)) WriteFinding(json, finding);
+        json.WriteEndArray();
+        json.WritePropertyName("classification");
+        var selected = runtime.Classify(text, new RuntimeContext("value"));
+        if (selected is null) json.WriteNullValue(); else WriteFinding(json, selected);
+        json.WriteString("redacted", runtime.Redact(text));
+    }
+
+    private static void WriteFinding(Utf8JsonWriter json, RuntimeFinding finding)
+    {
+        json.WriteStartObject();
+        json.WriteString("ruleId", finding.RuleId);
+        json.WriteString("category", finding.Category);
+        json.WriteString("severity", finding.Severity.ToString().ToLowerInvariant());
+        json.WriteNumber("start", finding.Start);
+        json.WriteNumber("length", finding.Length);
+        json.WriteEndObject();
+    }
+
+    private static IEnumerable<(string Name, IReadOnlyList<Rule> Rules, string Text)> RuntimeSamples()
+    {
+        Rule Rule(string id, string literal, Severity severity) => new(id, severity, "synthetic",
+            new Citation("Synthetic runtime conformance.", null, null), "2026.11.0", null, null, null, null,
+            new RuleMatcher(new RulePatternMatcher(
+            [new RuleShapePart(1, 1, "label:", null, null, null), new RuleShapePart(1, 1, literal, null, null, null, true)],
+            MatchBoundary.None, null, null, null, new RuleLocation(LocationKind.Log, ["not/a/runtime/path"]), null, null, null), null));
+        var rules = new[] { Rule("local.z", "mark", Severity.Error), Rule("local.b", "marker", Severity.Note), Rule("local.a", "marker", Severity.Warning) };
+        yield return ("astral-emitting-overlap", rules, "😀 label:marker!");
+        yield return ("reserved-unknown-mask", rules, "[REDACTED:local.previous] label:marker");
+        yield return ("mask-removed-before-keyword", [Rule("local.mask", "marker", Severity.Note)], "label:[REDACTED:local.previous]marker");
+        yield return ("empty", rules, "");
+        yield return ("near-miss", rules, "ordinary synthetic text");
+        yield return ("malformed-mask-is-text", rules, "[REDACTED:INVALID] label:marker");
+    }
+
+    internal static void Verify(string root, string name, string content)
     {
         var directory = Path.Combine(root, "tests", "conformance");
         var target = Path.Combine(directory, name);

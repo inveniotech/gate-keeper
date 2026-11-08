@@ -230,7 +230,9 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
 
     // This signs only in-memory test inputs with the existing labelled development seed.
     // No development signature is written into rule-packs or trusted by a released CLI.
-    internal static IReadOnlyList<Rule> Load(string family)
+    internal static IReadOnlyList<Rule> Load(string family) => LoadMerged(family).Rules.Select(item => item.Rule).ToArray();
+
+    internal static MergedRules LoadMerged(string family)
     {
         const string developmentKeyId = "gkpk-dev-1";
         var root = Path.GetDirectoryName(Path.GetDirectoryName(CorpusPaths.Root))!;
@@ -252,7 +254,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
         var armour = $"-----BEGIN GATE-KEEPER RULE PACK MANIFEST-----\nKey-Id: {developmentKeyId}\n{Encoding.UTF8.GetString(payload)}\n-----END GATE-KEEPER RULE PACK MANIFEST-----\n";
         var input = new SignedPackInput(family, content, armour, signer.GenerateSignature());
         return PackLoader.Load([input], [], new DevelopmentCatalogue(developmentKeyId, privateKey.GeneratePublicKey().GetEncoded()),
-            BundledPacksOnlyPolicy.Instance).Rules.Select(item => item.Rule).ToArray();
+            BundledPacksOnlyPolicy.Instance);
     }
 
     private sealed class DevelopmentCatalogue(string keyId, byte[] key) : IPackKeyCatalogue

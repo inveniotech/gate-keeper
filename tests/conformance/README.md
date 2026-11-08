@@ -11,6 +11,15 @@ Positive and near-miss list cases are included alongside pattern rules.
 No matched-text field is emitted. Only committed synthetic corpus inputs enter
 the vectors. Pack digests pin the exact authored source inputs.
 
+The same file now contains the native rule models, complete runtime matches,
+the selected classification and actual redacted output from the .NET core.
+`syntheticRuntimeCases` pins overlap ordering, emitted spans after an astral
+character, literal masks and removal before matching. `behaviour-vectors.json`
+records actual .NET consent and atomic wildcard-response results. It covers
+all provider states, invalid state, absent provider, exceptions, cancellation,
+purpose boundaries, every array element, nested/empty arrays, escaped keys,
+mixed types, content types, streaming and committed-response abort signalling.
+
 `patterns.tsv` contains a family for every authored structured pattern, with
 three positive and three negative samples where available. C# compiles shapes
 through the production compiler and records complete-match and emitting-group
@@ -34,7 +43,10 @@ dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~Conformanc
 Remove-Item Env:GATEKEEPER_WRITE_CONFORMANCE
 dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~ConformanceExportTests
 node tests/conformance/check-patterns.mjs
+node tests/conformance/check-runtime.mjs
 java tests/conformance/CheckPatterns.java tests/conformance/patterns.tsv
+javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/CheckRuntime.java
+java -cp artifacts/conformance-jvm CheckRuntime
 ```
 
 Never hand-edit generated JSON or TSV files. Verification recomputes expectations
@@ -43,12 +55,19 @@ expectations. The workflow has a five-minute timeout. Node and Java use only
 standard-library facilities; Java source-file execution needs Java 17 or later.
 No production trust, new shipped dependency or matcher capability is introduced.
 
-## Remaining acceptance
+## Native conformance and release boundary
 
-This is the executable classification and regex-portability slice of P3-00.
-Redacted-output, consent and pack-failure middleware vectors require the accepted
-P3-01 contract and a reference redactor. The generated status field records that
-gap rather than returning fabricated masks. Full adapter classification and
-validator parity must run on every supported runtime when P3-02 to P3-04 land;
-Python joins with P3-05. The current Node/JVM commands prove regex candidates,
-not complete adapter parity. Keep #37 open until those acceptance items pass.
+The kit executes actual .NET, Node and JVM matching/redaction cores and native
+validator implementations, not just regex compilation. Node 22/24/26 and Java
+17/21/25 run in independent CI jobs. The .NET probe publishes the actual core
+with NativeAOT and trimming and executes it with reflection-based JSON disabled.
+Boundary tests also cover invalid Unicode, scalar caps, output expansion,
+optional disablement and errors in a later selected response element.
+
+P3-01 contract acceptance remains an owner action. P3-02 to P3-04 own framework
+hooks, signed installation-container loading, complete application samples and
+package publishing. Those are not claimed by a tree-level reference core.
+Existing `PackLoaderTests` exercise the engine's signed-pack failures and
+watermark behaviour; this kit does not pretend its test-fixture JSON reader is
+a production JVM pack loader. Python joins with P3-05. Production keys, releases
+and framework dependencies are not introduced here.
