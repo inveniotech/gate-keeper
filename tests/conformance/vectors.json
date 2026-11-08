@@ -1,0 +1,2722 @@
+{
+  "version": 1,
+  "scope": "Authored unsigned source packs loaded with in-memory development signatures; not a published bundled pack.",
+  "redactionStatus": "Pending accepted P3-01 contract and reference redactor; no redaction expectation is fabricated.",
+  "packs": [
+    {
+      "path": "rule-packs/bvn.pack.json",
+      "sha256": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
+    },
+    {
+      "path": "rule-packs/locations.pack.json",
+      "sha256": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663"
+    },
+    {
+      "path": "rule-packs/nin.pack.json",
+      "sha256": "ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c"
+    },
+    {
+      "path": "rule-packs/phone.pack.json",
+      "sha256": "70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19"
+    },
+    {
+      "path": "rule-packs/processors.pack.json",
+      "sha256": "bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636"
+    }
+  ],
+  "cases": [
+    {
+      "name": "p2-bvn-distant-label/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const bvn = \u0022                                                                                                                                 32826314843\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-bvn-dotnet-source/src/example.cs",
+      "path": "src/example.cs",
+      "text": "var bankVerificationNumber = \u002232826314843\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 31,
+          "start": 30,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-bvn-jvm-source/src/example.kt",
+      "path": "src/example.kt",
+      "text": "val bankVerificationNumber = \u002232826314843\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 31,
+          "start": 30,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-bvn-label-after-value/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const identifier = \u002232826314843\u0022; // BVN\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 21,
+          "start": 20,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-bvn-node-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const bankVerificationNumber = \u002232826314843\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 33,
+          "start": 32,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-bvn-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const bankVerificationNumber = \u0022not-an-identifier\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-bvn-validator-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const bankVerificationNumber = \u002212345678901\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-bvn-without-label/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const identifier = \u002232826314843\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-email-dotnet-source/src/example.cs",
+      "path": "src/example.cs",
+      "text": "var email = \u0022amaka.ogbonna-42@ledger-ops.example\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-email-jvm-source/src/example.kt",
+      "path": "src/example.kt",
+      "text": "val email = \u0022amaka.ogbonna-42@ledger-ops.example\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-email-node-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const email = \u0022amaka.ogbonna-42@ledger-ops.example\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-email-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const email = \u0022not-an-identifier\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-email-validator-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const email = \u0022complaints-desk@example.com\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-api-dotnet/api/example.cs",
+      "path": "api/example.cs",
+      "text": "return Results.Json(new { bvn = customer.Bvn });\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 27,
+          "start": 26,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-api-jvm/api/example.kt",
+      "path": "api/example.kt",
+      "text": "return ResponseEntity.ok(mapOf(\u0022bvn\u0022 to customer.bvn));\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 33,
+          "start": 32,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-api-node/api/example.ts",
+      "path": "api/example.ts",
+      "text": "res.json({ bvn: customer.bvn });\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 12,
+          "start": 11,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-different-statement/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.name); const bvn = customer.bvn;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-log-dotnet/src/example.cs",
+      "path": "src/example.cs",
+      "text": "Log.Information(\u0022{Bvn}\u0022, customer.Bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 35,
+          "start": 34,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-log-dotnet-variable/src/example.cs",
+      "path": "src/example.cs",
+      "text": "Log.Information(\u0022{Bvn}\u0022, bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 26,
+          "start": 25,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-log-jvm/src/example.kt",
+      "path": "src/example.kt",
+      "text": "logger.info(\u0022{}\u0022, customer.bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-log-jvm-variable/src/example.kt",
+      "path": "src/example.kt",
+      "text": "logger.info(\u0022{}\u0022, bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-log-node/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 22,
+          "start": 21,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-log-node-variable/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(bvn);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 13,
+          "start": 12,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-masked/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(mask(customer.bvn));\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-migration-dotnet/migrations/example.cs",
+      "path": "migrations/example.cs",
+      "text": "migrationBuilder.AddColumn\u003Cstring\u003E(name: \u0022bvn\u0022, table: \u0022customers\u0022, nullable: true);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-migration-jvm/migrations/example.kt",
+      "path": "migrations/example.kt",
+      "text": "val bvn = varchar(\u0022bvn\u0022, 11);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-migration-node/migrations/example.ts",
+      "path": "migrations/example.ts",
+      "text": "table.string(\u0022bvn\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 15,
+          "start": 14,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-bvn-ordinary-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const bvn = customer.bvn;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-protected-column/migrations/example.ts",
+      "path": "migrations/example.ts",
+      "text": "table.string(\u0022encrypted_bvn\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-unrelated-field/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.bvnStatus);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-bvn-unrelated-response/src/example.ts",
+      "path": "src/example.ts",
+      "text": "res.json({ bvnStatus: customer.status });\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-api-dotnet/api/example.cs",
+      "path": "api/example.cs",
+      "text": "return Results.Json(new { nin = customer.Nin });\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 27,
+          "start": 26,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-api-jvm/api/example.kt",
+      "path": "api/example.kt",
+      "text": "return ResponseEntity.ok(mapOf(\u0022nin\u0022 to customer.nin));\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 33,
+          "start": 32,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-api-node/api/example.ts",
+      "path": "api/example.ts",
+      "text": "res.json({ nin: customer.nin });\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.api",
+          "severity": "error",
+          "line": 1,
+          "column": 12,
+          "start": 11,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-different-statement/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.name); const nin = customer.nin;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-log-dotnet/src/example.cs",
+      "path": "src/example.cs",
+      "text": "Log.Information(\u0022{Nin}\u0022, customer.Nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 35,
+          "start": 34,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-log-dotnet-variable/src/example.cs",
+      "path": "src/example.cs",
+      "text": "Log.Information(\u0022{Nin}\u0022, nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 26,
+          "start": 25,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-log-jvm/src/example.kt",
+      "path": "src/example.kt",
+      "text": "logger.info(\u0022{}\u0022, customer.nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-log-jvm-variable/src/example.kt",
+      "path": "src/example.kt",
+      "text": "logger.info(\u0022{}\u0022, nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-log-node/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 22,
+          "start": 21,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-log-node-variable/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(nin);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.log",
+          "severity": "error",
+          "line": 1,
+          "column": 13,
+          "start": 12,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-masked/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(mask(customer.nin));\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-migration-dotnet/migrations/example.cs",
+      "path": "migrations/example.cs",
+      "text": "migrationBuilder.AddColumn\u003Cstring\u003E(name: \u0022nin\u0022, table: \u0022customers\u0022, nullable: true);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-migration-jvm/migrations/example.kt",
+      "path": "migrations/example.kt",
+      "text": "val nin = varchar(\u0022nin\u0022, 11);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-migration-node/migrations/example.ts",
+      "path": "migrations/example.ts",
+      "text": "table.string(\u0022nin\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin.field.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 15,
+          "start": 14,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "name": "p2-field-nin-ordinary-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const nin = customer.nin;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-protected-column/migrations/example.ts",
+      "path": "migrations/example.ts",
+      "text": "table.string(\u0022encrypted_nin\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-unrelated-field/src/example.ts",
+      "path": "src/example.ts",
+      "text": "console.log(customer.ninStatus);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-field-nin-unrelated-response/src/example.ts",
+      "path": "src/example.ts",
+      "text": "res.json({ ninStatus: customer.status });\n",
+      "expected": []
+    },
+    {
+      "name": "p2-international-phone-api-model-international/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u00222348079012062\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 13
+        },
+        {
+          "ruleId": "pii.phone.international.api",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-api-model-international-plus/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u0022\u002B2348079012062\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 14
+        },
+        {
+          "ruleId": "pii.phone.international.api",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-api-model-overlong/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u002223480790120620\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-international-phone-configuration-international/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u00222348079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 13
+        },
+        {
+          "ruleId": "pii.phone.international.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-configuration-international-plus/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u0022\u002B2348079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 14
+        },
+        {
+          "ruleId": "pii.phone.international.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-configuration-overlong/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u002223480790120620\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-international-phone-fixture-international/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u00222348079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 13
+        },
+        {
+          "ruleId": "pii.phone.international.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-fixture-international-plus/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u0022\u002B2348079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 14
+        },
+        {
+          "ruleId": "pii.phone.international.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-fixture-overlong/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u002223480790120620\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-international-phone-log-international/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u00222348079012062\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 13
+        },
+        {
+          "ruleId": "pii.phone.international.log",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-log-international-plus/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u0022\u002B2348079012062\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 14
+        },
+        {
+          "ruleId": "pii.phone.international.log",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-log-overlong/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u002223480790120620\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-international-phone-migration-international/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u00272348079012062\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 13
+        },
+        {
+          "ruleId": "pii.phone.international.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-migration-international-plus/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u0027\u002B2348079012062\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 14
+        },
+        {
+          "ruleId": "pii.phone.international.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-international-phone-migration-overlong/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u002723480790120620\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-api-model/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { bankVerificationNumber: \u002232826314843\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 60,
+          "start": 59,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.bvn.api",
+          "severity": "error",
+          "line": 1,
+          "column": 60,
+          "start": 59,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-bvn-api-model-shape-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { bankVerificationNumber: \u0022not-an-identifier\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-api-model-validator-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { bankVerificationNumber: \u002212345678901\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-configuration/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u002232826314843\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.bvn.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-bvn-configuration-shape-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-configuration-validator-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u002212345678901\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-fixture/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u002232826314843\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.bvn.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-bvn-fixture-shape-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-fixture-validator-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022bankVerificationNumber\u0022:\u002212345678901\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-log/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022bankVerificationNumber\u0022, \u002232826314843\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 40,
+          "start": 39,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.bvn.log",
+          "severity": "error",
+          "line": 1,
+          "column": 40,
+          "start": 39,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-bvn-log-shape-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022bankVerificationNumber\u0022, \u0022not-an-identifier\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-log-validator-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022bankVerificationNumber\u0022, \u002212345678901\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-migration/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, bankVerificationNumber) VALUES (\u0027011\u0027, \u002732826314843\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.bvn",
+          "severity": "error",
+          "line": 1,
+          "column": 74,
+          "start": 73,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.bvn.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 74,
+          "start": 73,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-bvn-migration-shape-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, bankVerificationNumber) VALUES (\u0027011\u0027, \u0027not-an-identifier\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-bvn-migration-validator-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, bankVerificationNumber) VALUES (\u0027011\u0027, \u002712345678901\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-api-model/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { email: \u0022amaka.ogbonna-42@ledger-ops.example\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.email.api",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 35
+        }
+      ]
+    },
+    {
+      "name": "p2-location-email-api-model-shape-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { email: \u0022not-an-identifier\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-api-model-validator-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { email: \u0022complaints-desk@example.com\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-configuration/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022email\u0022:\u0022amaka.ogbonna-42@ledger-ops.example\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.email.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 35
+        }
+      ]
+    },
+    {
+      "name": "p2-location-email-configuration-shape-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022email\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-configuration-validator-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022email\u0022:\u0022complaints-desk@example.com\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-fixture/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022email\u0022:\u0022amaka.ogbonna-42@ledger-ops.example\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.email.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 35
+        }
+      ]
+    },
+    {
+      "name": "p2-location-email-fixture-shape-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022email\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-fixture-validator-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022email\u0022:\u0022complaints-desk@example.com\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-log/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022email\u0022, \u0022amaka.ogbonna-42@ledger-ops.example\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.email.log",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 35
+        }
+      ]
+    },
+    {
+      "name": "p2-location-email-log-shape-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022email\u0022, \u0022not-an-identifier\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-log-validator-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022email\u0022, \u0022complaints-desk@example.com\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-migration/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, email) VALUES (\u0027011\u0027, \u0027amaka.ogbonna-42@ledger-ops.example\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.email.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 35
+        }
+      ]
+    },
+    {
+      "name": "p2-location-email-migration-shape-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, email) VALUES (\u0027011\u0027, \u0027not-an-identifier\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-email-migration-validator-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, email) VALUES (\u0027011\u0027, \u0027complaints-desk@example.com\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-api-model/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { nationalId: \u002286893049845\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 48,
+          "start": 47,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.nin.api",
+          "severity": "error",
+          "line": 1,
+          "column": 48,
+          "start": 47,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nin-api-model-shape-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { nationalId: \u0022not-an-identifier\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-api-model-validator-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { nationalId: \u002212345678901\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-configuration/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022nationalId\u0022:\u002286893049845\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.nin.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nin-configuration-shape-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022nationalId\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-configuration-validator-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022nationalId\u0022:\u002212345678901\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-fixture/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022nationalId\u0022:\u002286893049845\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.nin.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nin-fixture-shape-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022nationalId\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-fixture-validator-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022nationalId\u0022:\u002212345678901\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-log/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022nationalId\u0022, \u002286893049845\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.nin.log",
+          "severity": "error",
+          "line": 1,
+          "column": 28,
+          "start": 27,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nin-log-shape-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022nationalId\u0022, \u0022not-an-identifier\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-log-validator-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022nationalId\u0022, \u002212345678901\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-migration/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, nationalId) VALUES (\u0027011\u0027, \u002786893049845\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 62,
+          "start": 61,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.nin.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 62,
+          "start": 61,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nin-migration-shape-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, nationalId) VALUES (\u0027011\u0027, \u0027not-an-identifier\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nin-migration-validator-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, nationalId) VALUES (\u0027011\u0027, \u002712345678901\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-api-model/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { accountNumber: \u00224631508225\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.nuban.api",
+          "severity": "error",
+          "line": 1,
+          "column": 51,
+          "start": 50,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nuban-api-model-shape-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { accountNumber: \u0022not-an-identifier\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-api-model-validator-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { accountNumber: \u00224631508220\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-configuration/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022accountNumber\u0022:\u00224631508225\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.nuban.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nuban-configuration-shape-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022accountNumber\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-configuration-validator-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022accountNumber\u0022:\u00224631508220\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-fixture/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022accountNumber\u0022:\u00224631508225\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.nuban.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nuban-fixture-shape-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022accountNumber\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-fixture-validator-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022accountNumber\u0022:\u00224631508220\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-log/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022accountNumber\u0022, \u00224631508225\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nuban.log",
+          "severity": "error",
+          "line": 1,
+          "column": 31,
+          "start": 30,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nuban-log-shape-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022accountNumber\u0022, \u0022not-an-identifier\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-log-validator-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022accountNumber\u0022, \u00224631508220\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-migration/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, accountNumber) VALUES (\u0027011\u0027, \u00274631508225\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.nuban.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 65,
+          "start": 64,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-location-nuban-migration-shape-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, accountNumber) VALUES (\u0027011\u0027, \u0027not-an-identifier\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-nuban-migration-validator-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, accountNumber) VALUES (\u0027011\u0027, \u00274631508220\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-api-model/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u002208079012062\u0022 };\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.phone.api",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-phone-api-model-shape-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u0022not-an-identifier\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-api-model-validator-near-miss/api/models/customer-response.ts",
+      "path": "api/models/customer-response.ts",
+      "text": "export const customerResponse = { phone: \u0022\u002B44-7700-900186\u0022 };\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-configuration/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u002208079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.phone.configuration",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-phone-configuration-shape-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-configuration-validator-near-miss/config/appsettings.json",
+      "path": "config/appsettings.json",
+      "text": "{\u0022phone\u0022:\u0022\u002B44-7700-900186\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-fixture/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u002208079012062\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.phone.fixture",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-phone-fixture-shape-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u0022not-an-identifier\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-fixture-validator-near-miss/fixtures/customer.json",
+      "path": "fixtures/customer.json",
+      "text": "{\u0022phone\u0022:\u0022\u002B44-7700-900186\u0022}\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-log/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u002208079012062\u0022);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.phone.log",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-phone-log-shape-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u0022not-an-identifier\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-log-validator-near-miss/src/logging.ts",
+      "path": "src/logging.ts",
+      "text": "console.log(\u0022phone\u0022, \u0022\u002B44-7700-900186\u0022);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-migration/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u002708079012062\u0027);\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 11
+        },
+        {
+          "ruleId": "pii.phone.migration",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-location-phone-migration-shape-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u0027not-an-identifier\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-location-phone-migration-validator-near-miss/migrations/001_customer.sql",
+      "path": "migrations/001_customer.sql",
+      "text": "INSERT INTO customer (bank_code, phone) VALUES (\u0027011\u0027, \u0027\u002B44-7700-900186\u0027);\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nin-distant-label/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const nin = \u0022                                                                                                                                 86893049845\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nin-dotnet-source/src/example.cs",
+      "path": "src/example.cs",
+      "text": "var nationalId = \u002286893049845\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-nin-incidental-keyword/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const scanning = \u002286893049845\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nin-jvm-source/src/example.kt",
+      "path": "src/example.kt",
+      "text": "val nationalId = \u002286893049845\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-nin-label-after-value/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const identifier = \u002286893049845\u0022; // NIN label\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 21,
+          "start": 20,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-nin-node-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const nationalId = \u002286893049845\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.nin",
+          "severity": "error",
+          "line": 1,
+          "column": 21,
+          "start": 20,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-nin-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const nationalId = \u0022not-an-identifier\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nin-validator-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const nationalId = \u002212345678901\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nin-without-label/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const identifier = \u002286893049845\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nuban-dotnet-source/src/example.cs",
+      "path": "src/example.cs",
+      "text": "var accountNumber = \u00224631508225\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nuban-jvm-source/src/example.kt",
+      "path": "src/example.kt",
+      "text": "val accountNumber = \u00224631508225\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nuban-node-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const accountNumber = \u00224631508225\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nuban-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const accountNumber = \u0022not-an-identifier\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-nuban-validator-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const accountNumber = \u00224631508220\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-dotnet-source/src/example.cs",
+      "path": "src/example.cs",
+      "text": "var phone = \u002208079012062\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 14,
+          "start": 13,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-phone-embedded-in-token/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u0022prefix08079012062suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-international/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u00222348079012062\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-phone-international-overlong/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u002223480790120620\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-international-plus/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u0022\u002B2348079012062\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone.international",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-phone-international-truncated/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u0022234807901206\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-jvm-source/src/example.kt",
+      "path": "src/example.kt",
+      "text": "val phone = \u002208079012062\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 14,
+          "start": 13,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-phone-national-overlong/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const phone = \u0022080790120620\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-node-source/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const phone = \u002208079012062\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "pii.phone",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 11
+        }
+      ]
+    },
+    {
+      "name": "p2-phone-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const phone = \u0022not-an-identifier\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-phone-validator-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const phone = \u0022\u002B44-7700-900186\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-bucket-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022aws_s3_bucket\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws.bucket",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-bucket-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-aws_s3_bucket-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-bucket-package-1/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022AWS::S3::Bucket\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws.bucket",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-bucket-package-1-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-AWS::S3::Bucket-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-capetown-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022af-south-1\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws.capetown",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-capetown-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-af-south-1-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022s3.amazonaws.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 16
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-s3.amazonaws.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022s3.eu-west-1.amazonaws.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 26
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-s3.eu-west-1.amazonaws.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-hostname-2/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022s3.af-south-1.amazonaws.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 27
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-hostname-2-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-s3.af-south-1.amazonaws.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-ireland-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022eu-west-1\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws.ireland",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 9
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-ireland-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-eu-west-1-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022AWSSDK.S3\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 9
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-AWSSDK.S3-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-package-1/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022@aws-sdk/client-s3\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 18
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-package-1-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-@aws-sdk/client-s3-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-package-2/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022boto3\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-package-2-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-boto3-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-aws-package-3/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022software.amazon.awssdk\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 22
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-aws-package-3-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-software.amazon.awssdk-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-dojah-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.dojah.io\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.dojah",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 12
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-dojah-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.dojah.io-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-dotnet-manifest/app.csproj",
+      "path": "app.csproj",
+      "text": "\u003CProject\u003E\u003CItemGroup\u003E\u003CPackageReference Include=\u0022AWSSDK.S3\u0022 /\u003E\u003C/ItemGroup\u003E\u003C/Project\u003E\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 48,
+          "start": 47,
+          "length": 9
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-flutterwave-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.flutterwave.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.flutterwave",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 19
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-flutterwave-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.flutterwave.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-flutterwave-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022flutterwave-node-v3\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.flutterwave",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 19
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-flutterwave-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-flutterwave-node-v3-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-infrastructure/infra/storage.tf",
+      "path": "infra/storage.tf",
+      "text": "resource \u0022aws_s3_bucket\u0022 \u0022synthetic_archive\u0022 {}\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws.bucket",
+          "severity": "note",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.interswitchng.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.interswitch",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 21
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.interswitchng.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022sandbox.interswitchng.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.interswitch",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 25
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-sandbox.interswitchng.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-2/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022webpay.interswitchng.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.interswitch",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 24
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-2-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-webpay.interswitchng.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-3/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022passport-sandbox.interswitchng.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.interswitch",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 34
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-interswitch-hostname-3-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-passport-sandbox.interswitchng.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-jvm-manifest/pom.xml",
+      "path": "pom.xml",
+      "text": "\u003Cproject\u003E\u003Cdependencies\u003E\u003Cdependency\u003E\u003CgroupId\u003Esoftware.amazon.awssdk\u003C/groupId\u003E\u003C/dependency\u003E\u003C/dependencies\u003E\u003C/project\u003E\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 45,
+          "start": 44,
+          "length": 22
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-korapay-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.korapay.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.korapay",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-korapay-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.korapay.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-lock-file/package-lock.json",
+      "path": "package-lock.json",
+      "text": "{\u0022dependencies\u0022:{\u0022flutterwave-node-v3\u0022:\u00221.0.0\u0022}}\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.flutterwave",
+          "severity": "note",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 19
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-monnify-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.monnify.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.monnify",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-monnify-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.monnify.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-monnify-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022sandbox.monnify.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.monnify",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 19
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-monnify-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-sandbox.monnify.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-nibss-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api-ninvoicex.nibss-plc.com.ng\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.nibss",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 30
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-nibss-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api-ninvoicex.nibss-plc.com.ng-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-nibss-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api-ninvoicex-sandbox.nibss-plc.com.ng\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.nibss",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 38
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-nibss-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api-ninvoicex-sandbox.nibss-plc.com.ng-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-nibss-java-manifest/pom.xml",
+      "path": "pom.xml",
+      "text": "\u003Cproject\u003E\u003Cdependencies\u003E\u003Cdependency\u003E\u003CgroupId\u003Euk.co.avidroneconsulting\u003C/groupId\u003E\u003CartifactId\u003Eninvoicex-sdk\u003C/artifactId\u003E\u003C/dependency\u003E\u003C/dependencies\u003E\u003C/project\u003E\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.nibss",
+          "severity": "note",
+          "line": 1,
+          "column": 91,
+          "start": 90,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-nibss-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022ninvoicex-sdk\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.nibss",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 13
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-nibss-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-ninvoicex-sdk-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-nibss-portal-only/docs/integrations.md",
+      "path": "docs/integrations.md",
+      "text": "Documentation: https://devportal.nibss-plc.com.ng/\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-nibss-public-api/config/nibss.json",
+      "path": "config/nibss.json",
+      "text": "{\u0022apiBaseUrl\u0022:\u0022https://api-ninvoicex.nibss-plc.com.ng/e-invoice/v1\u0022}\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.nibss",
+          "severity": "note",
+          "line": 1,
+          "column": 24,
+          "start": 23,
+          "length": 30
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-node-manifest/package.json",
+      "path": "package.json",
+      "text": "{\u0022dependencies\u0022:{\u0022flutterwave-node-v3\u0022:\u00221.0.0\u0022}}\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.flutterwave",
+          "severity": "note",
+          "line": 1,
+          "column": 19,
+          "start": 18,
+          "length": 19
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-opay-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022payapi.opayweb.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.opay",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 18
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-opay-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-payapi.opayweb.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-palmpay-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022open-gw-prod.palmpay-inc.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.palmpay",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 28
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-palmpay-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-open-gw-prod.palmpay-inc.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-palmpay-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022open-gw-sandbox.palmpay-inc.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.palmpay",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 31
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-palmpay-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-open-gw-sandbox.palmpay-inc.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-paystack-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.paystack.co\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.paystack",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-paystack-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.paystack.co-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-python-manifest/requirements.txt",
+      "path": "requirements.txt",
+      "text": "boto3\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.aws",
+          "severity": "note",
+          "line": 1,
+          "column": 1,
+          "start": 0,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-remita-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022demo.remita.net\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.remita",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-remita-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-demo.remita.net-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-remita-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022login.remita.net\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.remita",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 16
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-remita-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-login.remita.net-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-remita-hostname-2/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022remitademo.net\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.remita",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-remita-hostname-2-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-remitademo.net-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-remita-hostname-3/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api-demo.systemspecsng.com\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.remita",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 26
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-remita-hostname-3-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api-demo.systemspecsng.com-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-youverify-hostname-0/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.youverify.co\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.youverify",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 16
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-youverify-hostname-0-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.youverify.co-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-youverify-hostname-1/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022api.sandbox.youverify.co\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.youverify",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 24
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-youverify-hostname-1-near-miss/config/processor.json",
+      "path": "config/processor.json",
+      "text": "const processor = \u0022prefix-api.sandbox.youverify.co-suffix\u0022;\n",
+      "expected": []
+    },
+    {
+      "name": "p2-processor-youverify-package-0/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022youverify-web-sdk\u0022;\n",
+      "expected": [
+        {
+          "ruleId": "transfer.processor.youverify",
+          "severity": "note",
+          "line": 1,
+          "column": 20,
+          "start": 19,
+          "length": 17
+        }
+      ]
+    },
+    {
+      "name": "p2-processor-youverify-package-0-near-miss/src/integration.ts",
+      "path": "src/integration.ts",
+      "text": "const processor = \u0022prefix-youverify-web-sdk-suffix\u0022;\n",
+      "expected": []
+    }
+  ]
+}

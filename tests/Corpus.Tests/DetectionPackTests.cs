@@ -230,7 +230,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
 
     // This signs only in-memory test inputs with the existing labelled development seed.
     // No development signature is written into rule-packs or trusted by a released CLI.
-    private static IReadOnlyList<Rule> Load(string family)
+    internal static IReadOnlyList<Rule> Load(string family)
     {
         const string developmentKeyId = "gkpk-dev-1";
         var root = Path.GetDirectoryName(Path.GetDirectoryName(CorpusPaths.Root))!;

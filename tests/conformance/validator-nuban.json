@@ -1,0 +1,157 @@
+{
+  "validator": "nuban",
+  "cases": [
+    {
+      "text": "",
+      "accepted": false
+    },
+    {
+      "text": "\u002B44-7700-900186",
+      "accepted": false
+    },
+    {
+      "text": "0000000220",
+      "accepted": true
+    },
+    {
+      "text": "0000014579",
+      "accepted": true
+    },
+    {
+      "text": "08051575739",
+      "accepted": false
+    },
+    {
+      "text": "08079012062",
+      "accepted": false
+    },
+    {
+      "text": "08137243377",
+      "accepted": false
+    },
+    {
+      "text": "09096597201",
+      "accepted": false
+    },
+    {
+      "text": "09097778731",
+      "accepted": false
+    },
+    {
+      "text": "12345678901",
+      "accepted": false
+    },
+    {
+      "text": "146283051",
+      "accepted": false
+    },
+    {
+      "text": "25847556452",
+      "accepted": false
+    },
+    {
+      "text": "32826314843",
+      "accepted": false
+    },
+    {
+      "text": "43004607524",
+      "accepted": false
+    },
+    {
+      "text": "4631508220",
+      "accepted": false
+    },
+    {
+      "text": "4631508225",
+      "accepted": true
+    },
+    {
+      "text": "47943379124",
+      "accepted": false
+    },
+    {
+      "text": "5561340446",
+      "accepted": true
+    },
+    {
+      "text": "56777915682",
+      "accepted": false
+    },
+    {
+      "text": "57661393750",
+      "accepted": false
+    },
+    {
+      "text": "58573138343",
+      "accepted": false
+    },
+    {
+      "text": "59217260258",
+      "accepted": false
+    },
+    {
+      "text": "6219160147",
+      "accepted": false
+    },
+    {
+      "text": "62191601476",
+      "accepted": false
+    },
+    {
+      "text": "62608572818",
+      "accepted": false
+    },
+    {
+      "text": "626085728182",
+      "accepted": false
+    },
+    {
+      "text": "7152808393",
+      "accepted": true
+    },
+    {
+      "text": "86893049845",
+      "accepted": false
+    },
+    {
+      "text": "92302271889",
+      "accepted": false
+    },
+    {
+      "text": "97460547559",
+      "accepted": false
+    },
+    {
+      "text": "amaka.ogbonna-42@ledger-ops.example",
+      "accepted": false
+    },
+    {
+      "text": "chidi.nwosu-18@ledger-ops.example",
+      "accepted": false
+    },
+    {
+      "text": "complaints-desk@example.com",
+      "accepted": false
+    },
+    {
+      "text": "compliance-reviews@ledger-ops.example",
+      "accepted": false
+    },
+    {
+      "text": "data-officer@example.com",
+      "accepted": false
+    },
+    {
+      "text": "ordinary synthetic near-miss",
+      "accepted": false
+    },
+    {
+      "text": "processor-alerts@ledger-ops.example",
+      "accepted": false
+    },
+    {
+      "text": "tunde.balogun-27@ledger-ops.example",
+      "accepted": false
+    }
+  ]
+}
