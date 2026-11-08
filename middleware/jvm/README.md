@@ -1,6 +1,37 @@
 # Kotlin / JVM middleware
 
-**Status: not started.** The JVM adapter arrives in Phase 3 (P3-04).
+**Status: executable Java-friendly JVM core for P3-00.** The Kotlin package,
+Spring Boot and logging registrations, signed installation loading and package
+publication remain P3-04. The core is Java source at Java 15 bytecode, callable
+from Java or Kotlin without a Kotlin runtime dependency.
+
+`RuntimeMatcher` consumes already validated, verified rule models, prepares
+private immutable matching data and interprets bounded shapes with memoised
+states. It implements every validator, exclusion, boundary, keyword window and
+list-token rule; no unbounded native regex backtracking is used for shapes.
+Runtime paths and context do not select rules. Classification and redaction
+use scalar emitting spans, reserved literal masks and the same overlap order
+and 65,536-scalar input/result cap as .NET and Node. `versions()` accepts only
+the supplied verified pack metadata. It performs no entitlement or network work.
+
+`ConsentCheck` supplies the blocking Java-friendly provider interface and safe
+tri-state mapping, propagating cancellation and thread interruption. The adapter
+never retains answers. `ResponseFilter` transforms a private parsed JSON tree,
+filtering every selected array element with the explicit `*` extension. Pointer
+escapes `~0`, `~1`, `~2` name literal tilde, slash and star keys. Framework hooks
+must bound parsing first and honour the failure's `abortRequired` flag.
+
+## Validate
+
+```sh
+mkdir -p artifacts/conformance-jvm
+javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/CheckRuntime.java
+java -cp artifacts/conformance-jvm CheckRuntime
+```
+
+The JSON reader is test-fixture infrastructure only and is not a pack parser
+inside the adapter. CI runs the core on Java 17, 21 and 25. No new dependency,
+production key or published JVM package is introduced.
 
 ## Toolchain
 
