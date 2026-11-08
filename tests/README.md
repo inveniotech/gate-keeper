@@ -13,6 +13,12 @@ The test projects, one folder under `tests/` each:
 
 ## How to test
 
+The corpus runner explicitly disables the regular-expression deadline for
+semantic acceptance, matching the existing engine conformance tests. Hosted
+runner scheduling therefore cannot change a corpus result. Production keeps
+its 100 ms default, verified separately by `ShapeCompilerTests`; no production
+timeout, quality threshold or performance budget changes.
+
 From the repository root:
 
 ```powershell

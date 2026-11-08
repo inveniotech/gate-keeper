@@ -36,6 +36,15 @@ Work package P1-03 (issue #13) added the pack loader: it turns pack bytes into t
 
 ## How to test
 
+`DomainSnapshotTests` checks source-generated snapshots of rules, complete packs
+and merged load results. Round trips preserve matching, exclusions, optional
+metadata, selected pack provenance and exact deterministic JSON. Value-object
+snapshots use explicit reflection-free converters: positional record members
+and validated properties otherwise collide under camel-case naming. The
+converters retain existing public members and reapply coordinate and fingerprint
+validation on read. They do not change the evidence or pack wire formats, whose
+dedicated readers and writers remain authoritative.
+
 From the repository root:
 
 ```powershell

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
+using System.Text.Json.Serialization;
+
 namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
@@ -11,6 +13,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// </summary>
 /// <param name="value">The fingerprint as 64 lowercase hexadecimal characters, the text form of the HMAC-SHA-256 output.</param>
 /// <exception cref="ArgumentException">The text is not exactly 64 lowercase hexadecimal characters.</exception>
+[JsonConverter(typeof(FingerprintJsonConverter))]
 public readonly record struct Fingerprint(string value)
 {
     /// <summary>Gets the fingerprint as 64 lowercase hexadecimal characters.</summary>

@@ -1,0 +1,33 @@
+name: Detection quality
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Restore locked dependencies
+        run: dotnet restore --locked-mode
+      - name: Exercise the coverage gate boundary and invalid reports
+        shell: pwsh
+        run: ./ci/guardrails/Test-EngineCoverageGate.ps1
+      - name: Install pinned test-only coverage tool
+        run: dotnet tool install dotnet-coverage --version 18.12.0 --tool-path artifacts/tools
+      - name: Measure all tests, including real synthetic matching and per-rule scoring
+        run: artifacts/tools/dotnet-coverage collect 'dotnet test -c Release --no-restore --logger console;verbosity=minimal' -f cobertura -o artifacts/coverage/solution.cobertura.xml
+      - name: Enforce engine coverage at 80 per cent
+        shell: pwsh
+        run: ./ci/guardrails/Invoke-EngineCoverageGate.ps1 -Report artifacts/coverage/solution.cobertura.xml
+      - name: Retain measured coverage even when the gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detection-quality-coverage
+          path: artifacts/coverage/
+          if-no-files-found: warn
