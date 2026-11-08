@@ -51,7 +51,10 @@ internal sealed class CorpusScanRunner
             cancellationToken).ConfigureAwait(true);
 
             if (rules is null) return new CorpusScan(this.@case, copyRoot, enumeration, Findings: []);
-            var result = await new ScanOrchestrator(new MatcherEngine(rules)).ScanAsync(enumeration, cancellationToken).ConfigureAwait(true);
+            // Corpus acceptance checks semantic results, independently of runner
+            // scheduling. Production deadline propagation is covered in ShapeCompilerTests.
+            var matcher = new MatcherEngine(rules, shapes: new ShapeRegexCache(Timeout.InfiniteTimeSpan));
+            var result = await new ScanOrchestrator(matcher).ScanAsync(enumeration, cancellationToken).ConfigureAwait(true);
             var findings = result.Findings.Select(match => new Finding(match.RuleId, match.Severity, match.Category, match.Path,
                 match.Line, match.Column, match.LocationKind, null, BaselineState.New, match.Citation)).ToArray();
             return new CorpusScan(this.@case, copyRoot, enumeration, findings, MatcherStagePresent: true);
