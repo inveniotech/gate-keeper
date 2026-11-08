@@ -71,7 +71,7 @@ public sealed class ConformanceExportTests
             json.WriteEndArray();
             json.WriteEndObject();
         }
-        Verify(root, "vectors.json", Encoding.UTF8.GetString(stream.ToArray()) + "\n");
+        Verify(root, "vectors.json", Encoding.UTF8.GetString(stream.ToArray()).Replace("\r\n", "\n", StringComparison.Ordinal) + "\n");
 
         var portability = new StringBuilder("# rule-id\tpattern-base64\ttext-base64\tfull-start:length:emit-start:length\n");
         foreach (var rule in rules.Where(rule => rule.Matcher.Pattern is not null))
@@ -128,7 +128,7 @@ public sealed class ConformanceExportTests
                 json.WriteEndArray();
                 json.WriteEndObject();
             }
-            Verify(root, "validator-" + name + ".json", Encoding.UTF8.GetString(validatorStream.ToArray()) + "\n");
+            Verify(root, "validator-" + name + ".json", Encoding.UTF8.GetString(validatorStream.ToArray()).Replace("\r\n", "\n", StringComparison.Ordinal) + "\n");
         }
     }
 
