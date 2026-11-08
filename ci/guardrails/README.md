@@ -4,8 +4,7 @@
 
 The detection-quality workflow measures the complete test suite with the pinned,
 test-only `dotnet-coverage` tool, version 18.12.0. The tool is not referenced by
-the engine or the published binary. Its adoption is proposed for owner review
-with this card; it adds no shipped dependency. The existing matrix remains in
+the engine or the published binary. It adds no shipped dependency. The existing matrix remains in
 place. Coverage counts only the engine assembly, deduplicating source lines
 across classes. It includes generated engine code and does not remove uncovered
 lines. Missing, malformed, empty or ambiguous reports fail closed. Exactly
@@ -24,10 +23,17 @@ Warning and note findings remain separate. Real public-repository precision
 remains unmeasured until owner triage is complete under P2-06/P2-07. Mutation
 testing is optional and is not introduced here.
 
-The first local full-suite measurement on Windows covered 4,118 of 7,371 distinct
-engine source lines (about 55.9 per cent). The proposed gate correctly fails
-that baseline. This PR must remain a draft until the coverage deficit is fixed
-and the test-only tool is reviewed; no threshold reduction is proposed.
+The initial Windows baseline covered 4,118 of 7,371 distinct engine source
+lines (55.9 per cent). Snapshot round-trip and behavioural tests exposed and
+fixed the value-object JSON name collision and exercise the previously unused
+generated rule/pack serialisers. The full suite now covers 6,381 of 7,185 lines
+(88.8 per cent), with no coverage exclusion or threshold reduction. The source
+line count changes because explicit value-object converters replace invalid
+generated metadata; the gate still measures every engine line.
+
+The offline harness explicitly exits zero after checking expected failure
+statuses, so PowerShell on Linux cannot accidentally return the final negative
+case's exit code to GitHub Actions.
 
 This folder contains the scripts and small tools that enforce the CI guard-rails defined in P0-12. The GitHub Actions workflow in `.github/workflows/pr-guardrails.yml` wires them into the pull-request gate.
 
