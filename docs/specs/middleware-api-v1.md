@@ -33,8 +33,8 @@ application code; the adapter MUST NOT implement its storage or transport.
 | Finding | `ruleId`, `category`, `start`, `length`, `severity` | MUST NOT contain matched text, source text, subject or purpose |
 | Classification | One Finding, or none | No exception for an ordinary non-match |
 | Context | `surface`: log, response or value; optional `fieldName` | MUST NOT carry subject or purpose |
-| Mask | `[REDACTED:<rule-id>]` | No value-derived suffix or identifier |
-| Subject | Non-empty opaque application string | MUST NOT be logged |
+| Mask | Literal `[REDACTED:` followed by a pack rule identifier and `]` | Matched value, subject and purpose MUST NOT appear |
+| Subject | Opaque application string of 1 to 1,024 Unicode scalars | MUST NOT be logged |
 | Purpose | Namespaced string under section 8 | No free-form log message |
 
 The common operations are `redact(text) -> text`,
@@ -52,53 +52,106 @@ UTF-16 indices to scalar counts; Node MUST count code points rather than string
 code units; Python MUST reject surrogate values before using native indices.
 
 Matching MUST use the pack's ASCII folding and ordinal comparison, independent
-of locale. Overlaps MUST resolve by earliest start, then longest span, then
-ordinal rule identifier. After accepting a span, overlapping candidates MUST be
-discarded. Adapters MUST NOT normalise Unicode or change unrelated text.
+of locale. A pattern's finding start and length MUST identify its single `emit`
+part when present, or the whole shape when no part emits, as
+[rule-pack section 7.1](rule-pack-v1.md#7-the-structured-shape-iq-14) defines.
+Redaction MUST replace that finding span, not the surrounding shape, label or
+keyword. List rules use the exact accepted token's span.
+
+The scanner reports every rule's own accepted matches. Middleware MUST preserve
+that per-rule matching and the pack's within-rule resume semantics. Separately,
+`classify` MUST select one finding by earliest scalar start, then longest scalar
+length, then ordinal rule identifier. `redact` MUST use the same ordering and
+discard spans overlapping a previously selected span. This cross-rule selection
+is middleware behaviour; it MUST NOT be applied to scanner results. P3-00 parity
+means the same rule identifier and the same scalar span after translating engine
+UTF-16 indexes. Vectors MUST include an astral character before an emitted span.
+Adapters MUST NOT normalise Unicode or change unrelated text.
 
 ## 5. Redaction
 
 `redact(text)` MUST apply every loaded rule regardless of severity, with no
-context argument. Each accepted span MUST be replaced by its stable mask, for
-example `[REDACTED:pii.bvn]`. Output MUST retain all other scalars in order.
+context argument. Each selected finding's emit span MUST be replaced by the
+literal `[REDACTED:` plus its exact pack rule identifier plus `]`, for example
+`[REDACTED:pii.bvn]`. The mask MUST NOT contain matched values, subjects or
+purposes. Output MUST retain all other scalars in order.
 An empty string MUST return an empty string. Null MUST raise an argument error.
 
 Only a rule marked `redaction.optional` in the pack MAY be disabled, by identifier
 at start-up (IQ-76). Unknown identifiers and attempts to disable mandatory rules
 MUST fail start-up. The adapter MUST log disabled rule identifiers once, without
-source text. Severity overrides MUST NOT reduce redaction.
+source text. Severity overrides MUST NOT reduce redaction. Scanner configuration
+keys `rules.disabled`, `severity.overrides`, profiles, exclusions and
+`packs.local` MUST NOT be middleware inputs. Middleware start-up disablement is
+the separate optional-rule mechanism in this section, not scan configuration.
 
-The mask syntax MUST be treated as already redacted, including a literal
-mask-shaped string supplied by the caller, so a second call is idempotent.
-Masks MUST NOT be passed through the matcher again. This reserved syntax is a
-documented limitation: the middleware does not classify the content of a mask.
+The reserved literal grammar is
+`\[REDACTED:[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)*\]`, using the pack schema's
+rule-identifier grammar. The identifier need not be in the loaded pack: masks
+from a previous pack remain reserved. Both operations MUST remove these spans
+from matcher input before matching, process the intervening text independently,
+and preserve original scalar offsets. Redaction MUST restore literal masks
+unchanged. A malformed mask is ordinary text. No match may cross a removed
+mask. Reserving caller-supplied literals is an explicit limitation, not evidence
+that the literal was produced by the adapter. This gives the same idempotence
+semantics for produced masks and literal masks across stacks.
 
-The proposed input limit is 1,048,576 UTF-8 bytes per call, checked before
-matching. Oversized input MUST raise the stack's limit error without returning
-text without redaction. This limit and mask reservation need owner acceptance.
-Adapters SHOULD measure the per-call matching budget using the existing
-[quality budgets](quality-budgets.md); this draft creates no new latency budget.
+The sole per-call cap is **65,536 Unicode scalar values**, fixed by
+[rule-pack section 7.5](rule-pack-v1.md#75-indexes-and-the-resume-rule). It is
+neither UTF-8 bytes nor UTF-16 code units. Adapters MUST validate text and count
+all input scalars, including reserved masks, before matching. Oversized input
+MUST raise the named input-limit error in section 10 without returning text.
+A successful redaction MUST also fit that same cap; if expansion into masks
+would exceed it, the entire call MUST fail with the same limit error. This
+keeps a successful result valid for a second, idempotent call.
+This contract sets **no per-call latency number**. Command-line file and
+continuous-integration budgets are not middleware latency budgets.
 
 ## 6. Classification
 
 `classify(value, context)` MUST return the first finding under section 4, or none.
-The surface and optional field name MAY select pack-defined context scopes;
-adapters MUST NOT invent a rule or infer consent from the field name.
-Invalid context or null input MUST raise an argument error. A non-match MUST
-return none. Classification MUST NOT modify the input or record its contents.
+`surface` MUST be exactly `log`, `response` or `value`. `fieldName` MAY be absent;
+when present it MUST be a non-empty string. Unknown surfaces, empty field names,
+a missing context or null input MUST raise the argument error in section 10.
+An empty input MUST return none after context validation.
+
+For version 1, `redact` and `classify` MUST execute the loaded rules without
+using surface, field name or repository paths to select rules. Pack
+`location.kind` remains a label, not a context filter. `location.paths` MUST NOT
+filter runtime strings, which have no repository path. Context does not alter
+keywords, boundaries, validators, exclusions or any other matching semantics.
+The operations MUST NOT invent rules or infer consent. A non-match MUST return
+none. Classification MUST NOT modify the input or record its contents.
 
 ## 7. Response filtering
 
-The proposed path syntax is RFC 6901 JSON Pointer, with no wildcard extension.
-Configured paths MUST be validated at start-up. A numeric segment addresses an
-array element; `~0` and `~1` decode to tilde and slash. Missing fields MUST be
-ignored. Selected strings MUST pass through `redact`; selected non-string values
-MUST produce a type error before any response bytes are written. Other fields
-MUST remain unchanged. Applications MUST explicitly list nested string paths.
+The object-field path proposal is RFC 6901 JSON Pointer. Configured paths MUST
+be validated at start-up; `~0` and `~1` decode to tilde and slash. Missing object
+properties MAY be ignored. Selected strings MUST pass through `redact`; selected
+non-string values and any redaction failure, including invalid text or the
+section 5 scalar cap, MUST fail the protected response before body bytes are
+written. Transformations MUST be atomic, not a partially redacted body.
+
+**Owner decision, 8 November 2026:** add an explicit wildcard extension and
+filter every selected array element. A complete unescaped path segment `*`
+MUST select every element of an array, for example `/customers/*/phone`.
+Wildcards MUST NOT select object properties. For literal object property `*`,
+this extension uses `~2`; standard `~0` and `~1` retain their meanings. Other
+escape sequences MUST be rejected at start-up. An empty array selects nothing.
+A wildcard applied to a non-array MUST fail the protected response; selected
+elements of the wrong type MUST also fail, not be skipped. Exact numeric
+indices remain explicit single-element selection and MUST NOT be described as
+protecting siblings. Nested wildcards MUST visit every selected element.
+Paths selecting the same string MUST redact it once. Selection and redaction
+MUST complete on a private copy before any transformed body can be committed.
 
 Only bounded JSON responses are supported. A configured protected response that
-is streaming, exceeds the limit or has a non-JSON content type MUST fail before
-headers or body are sent. A response without configured protected paths MUST pass through unchanged.
+is streaming, exceeds the cap or has a non-JSON content type MUST fail before
+headers or body are sent. Streaming means the length is unknown or the host has
+already started the body. If headers are already committed when a protected
+response fails, the adapter MUST abort the response/connection; it MUST NOT send
+the original or partially transformed body. A response without configured
+protected paths MUST pass through unchanged.
 Adapters MUST NOT buffer an unbounded stream or silently return unfiltered
 protected content. JSON Pointer and this bounded-response policy are proposals
 for owner acceptance, not existing adapter behaviour.
@@ -108,21 +161,25 @@ for owner acceptance, not existing adapter behaviour.
 The consent helper is for processing whose lawful basis is consent. Consent is
 one of several lawful bases under the Nigeria Data Protection Act 2023; this
 surface does not decide which basis applies. An application MUST NOT treat its
-absence as a finding for processing based on another lawful basis. This
+absence of this surface as a finding for processing based on another lawful basis. This
 paragraph is draft legal-adjacent wording for owner review.
 
-The application MUST supply a consent provider. The adapter MUST NOT store,
-cache or copy consent state. The provider MUST return `granted`, `denied` or
-`unknown`; no record MUST mean `denied`. `unknown` means the answer could not be
-obtained, rather than that no consent record exists (IQ-32).
+The application supplies a consent provider. The adapter MUST NOT store, cache
+or copy consent state. A provider SHOULD return `denied` when it holds no record
+for the subject and purpose. It MAY return `unknown` only when it cannot reach
+its own store. `unknown` is inability to obtain an answer, not the absence of a
+consent record (IQ-32). The adapter cannot inspect the provider's records.
 
 `check` MUST return `unknown` if no provider is registered, if a provider throws,
-or if it returns a value outside the three states. `isGranted` MUST be true only
-for `granted`. A caller MUST treat `unknown` as not granted.
+or if it returns a value outside the three states. The adapter MUST NOT return
+`granted` in any other case. `isGranted` MUST perform exactly the same check,
+returning true for `granted` and false for `denied` and `unknown`, with the same
+diagnostic and cancellation behaviour. A caller MUST treat `unknown` as not granted.
 
-`subjectId` MUST be a non-empty opaque string; applications SHOULD use an
-internal surrogate. Purpose MUST match
-`^[a-z][a-z0-9-]{0,31}(\.[a-z][a-z0-9-]{0,31}){1,4}$`, with at most 160 ASCII
+`subjectId` MUST be an opaque string of 1 to 1,024 Unicode scalars; applications
+SHOULD use an internal surrogate. This subject bound is a proposed API limit
+for owner review. Purpose MUST match
+`^[a-z][a-z0-9-]{0,31}(\.[a-z][a-z0-9-]{0,31}){1,4}$`, with at most 164 ASCII
 characters, for example `acme.marketing-sms`. Invalid arguments MUST raise the
 stack's argument error immediately, without calling the provider.
 
@@ -141,15 +198,25 @@ work and is not specified here.
 ## 9. Pack loading
 
 Free installations MUST embed free packs; paid installation media MUST embed
-paid packs. An optional local path MAY supply a newer pack. Older or equal
-versions MUST be rejected, using numeric pack-version comparison. There is no
-same-kind restriction on a newer pack (IQ-33).
+paid packs. The optional filesystem path MUST load a signed replacement for an
+embedded pack with the **same pack identifier** and a strictly greater numeric
+`(year, month, patch)` triple from `YYYY.MM.P`, as defined by
+[rule-pack section 9](rule-pack-v1.md#9-pack-lines-versions-and-dates-iq-36).
+Different identifiers have no replacement precedence. An older, equal or
+different-ID candidate MUST refuse process start-up with a pack-load error.
+Unsigned local packs remain a scanner feature and MUST NOT load in middleware.
 
-Every pack MUST be validated and its signature verified at load, using the
-rule-pack contract. The adapter MUST NOT fetch a pack or verify a licence.
+Every middleware pack MUST be validated and its manifest signature verified at
+load using the rule-pack contract. A detached watermark MUST be verified only
+when the block is present, including its own signature and content-digest
+binding. A missing watermark MUST NOT be invented or required. These checks
+are not licence checks: the adapter MUST NOT fetch a pack, verify a licence or
+run entitlement policy.
 Loading MUST be atomic: unverified candidates MUST never become active.
-Version reporting MUST expose adapter version and loaded pack identity,
-version and content digest (NFR-031), without application inputs.
+`versions() -> VersionInfo` MUST return `adapterVersion` and an ordinally
+pack-ID-sorted `packs` array containing `id`, `version` and `contentDigest`
+(NFR-031). .NET names this `Versions()`, Node/JVM `versions()`, and Python
+`versions()`. It MUST be side-effect-free and contain no application inputs.
 
 ## 10. Cross-cutting requirements
 
@@ -159,10 +226,16 @@ Public errors MUST name the cause and recovery action without input values.
 .NET MUST remain ahead-of-time and trim safe. No named integration in this
 document approves a new dependency; rule 8 still applies.
 
-The stack error mapping is .NET `ArgumentException` and a typed middleware
-failure; Node `TypeError` and a typed `Error` subclass; JVM
-`IllegalArgumentException` and a typed runtime failure; Python `ValueError`
-and a typed exception. Cancellation MUST retain its native stack form.
+| Failure | .NET | Node | JVM | Python |
+|---|---|---|---|---|
+| Invalid argument/text/context | `ArgumentException` | `TypeError` | `IllegalArgumentException` | `ValueError` |
+| Scalar cap exceeded | `InputLimitException` | `InputLimitError` | `InputLimitException` | `InputLimitError` |
+| Pack load/verification/version failure | `PackLoadException` | `PackLoadError` | `PackLoadException` | `PackLoadError` |
+| Protected response failure | `ResponseFilterException` | `ResponseFilterError` | `ResponseFilterException` | `ResponseFilterError` |
+
+The named limit, pack and response errors MUST be separate public types derived
+from the stack's ordinary exception/error base. Cancellation MUST retain its
+native stack form and MUST NOT become a consent answer or response success.
 
 ## 11. Fail-closed policy
 
@@ -171,23 +244,30 @@ and a typed exception. Cancellation MUST retain its native stack form.
 | Pack verification fails | MUST reject the candidate; retain the already verified active pack, or refuse start-up if none exists | Redact more, never less; no weaker fallback |
 | Pack absent | MUST refuse start-up | No silent empty matcher |
 | Pack unreadable | MUST reject the candidate; retain active verified pack or refuse start-up | No partial load |
-| Unsupported pack version | MUST reject candidate and explain required adapter upgrade | No guessed semantics |
+| Older/equal calendar version or different pack ID | MUST refuse start-up with a pack-load error | Not a newer replacement of that embedded pack |
+| Unsupported `schemaVersion` or newer `minEngineVersion` | MUST refuse start-up and explain required adapter upgrade | Engine capability is distinct from calendar precedence |
 | No consent provider | MUST return `unknown`; emit one start-up warning | No invented grant |
 | Provider throws | MUST return `unknown`, with the safe diagnostic from section 8 | No content leakage |
 | Provider returns `unknown` | MUST preserve `unknown`; `isGranted` MUST return false | No inferred grant |
 | Invalid text | MUST raise an argument error before output | No lossy matching |
 | Input exceeds limit | MUST raise a limit error before output | Bounded work |
 | Unsupported protected content type | MUST fail before response bytes are sent | No unfiltered protected payload |
+| Selected string fails redaction or has wrong type | MUST fail atomically before body bytes; abort if headers are committed | No original or partially transformed body |
+| Protected response is streaming or already started | MUST refuse before commit, or abort when committed | No unbounded buffering or continued body |
 | Constructed without verified pack | MUST refuse construction | No operational empty matcher |
 
 ## 12. Idiomatic stack shapes
 
-The IQ-31 integration set is owner direction pending interview validation.
-These are proposed signatures, not installed packages or runnable adapter code.
+The IQ-31 integration set is owner direction pending interview validation. The
+named frameworks and logging libraries are the closed integration list. Samples
+below show core operations, not framework-hook registration. Registration
+examples belong to individual adapter guides and cannot be claimed implemented
+from these samples. These are proposed signatures, not installed packages or
+runnable adapter code.
 
 ### .NET
 
-Package names follow the .NET namespace row in the source card, targeting .NET 10. ASP.NET Core hooks
+Packages are `InvenioTech.GateKeeper.*`, targeting .NET 10. ASP.NET Core hooks
 MUST include middleware, minimal-API endpoint filtering and MVC result filtering.
 Logging integrations are `Microsoft.Extensions.Logging` through
 `Microsoft.Extensions.Compliance.Redaction`, and Serilog.
@@ -256,18 +336,26 @@ the major's release MUST pass conformance. Hooks are Django, FastAPI/Starlette
 and standard-library `logging`. The provider and check MUST offer synchronous
 and asynchronous forms; the asynchronous check MUST NOT block its event loop.
 
+`ConsentCheck.check` and `is_granted` MUST call the synchronous
+`ConsentProvider.get_state`. `acheck` and `ais_granted` MUST await
+`AsyncConsentProvider.get_state`; they MUST NOT call the synchronous provider.
+Both pairs MUST apply the same state mapping, safe diagnostics and cancellation
+rules from section 8.
+
 ```python
 class ExampleConsentProvider:
     def get_state(self, subject_id: str, purpose: str) -> ConsentState:
         return ConsentState.DENIED
 
-    async def get_state_async(self, subject_id: str, purpose: str) -> ConsentState:
+class ExampleAsyncConsentProvider:
+    async def get_state(self, subject_id: str, purpose: str) -> ConsentState:
         return ConsentState.DENIED
 
 consent = ConsentCheck(ExampleConsentProvider())
 safe = redactor.redact("ordinary synthetic text")
 finding = classifier.classify("ordinary synthetic text", context)
 granted = consent.is_granted("synthetic-subject", "acme.marketing-sms")
+# With an asynchronous provider: await async_consent.acheck(...) or ais_granted(...).
 ```
 
 For every stack, response filtering MUST be registered through the named web
@@ -289,8 +377,9 @@ or dependency is introduced by these examples.
 Every MUST in sections 3–11 MUST be mapped to one of these families before an
 adapter is accepted. The specification is the source of truth; adapters MUST NOT
 add behaviours that the shared cases cannot express. P3-00 can begin with
-existing engine classification vectors; redaction and consent vectors MUST
-remain pending until this draft is accepted and the reference behaviour exists.
+existing engine classification vectors. Reference redaction and consent
+implementation and executable vectors may be developed for review; an adapter
+MUST NOT be accepted or released against an unaccepted contract.
 
 ## 14. Compatibility and versions
 
@@ -302,10 +391,16 @@ through its current major and name its replacement in documentation.
 ## 15. Review and deferred work
 
 IQ-32, IQ-33, IQ-54, IQ-76, IQ-78 and IQ-79 are recorded as decided in the source
-card; this draft does not reopen them. IQ-31 remains pending interview validation.
-The owner must review this document, especially the proposed limit, reserved
-mask syntax, JSON Pointer policy and section 8 legal-adjacent wording. No new
-decision is claimed here. The current engine exposes UTF-16 spans internally;
+card. The owner's 8 November review makes replacement same-ID and signed-only,
+fixes the cap to rule-pack section 7.5, and requires the corrections recorded
+above. IQ-31 remains pending interview validation. The owner must review the
+proposed subject bound, mask reservation, output
+expansion policy and section 8 legal-adjacent wording. No acceptance is claimed.
+The current engine exposes UTF-16 spans internally;
 the middleware boundary must translate them rather than change existing results.
 
 Change log: 8 November 2026 — first complete P3-01 draft for owner review.
+8 November 2026 — incorporated owner review of cap units, emit spans, mask
+grammar, runtime context, signed replacement, response failures, consent mapping
+and named API errors. The owner selected explicit wildcard protection of every
+array element; section 7 records its proposed concrete path syntax.
