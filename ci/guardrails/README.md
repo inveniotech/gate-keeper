@@ -1,5 +1,34 @@
 # Pull-request guard-rails
 
+## Detection quality (P2-11, NFR-013 and NFR-026)
+
+The detection-quality workflow measures the complete test suite with the pinned,
+test-only `dotnet-coverage` tool, version 18.12.0. The tool is not referenced by
+the engine or the published binary. Its adoption is proposed for owner review
+with this card; it adds no shipped dependency. The existing matrix remains in
+place. Coverage counts only the engine assembly, deduplicating source lines
+across classes. It includes generated engine code and does not remove uncovered
+lines. Missing, malformed, empty or ambiguous reports fail closed. Exactly
+80 per cent passes; 79.9 per cent fails without rounding.
+
+```powershell
+./ci/guardrails/Test-EngineCoverageGate.ps1
+dotnet-coverage collect 'dotnet test -c Release --no-restore' -f cobertura -o artifacts/coverage/solution.cobertura.xml
+./ci/guardrails/Invoke-EngineCoverageGate.ps1 -Report artifacts/coverage/solution.cobertura.xml
+```
+
+The same run executes `DetectionPackTests` and `CorpusGateTests`: per-rule and
+overall error-level false positives must remain at or below five per cent;
+unexpected synthetic findings, missed expectations and stale reports fail.
+Warning and note findings remain separate. Real public-repository precision
+remains unmeasured until owner triage is complete under P2-06/P2-07. Mutation
+testing is optional and is not introduced here.
+
+The first local full-suite measurement on Windows covered 4,118 of 7,371 distinct
+engine source lines (about 55.9 per cent). The proposed gate correctly fails
+that baseline. This PR must remain a draft until the coverage deficit is fixed
+and the test-only tool is reviewed; no threshold reduction is proposed.
+
 This folder contains the scripts and small tools that enforce the CI guard-rails defined in P0-12. The GitHub Actions workflow in `.github/workflows/pr-guardrails.yml` wires them into the pull-request gate.
 
 ## Gates
