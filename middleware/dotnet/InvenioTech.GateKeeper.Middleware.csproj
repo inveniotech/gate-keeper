@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../version.txt').Trim())</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Engine.Tests" />
+    <ProjectReference Include="../../src/Engine/InvenioTech.GateKeeper.Engine.csproj" />
+  </ItemGroup>
+</Project>

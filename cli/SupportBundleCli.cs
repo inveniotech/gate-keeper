@@ -13,7 +13,8 @@ internal static class SupportBundleCli
 {
     private const string Mask = "[masked]";
 
-    internal static Command Create(TextWriter output, TextWriter errors, string root)
+    internal static Command Create(TextWriter output, TextWriter errors, string root,
+        Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory = null)
     {
         var command = new Command("support-bundle", "Writes a local ZIP of masked configuration, versions and finding counts");
         var date = new Option<string?>("--evaluated-on") { Description = "The evaluation date in YYYY-MM-DD form" };
@@ -27,8 +28,8 @@ internal static class SupportBundleCli
             {
                 var relative = parse.GetValue(destination)!;
                 var path = DoctorCli.ResolveOutput(root, relative);
-                var prepared = await ScanCli.PrepareAsync(root, parse.GetValue(date), token).ConfigureAwait(false);
-                var bytes = Build(prepared);
+                var prepared = await ScanCli.PrepareAsync(root, parse.GetValue(date), token, matcherFactory).ConfigureAwait(false);
+                var bytes = Build(prepared, matcherFactory);
                 var parent = Path.GetDirectoryName(path)!;
                 Directory.CreateDirectory(parent);
                 temporary = Path.Combine(parent, $".support-bundle-{Guid.NewGuid():N}.tmp");
@@ -48,7 +49,7 @@ internal static class SupportBundleCli
         return command;
     }
 
-    private static byte[] Build(PreparedScan scan)
+    private static byte[] Build(PreparedScan scan, Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory)
     {
         // Diagnostic checks remove contextual restrictions so metadata cannot evade a source-specific rule.
         var rules = scan.Packs.Rules.Select(r => r.Rule with
@@ -56,7 +57,7 @@ internal static class SupportBundleCli
             Matcher = r.Rule.Matcher.Pattern is { } pattern
                 ? new RuleMatcher(pattern with { Location = null, Keywords = null, Window = null }, null) : r.Rule.Matcher,
         }).ToArray();
-        var privacy = new MatcherEngine(rules);
+        var privacy = matcherFactory is null ? new MatcherEngine(rules) : matcherFactory(rules);
         string Safe(string value) => privacy.Match("support-metadata.json", value).Count == 0 ? value : Mask;
         var input = scan.Results;
         var settings = input.Settings;

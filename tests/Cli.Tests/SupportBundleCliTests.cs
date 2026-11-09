@@ -2,11 +2,35 @@
 
 using System.IO.Compression;
 using System.Text.Json;
+using InvenioTech.GateKeeper.Engine;
 
 namespace InvenioTech.GateKeeper.Cli.Tests;
 
 public sealed class SupportBundleCliTests
 {
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task SupportBundle_Should_PreserveTheArchiveAndReturnToolError_When_EitherMatcherFails(int failingStage)
+    {
+        using var repo = new CliRepository();
+        (await repo.Run("support-bundle", "--evaluated-on", "2026-11-01")).Code.Should().Be(0);
+        var path = Path.Combine(repo.Root, ".ndpa-check", "support-bundle.zip");
+        var previous = await File.ReadAllBytesAsync(path);
+        var errors = new StringWriter(); var calls = 0;
+        var result = await CliModule.RunWithMatcherFactoryAsync(["support-bundle", "--evaluated-on", "2026-11-01"],
+            new StringWriter(), errors, repo.Root, rules =>
+            {
+                if (++calls == failingStage) throw new EngineToolException("Synthetic matcher deadline failure.");
+                return new MatcherEngine(rules);
+            });
+        result.Should().Be(2);
+        calls.Should().Be(failingStage);
+        errors.ToString().Should().Contain("Synthetic matcher deadline failure.");
+        (await File.ReadAllBytesAsync(path)).Should().Equal(previous);
+        Directory.EnumerateFiles(Path.GetDirectoryName(path)!, "*.tmp").Should().BeEmpty();
+    }
+
     [Fact]
     public async Task SupportBundle_Should_ContainOnlyMaskedMetadataAndCounts_When_TheScanHasFindings()
     {

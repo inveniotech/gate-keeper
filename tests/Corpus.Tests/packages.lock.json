@@ -120,6 +120,12 @@
           "Tomlyn": "[2.10.1, )"
         }
       },
+      "inveniotech.gatekeeper.middleware": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Engine": "[1.0.0, )"
+        }
+      },
       "inveniotech.gatekeeper.signing": {
         "type": "Project",
         "dependencies": {

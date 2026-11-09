@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[10.0.14, )",
+        "resolved": "10.0.14",
+        "contentHash": "YlTamXppEQls6DYWt7RdUuwWDb0lyw/vXCaGeQpLCpsLmfwGuCkOz/vIGgMTV7ECsJcavkCOkxZXv9s8rdAHkQ=="
+      },
+      "inveniotech.gatekeeper.engine": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Signing": "[1.0.0, )",
+          "SarifKit": "[1.0.0, )",
+          "Tomlyn": "[2.10.1, )"
+        }
+      },
+      "inveniotech.gatekeeper.middleware": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Engine": "[1.0.0, )"
+        }
+      },
+      "inveniotech.gatekeeper.signing": {
+        "type": "Project",
+        "dependencies": {
+          "BouncyCastle.Cryptography": "[2.7.0, )"
+        }
+      },
+      "BouncyCastle.Cryptography": {
+        "type": "CentralTransitive",
+        "requested": "[2.7.0, )",
+        "resolved": "2.7.0",
+        "contentHash": "U+12df8UEWHgBi04YVf/Lgi2dy3SItlIYvHjjEVa/BngCQIzDCDRBk50DDByCfDvSbe5pRNFr3b7UrVK2kMcLw=="
+      },
+      "SarifKit": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "CJH8MjgTGLqT1Uy7nJ4CZqVigk+5yMP+oQbJ9QucEZyxB4s8ybi8jvYXi+ZhGTV9hrdkUvuC6CYHLTonIJ33BQ=="
+      },
+      "Tomlyn": {
+        "type": "CentralTransitive",
+        "requested": "[2.10.1, )",
+        "resolved": "2.10.1",
+        "contentHash": "ykjOY3IpYmC4SpPcAZRTl/w2jTmhPMDydHq8xcV7tTBAQ22nKBsOkPqauIrZlMjHm03cmKfV23UOPscKp+J4Og=="
+      }
+    }
+  }
+}

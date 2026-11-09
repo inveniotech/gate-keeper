@@ -12,4 +12,4 @@ This folder holds the specifications for the open formats. Each is a written con
 | Quality budgets: false positives and performance | [quality-budgets.md](quality-budgets.md) | None in this draft. The gate and the budgets are measured, not serialised; the arithmetic is fixed in the text. | Draft — not accepted (P0-17) |
 | Processor catalogue output | [processor-output-proposal.md](processor-output-proposal.md) | Existing v1 schemas unchanged; implementation follows separately. | Additive v1 policy approved by the owner, 9 November 2026; remaining proposal draft (P2-12) |
 
-Still to arrive in their own cards: the licence token (P0-06) and the middleware API contract (P3-01).
+| Middleware API | [middleware-api-v1.md](middleware-api-v1.md) | None. The API contract defines native stack types. | Accepted by the owner, 9 November 2026 (P3-01; #123) |

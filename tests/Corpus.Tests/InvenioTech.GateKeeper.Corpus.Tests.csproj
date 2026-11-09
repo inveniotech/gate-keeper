@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+    <ProjectReference Include="../../middleware/dotnet/InvenioTech.GateKeeper.Middleware.csproj" />
     <ProjectReference Include="..\..\cli\InvenioTech.GateKeeper.Cli.csproj" />
   </ItemGroup>
   <ItemGroup>
