@@ -18,9 +18,11 @@ public static class EngineProduct
     /// <summary>
     /// Gets the engine version as a semantic version <c>major.minor.patch</c>,
     /// which is the form the results format fixes for the engine version. New
-    /// features land only in a new major, so Phase 1 carries 0.1.0 (rule 13).
+    /// features land only in a new major (rule 13), and before the first
+    /// release every capability lands as a minor of the 0 line: 0.1.0 was
+    /// Phase 1 and 0.2.0 carries the email match boundary (IQ-91).
     /// </summary>
-    public const string EngineVersion = "0.1.0";
+    public const string EngineVersion = "0.2.0";
 
     /// <summary>
     /// Gets the version of the rule pack bundled into this build, or null when

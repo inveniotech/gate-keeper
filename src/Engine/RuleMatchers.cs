@@ -23,6 +23,17 @@ public enum MatchBoundary
     /// <summary>A letter-or-digit neighbour or the very end (or start) of the input limits the shape.</summary>
     [JsonStringEnumMemberName("alnum")]
     Alnum = 2,
+
+    /// <summary>
+    /// The email-address neighbour set limits the shape. A leading neighbour that
+    /// is an ASCII letter, digit, <c>.</c>, <c>_</c>, <c>%</c>, <c>+</c> or <c>-</c>,
+    /// or a trailing neighbour that is an ASCII letter, digit, <c>_</c>, <c>%</c>,
+    /// <c>+</c> or <c>-</c>, rejects the span; the very end (or start) of the input
+    /// limits it. This is an engine capability added in version 0.2.0 (IQ-91), so
+    /// a pack that carries it must set its <c>minEngineVersion</c> to 0.2.0 or newer.
+    /// </summary>
+    [JsonStringEnumMemberName("email")]
+    Email = 3,
 }
 
 /// <summary>
