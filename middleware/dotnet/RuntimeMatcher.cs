@@ -165,7 +165,7 @@ public sealed class RuntimeMatcher
         return count;
     }
 
-    internal static void ValidateText(string text)
+    internal static void ValidateText(string text, string parameterName = "text")
     {
         ArgumentNullException.ThrowIfNull(text);
         var count = 0;
@@ -174,10 +174,10 @@ public sealed class RuntimeMatcher
             if (char.IsHighSurrogate(text[index]))
             {
                 if (++index >= text.Length || !char.IsLowSurrogate(text[index]))
-                    throw new ArgumentException("Middleware text must contain valid Unicode scalars.", nameof(text));
+                    throw new ArgumentException("Middleware text must contain valid Unicode scalars.", parameterName);
             }
             else if (char.IsLowSurrogate(text[index]))
-                throw new ArgumentException("Middleware text must contain valid Unicode scalars.", nameof(text));
+                throw new ArgumentException("Middleware text must contain valid Unicode scalars.", parameterName);
             if (++count > MaximumScalars) throw new InputLimitException();
         }
     }

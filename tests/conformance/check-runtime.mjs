@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { RuntimeMatcher, InputLimitError, validate } from '../../middleware/node/runtime.ts';
 import { ConsentCheck } from '../../middleware/node/consent.ts';
 import { ResponseFilter, ResponseFilterError } from '../../middleware/node/response.ts';
+import './check-review.mjs';
 
 const vectors = JSON.parse(readFileSync(new URL('./vectors.json', import.meta.url), 'utf8'));
 const runtime = new RuntimeMatcher(vectors.rules, [], undefined, vectors.packs);
@@ -48,6 +49,8 @@ for (const sample of behaviour.consent.cases) {
   const provider = sample.provider === 'absent' ? undefined : {
     async getState() {
       calls++;
+      if (sample.provider === 'provider-timeout') { const internal = new AbortController(); internal.abort(); internal.signal.throwIfAborted(); }
+      if (sample.provider === 'caller-cancelled-during') { controller.abort(); controller.signal.throwIfAborted(); }
       if (sample.provider === 'throws') throw new Error('synthetic-sensitive-marker');
       return sample.provider;
     },

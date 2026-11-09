@@ -50,6 +50,20 @@
         "isGranted": null,
         "calls": 0,
         "diagnostics": 0
+      },
+      {
+        "provider": "provider-timeout",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 2
+      },
+      {
+        "provider": "caller-cancelled-during",
+        "expected": "cancelled",
+        "isGranted": null,
+        "calls": 1,
+        "diagnostics": 0
       }
     ],
     "purposes": [
@@ -357,6 +371,80 @@
         "lengthKnown": true,
         "headersCommitted": false,
         "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "null-parent-fails",
+        "body": {
+          "user": null
+        },
+        "paths": [
+          "/user/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "missing-parent-passes",
+        "body": {},
+        "paths": [
+          "/user/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {}
+      },
+      {
+        "name": "missing-content-type-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": null,
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "empty-content-type-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "",
         "failed": true,
         "abortRequired": false,
         "expected": null

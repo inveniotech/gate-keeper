@@ -21,11 +21,18 @@ filtering every selected array element with the explicit `*` extension. Pointer
 escapes `~0`, `~1`, `~2` name literal tilde, slash and star keys. Framework hooks
 must bound parsing first and honour the failure's `abortRequired` flag.
 
+Present null leaves or intermediate containers fail as type errors; missing
+properties are ignored. Committed protected responses always abort because the
+contract defines an already started body as streaming. Null or empty content
+types fail closed. All runtime matcher exceptions become content-free response
+failures. Provider cancellation without caller thread interruption returns
+unknown with a diagnostic; caller interruption still propagates.
+
 ## Validate
 
 ```sh
 mkdir -p artifacts/conformance-jvm
-javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/CheckRuntime.java
+javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/ResponseFailureProbe.java tests/conformance/CheckRuntime.java
 java -cp artifacts/conformance-jvm CheckRuntime
 ```
 

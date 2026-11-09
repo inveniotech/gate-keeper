@@ -3,6 +3,7 @@
     <Version>0.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Engine.Tests" />
     <ProjectReference Include="../../src/Engine/InvenioTech.GateKeeper.Engine.csproj" />
   </ItemGroup>
 </Project>

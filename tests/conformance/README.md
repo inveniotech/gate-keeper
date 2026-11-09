@@ -45,7 +45,7 @@ dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~Conformanc
 node tests/conformance/check-patterns.mjs
 node tests/conformance/check-runtime.mjs
 java tests/conformance/CheckPatterns.java tests/conformance/patterns.tsv
-javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/CheckRuntime.java
+javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/ResponseFailureProbe.java tests/conformance/CheckRuntime.java
 java -cp artifacts/conformance-jvm CheckRuntime
 ```
 
@@ -64,7 +64,7 @@ with NativeAOT and trimming and executes it with reflection-based JSON disabled.
 Boundary tests also cover invalid Unicode, scalar caps, output expansion,
 optional disablement and errors in a later selected response element.
 
-P3-01 contract acceptance remains an owner action. P3-02 to P3-04 own framework
+The owner accepted the P3-01 contract on 9 November 2026. P3-02 to P3-04 own framework
 hooks, signed installation-container loading, complete application samples and
 package publishing. Those are not claimed by a tree-level reference core.
 Existing `PackLoaderTests` exercise the engine's signed-pack failures and

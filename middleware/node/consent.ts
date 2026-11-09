@@ -26,7 +26,7 @@ export class ConsentCheck {
       signal?.throwIfAborted();
       return state === 'granted' || state === 'denied' || state === 'unknown' ? state : 'unknown';
     } catch (error: unknown) {
-      if (signal?.aborted || error instanceof Error && error.name === 'AbortError') throw error;
+      if (signal?.aborted) signal.throwIfAborted();
       this.diagnostic({ purpose, errorType: error instanceof Error ? error.constructor.name : 'NonErrorFailure' });
       return 'unknown';
     }

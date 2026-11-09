@@ -32,6 +32,7 @@ class CheckRuntime {
         equal(runtime.redact(redacted), redacted, name + " idempotence");
     }
     public static void main(String[] args) throws Exception {
+        africa.gatekeeper.ResponseFailureProbe.run();
         Path directory = Path.of(args.length == 0 ? "tests/conformance" : args[0]);
         Map<String, Object> data = read(directory.resolve("vectors.json")); RuntimeMatcher runtime = new RuntimeMatcher(rules(data.get("rules")), Set.of(), null, rules(data.get("packs"))); int checked = 0;
         List<Map<String, Object>> packs = new ArrayList<>();
@@ -77,6 +78,8 @@ class CheckRuntime {
             int[] calls = {0}; List<String> events = new ArrayList<>();
             ConsentCheck.ConsentProvider provider = mode.equals("absent") ? null : (subject, purpose) -> {
                 calls[0]++;
+                if (mode.equals("provider-timeout")) throw new CancellationException("synthetic-sensitive-marker");
+                if (mode.equals("caller-cancelled-during")) { Thread.currentThread().interrupt(); throw new CancellationException(); }
                 if (mode.equals("throws")) throw new IllegalStateException("synthetic-sensitive-marker");
                 if (mode.equals("invalid")) return null;
                 return mode.equals("granted") || mode.equals("cancelled") ? ConsentCheck.ConsentState.GRANTED

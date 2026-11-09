@@ -8,6 +8,34 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 public sealed class ResponseFilterTests
 {
     [Fact]
+    public void Response_Should_ConvertEngineFailuresWithoutLeakingContent_When_RedactionThrows()
+    {
+        var body = JsonNode.Parse("""{"phone":"marker"}""");
+        var filter = new ResponseFilter(_ => throw new EngineToolException("synthetic-sensitive-marker"), ["/phone"]);
+        Action transform = () => filter.Transform(body);
+        var error = transform.Should().ThrowExactly<ResponseFilterException>().Which;
+        error.AbortRequired.Should().BeFalse(); error.InnerException.Should().BeNull();
+        error.Message.Should().NotContain("synthetic-sensitive-marker");
+        body!["phone"]!.GetValue<string>().Should().Be("marker");
+    }
+
+    [Fact]
+    public void Response_Should_RejectNullPathsWithAnArgumentError_When_Configured()
+    {
+        Action create = () => new ResponseFilter(Runtime(), null!);
+        create.Should().ThrowExactly<ArgumentNullException>().Which.ParamName.Should().Be("paths");
+    }
+
+    [Fact]
+    public void Response_Should_FailClosed_When_TheContentTypeIsMissing()
+    {
+        var body = JsonNode.Parse("""{"phone":"marker"}""");
+        Action transform = () => new ResponseFilter(Runtime(), ["/phone"]).Transform(body, contentType: null);
+        transform.Should().ThrowExactly<ResponseFilterException>().Which.AbortRequired.Should().BeFalse();
+        body!["phone"]!.GetValue<string>().Should().Be("marker");
+    }
+
+    [Fact]
     public void Response_Should_FilterEveryWildcardElementAndLeaveInputUnchanged_When_ProtectedPathsSelectArrays()
     {
         var body = JsonNode.Parse("""{"customers":[{"phone":"marker"},{"phone":"marker"}],"other":"unchanged"}""")!;

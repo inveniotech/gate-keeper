@@ -2,6 +2,7 @@
 package africa.gatekeeper;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 /** Atomic filtering over a parsed JSON tree supplied by a bounded framework hook. */
 public final class ResponseFilter {
@@ -43,10 +44,14 @@ public final class ResponseFilter {
             return value;
         }
     }
-    private final RuntimeMatcher runtime;
+    private final UnaryOperator<String> redact;
     private final List<List<Segment>> paths;
     public ResponseFilter(RuntimeMatcher runtime, List<String> pointers) {
-        this.runtime = Objects.requireNonNull(runtime); List<List<Segment>> parsed = new ArrayList<>();
+        this(Objects.requireNonNull(runtime)::redact, pointers);
+    }
+    // Package-private fault seam keeps deadline tests deterministic.
+    ResponseFilter(UnaryOperator<String> redact, List<String> pointers) {
+        this.redact = redact; List<List<Segment>> parsed = new ArrayList<>();
         for (String pointer : pointers) {
             if (pointer == null || !pointer.isEmpty() && !pointer.startsWith("/")) throw new IllegalArgumentException("Use a JSON Pointer.");
             List<Segment> path = new ArrayList<>();
@@ -74,10 +79,10 @@ public final class ResponseFilter {
             for (List<Segment> path : paths) select(copy, path, 0, selected);
             for (Node node : selected) {
                 if (node.fields != null || node.elements != null || !(node.value instanceof String)) throw new ResponseFilterException(headersCommitted);
-                node.value = runtime.redact((String) node.value);
+                node.value = redact.apply((String) node.value);
             }
             return copy.result();
-        } catch (IllegalArgumentException | RuntimeMatcher.InputLimitException error) { throw new ResponseFilterException(headersCommitted); }
+        } catch (RuntimeException error) { throw new ResponseFilterException(headersCommitted); }
     }
     private static void select(Node node, List<Segment> path, int depth, Set<Node> selected) {
         if (depth == path.size()) { selected.add(node); return; }

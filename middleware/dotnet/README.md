@@ -1,7 +1,7 @@
 # .NET middleware
 
 **Status: executable reference core for P3-00.** Framework hooks and package
-publication remain P3-02. The P3-01 contract is still a draft for owner review.
+publication remain P3-02. The owner accepted the P3-01 contract on 9 November 2026.
 
 `RuntimeMatcher` consumes an already verified signed `MergedRules` load from
 the existing pack loader. It rejects empty and local-pack loads; it performs no
@@ -23,6 +23,13 @@ segment selects every array element; `~0`, `~1`, `~2` address literal tilde,
 slash and star keys. The framework must bound parsing first and must abort an
 already committed protected response when `AbortRequired` is true. No HTTP
 framework hook is claimed by this tree-level core.
+
+A missing path is ignored; a present null leaf or null intermediate container
+fails as a type error. Protected responses with committed headers always abort:
+the contract defines an already started body as streaming. Explicit null or
+empty content types fail closed. Every matcher failure, including the engine's
+regex deadline, becomes a content-free `ResponseFilterException`. Provider
+timeouts become unknown with diagnostics unless the caller token was cancelled.
 
 ## Dependencies and validation
 

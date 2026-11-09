@@ -31,8 +31,7 @@ public final class ConsentCheck {
             ConsentState state = provider.getState(subjectId, purpose);
             if (Thread.currentThread().isInterrupted()) throw new CancellationException();
             return state == null ? ConsentState.UNKNOWN : state;
-        } catch (CancellationException error) { throw error; }
-        catch (InterruptedException error) { Thread.currentThread().interrupt(); throw new CancellationException(); }
+        } catch (InterruptedException error) { Thread.currentThread().interrupt(); throw new CancellationException(); }
         catch (Exception error) {
             if (Thread.currentThread().isInterrupted()) throw new CancellationException();
             diagnostic.accept(purpose, error.getClass().getSimpleName()); return ConsentState.UNKNOWN;

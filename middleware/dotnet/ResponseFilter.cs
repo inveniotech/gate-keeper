@@ -17,7 +17,7 @@ public sealed class ResponseFilterException : Exception
 /// <summary>Atomic JSON-tree filtering with the owner's explicit array wildcard extension.</summary>
 public sealed class ResponseFilter
 {
-    private readonly RuntimeMatcher runtime;
+    private readonly Func<string, string> redact;
     private readonly Segment[][] paths;
     private sealed record Segment(string Key, bool Wildcard);
 
@@ -25,8 +25,13 @@ public sealed class ResponseFilter
     /// <param name="runtime">The prepared runtime redactor.</param>
     /// <param name="paths">Object paths; ~2 names a literal star, alongside ~0 and ~1.</param>
     public ResponseFilter(RuntimeMatcher runtime, IReadOnlyList<string> paths)
+        : this((runtime ?? throw new ArgumentNullException(nameof(runtime))).Redact, paths) { }
+
+    // Fault injection exercises matcher failures without timing-dependent regex probes.
+    internal ResponseFilter(Func<string, string> redact, IReadOnlyList<string> paths)
     {
-        this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
+        ArgumentNullException.ThrowIfNull(paths);
+        this.redact = redact;
         this.paths = paths.Select(Parse).ToArray();
     }
 
@@ -42,21 +47,23 @@ public sealed class ResponseFilter
         if (!lengthKnown || headersCommitted || !(media.Equals("application/json", StringComparison.OrdinalIgnoreCase)
             || media.StartsWith("application/", StringComparison.OrdinalIgnoreCase) && media.EndsWith("+json", StringComparison.OrdinalIgnoreCase)))
             throw new ResponseFilterException(headersCommitted);
-        var holder = new JsonObject { ["body"] = body?.DeepClone() };
         var selected = new HashSet<(JsonNode Parent, string Key)>();
-        foreach (var path in paths) Select(holder, "body", path, 0);
         try
         {
+            var holder = new JsonObject { ["body"] = body?.DeepClone() };
+            foreach (var path in paths) Select(holder, "body", path, 0);
             foreach (var slot in selected)
             {
                 var node = Get(slot.Parent, slot.Key);
                 if (node is not JsonValue value || !value.TryGetValue<string>(out var text)) throw new ResponseFilterException(headersCommitted);
-                Set(slot.Parent, slot.Key, JsonValue.Create(runtime.Redact(text)));
+                Set(slot.Parent, slot.Key, JsonValue.Create(redact(text)));
             }
+            var result = holder["body"];
+            holder.Remove("body");
+            return result;
         }
-        catch (Exception error) when (error is ArgumentException or InputLimitException)
+        catch (Exception)
         { throw new ResponseFilterException(headersCommitted); }
-        return holder["body"]?.DeepClone();
 
         void Select(JsonNode parent, string key, Segment[] path, int depth)
         {

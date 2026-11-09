@@ -9,7 +9,7 @@ export class ResponseFilterError extends Error {
   }
 }
 interface Segment { readonly key: string; readonly wildcard: boolean }
-interface HostState { readonly lengthKnown?: boolean; readonly headersCommitted?: boolean; readonly contentType?: string }
+interface HostState { readonly lengthKnown?: boolean; readonly headersCommitted?: boolean; readonly contentType?: string | null }
 type Container = Record<string, unknown> | unknown[];
 
 /** Atomic filtering of an already parsed, host-bounded JSON tree. */
@@ -31,7 +31,7 @@ export class ResponseFilter {
   transform(body: unknown, state: HostState = {}): unknown {
     const abort = state.headersCommitted ?? false;
     if (this.paths.length === 0) return structuredClone(body);
-    const media = (state.contentType ?? 'application/json').split(';')[0]!.trim().toLowerCase();
+    const media = (state.contentType ?? '').split(';')[0]!.trim().toLowerCase();
     const failure = (): never => { throw new ResponseFilterError(abort); };
     if (state.lengthKnown === false || abort || !(media === 'application/json' || media.startsWith('application/') && media.endsWith('+json'))) failure();
     const holder: Record<string, unknown> = { body: structuredClone(body) };

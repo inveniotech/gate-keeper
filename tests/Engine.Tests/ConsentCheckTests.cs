@@ -5,6 +5,35 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 
 public sealed class ConsentCheckTests
 {
+    [Fact]
+    public async Task Consent_Should_ReturnUnknownWithSafeDiagnostics_When_TheProviderTimesOut()
+    {
+        var events = new List<ConsentDiagnostic>();
+        var check = new ConsentCheck(new Provider(() => throw new TaskCanceledException("synthetic-sensitive-marker")), events.Add);
+        (await check.CheckAsync("synthetic-subject", "a.b")).Should().Be(ConsentState.Unknown);
+        (await check.IsGrantedAsync("synthetic-subject", "a.b")).Should().BeFalse();
+        events.Should().Equal(new ConsentDiagnostic("a.b", "TaskCanceledException"), new ConsentDiagnostic("a.b", "TaskCanceledException"));
+    }
+
+    [Fact]
+    public async Task Consent_Should_PropagateCancellationWithoutDiagnostics_When_TheCallerCancelsInsideTheProvider()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var events = new List<ConsentDiagnostic>();
+        var check = new ConsentCheck(new Provider(() => { cancellation.Cancel(); throw new TaskCanceledException(); }), events.Add);
+        Func<Task> run = async () => await check.CheckAsync("synthetic-subject", "a.b", cancellation.Token);
+        await run.Should().ThrowAsync<OperationCanceledException>();
+        events.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Consent_Should_NameTheSubjectArgument_When_ItContainsInvalidUnicode()
+    {
+        var check = new ConsentCheck(null, _ => { });
+        Func<Task> run = async () => await check.CheckAsync("\ud800", "a.b");
+        (await run.Should().ThrowExactlyAsync<ArgumentException>()).Which.ParamName.Should().Be("subjectId");
+    }
+
     [Theory]
     [InlineData(ConsentState.Granted, ConsentState.Granted, true)]
     [InlineData(ConsentState.Denied, ConsentState.Denied, false)]

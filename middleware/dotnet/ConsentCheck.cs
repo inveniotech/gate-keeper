@@ -53,7 +53,7 @@ public sealed class ConsentCheck
     public async ValueTask<ConsentState> CheckAsync(string subjectId, string purpose, CancellationToken cancellationToken = default)
     {
         if (subjectId is null || subjectId.Length is 0 or > 2048) throw new ArgumentException("Supply a subject of 1 to 1,024 scalars.", nameof(subjectId));
-        RuntimeMatcher.ValidateText(subjectId);
+        RuntimeMatcher.ValidateText(subjectId, nameof(subjectId));
         if (subjectId.EnumerateRunes().Count() > 1024) throw new ArgumentException("Supply a subject of 1 to 1,024 scalars.", nameof(subjectId));
         if (purpose is null || purpose.Length > 164 || !Purpose.IsMatch(purpose))
             throw new ArgumentException("Supply a valid namespaced consent purpose.", nameof(purpose));
@@ -65,7 +65,7 @@ public sealed class ConsentCheck
             cancellationToken.ThrowIfCancellationRequested();
             return state is ConsentState.Granted or ConsentState.Denied or ConsentState.Unknown ? state : ConsentState.Unknown;
         }
-        catch (OperationCanceledException) { throw; }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception error)
         {
             cancellationToken.ThrowIfCancellationRequested();

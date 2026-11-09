@@ -56,6 +56,6 @@ jobs:
       - name: Compile the native core as Java 15 bytecode
         run: |
           mkdir -p artifacts/conformance-jvm
-          javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/CheckRuntime.java
+          javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/ResponseFailureProbe.java tests/conformance/CheckRuntime.java
       - name: Verify native matcher, validators, redaction, consent and wildcard responses
         run: java -cp artifacts/conformance-jvm CheckRuntime

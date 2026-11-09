@@ -21,6 +21,13 @@ diagnostics contain no subjects or provider messages. Scanner configuration and
 consent state cannot alter redaction. `versions()` reports supplied verified
 pack identities without application inputs.
 
+Hosts must supply the actual `contentType`; absent, null and empty values fail
+closed on protected responses. A present null leaf or intermediate container is
+a type error; missing properties are ignored. Committed protected responses
+always abort because an already started body is streaming under the contract.
+A provider's own abort returns unknown with diagnostics; only the caller's
+aborted signal propagates cancellation.
+
 ## Validate
 
 ```sh

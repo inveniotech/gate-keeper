@@ -19,8 +19,9 @@ public sealed partial class ConformanceExportTests
         {
             json.WriteStartObject(); json.WriteNumber("version", 1);
             json.WriteStartObject("consent"); json.WriteStartArray("cases");
-            foreach (var mode in new[] { "granted", "denied", "unknown", "invalid", "absent", "throws", "cancelled" })
+            foreach (var mode in new[] { "granted", "denied", "unknown", "invalid", "absent", "throws", "cancelled", "provider-timeout", "caller-cancelled-during" })
             {
+                using var cancellation = new CancellationTokenSource();
                 var calls = 0; var events = new List<ConsentDiagnostic>();
                 IConsentProvider? provider = mode == "absent" ? null : new VectorProvider(() =>
                 {
@@ -31,11 +32,13 @@ public sealed partial class ConformanceExportTests
                         "denied" => ConsentState.Denied,
                         "unknown" => ConsentState.Unknown,
                         "invalid" => (ConsentState)999,
+                        "provider-timeout" => throw new TaskCanceledException("synthetic-sensitive-marker"),
+                        "caller-cancelled-during" => CancelCaller(),
                         _ => throw new InvalidOperationException("synthetic-sensitive-marker"),
                     };
                 });
                 var check = new ConsentCheck(provider, events.Add);
-                using var cancellation = new CancellationTokenSource(); if (mode == "cancelled") cancellation.Cancel();
+                if (mode == "cancelled") cancellation.Cancel();
                 string state; bool? granted;
                 try { state = (await check.CheckAsync("synthetic-subject", "acme.marketing-sms", cancellation.Token)).ToString().ToLowerInvariant(); }
                 catch (OperationCanceledException) { state = "cancelled"; }
@@ -44,6 +47,8 @@ public sealed partial class ConformanceExportTests
                 json.WriteStartObject(); json.WriteString("provider", mode); json.WriteString("expected", state);
                 if (granted is { } answer) json.WriteBoolean("isGranted", answer); else json.WriteNull("isGranted");
                 json.WriteNumber("calls", calls); json.WriteNumber("diagnostics", events.Count); json.WriteEndObject();
+
+                ConsentState CancelCaller() { cancellation.Cancel(); throw new OperationCanceledException(cancellation.Token); }
             }
             json.WriteEndArray(); json.WriteStartArray("purposes");
             foreach (var purpose in new[] { "acme.marketing-sms", "a.b", "", "single", "Acme.marketing", "acme..marketing", "acme.marketing\n",
@@ -79,7 +84,7 @@ public sealed partial class ConformanceExportTests
         Verify(root, "behaviour-vectors.json", Encoding.UTF8.GetString(output.ToArray()).Replace("\r\n", "\n", StringComparison.Ordinal) + "\n");
     }
 
-    private static IEnumerable<(string Name, string Body, string[] Paths, bool Known, bool Committed, string ContentType)> ResponseSamples()
+    private static IEnumerable<(string Name, string Body, string[] Paths, bool Known, bool Committed, string? ContentType)> ResponseSamples()
     {
         const string customers = """{"customers":[{"phone":"marker"},{"phone":"marker"}],"other":"unchanged"}""";
         yield return ("all-array-elements", customers, ["/customers/*/phone"], true, false, "application/json");
@@ -92,6 +97,10 @@ public sealed partial class ConformanceExportTests
         yield return ("missing-object-field", """{"customers":[{}]}""", ["/customers/*/phone"], true, false, "application/json");
         yield return ("wildcard-needs-array", """{"customers":{}}""", ["/customers/*/phone"], true, false, "application/json");
         yield return ("selected-null-fails", """{"phone":null}""", ["/phone"], true, false, "application/json");
+        yield return ("null-parent-fails", """{"user":null}""", ["/user/phone"], true, false, "application/json");
+        yield return ("missing-parent-passes", "{}", ["/user/phone"], true, false, "application/json");
+        yield return ("missing-content-type-fails", customers, ["/customers/*/phone"], true, false, null);
+        yield return ("empty-content-type-fails", customers, ["/customers/*/phone"], true, false, "");
         yield return ("streaming-fails", customers, ["/customers/*/phone"], false, false, "application/json");
         yield return ("committed-requires-abort", customers, ["/customers/*/phone"], true, true, "application/json");
         yield return ("wrong-content-type-fails", customers, ["/customers/*/phone"], true, false, "text/plain");
