@@ -42,3 +42,11 @@ The doctor command checks configuration and policy validity, loads packs through
 The fixed entries are `configuration.json` (typed effective settings with all free text masked), `findings.json` (counts grouped by rule, without locations or fingerprints), and `versions.json` (engine and pack metadata). Source files, matched values, paths, Git remotes, exception reasons, keys, licence tokens and environment variables are excluded. Retained metadata is checked with every loaded rule, with path and keyword restrictions removed for this diagnostic check. A remaining match in the serialised documents fails closed before a file is written. ZIP entries have fixed names, timestamps and attributes, use UTF-8 JSON with LF, and are written atomically. The bundle does not define support channels, response commitments or retention policy; those remain IQ-55 support work.
 
 Run `dotnet test tests/Cli.Tests --filter FullyQualifiedName~SupportBundleCliTests` and `dotnet test tests/Corpus.Tests --filter FullyQualifiedName~CorpusSupportBundleTests` for command behaviour and the corpus-wide privacy acceptance test.
+
+The corpus privacy acceptance test supplies real matchers through an internal
+composition seam for both source scanning and final-document checks. Its shape
+cache has no elapsed-time deadline so that busy runners cannot turn a semantic
+privacy assertion into a timing test. Public CLI entry points retain the
+100 millisecond production deadline; no flag or environment override is exposed.
+Deterministic fault-injection tests prove that a matcher failure in either stage
+returns exit code 2, preserves a previous archive and leaves no temporary file.

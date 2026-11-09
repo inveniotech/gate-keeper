@@ -14,5 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Cli.Tests" />
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Corpus.Tests" />
   </ItemGroup>
 </Project>

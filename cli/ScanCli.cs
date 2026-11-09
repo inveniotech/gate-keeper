@@ -41,7 +41,8 @@ internal static class ScanCli
         });
     }
 
-    internal static async Task<PreparedScan> PrepareAsync(string root, string? date, CancellationToken token)
+    internal static async Task<PreparedScan> PrepareAsync(string root, string? date, CancellationToken token,
+        Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory = null)
     {
         var load = ConfigurationLoader.Load(root);
         if (load.Settings is not { } settings || load.Errors.Count > 0) throw new EngineToolException(string.Join(" ", load.Errors));
@@ -52,7 +53,7 @@ internal static class ScanCli
         var state = await PolicyStore.LoadAsync(root, rules, token).ConfigureAwait(false);
         var enabled = rules.Where(r => !settings.DisabledRules.Any(d => d.Id == r.Id)
             && (r.Profiles is null || r.Profiles.Count == 0 || r.Profiles.Contains(settings.Profile == ScanProfile.Deep ? "deep" : "default", StringComparer.Ordinal))).ToArray();
-        var scan = await new ScanOrchestrator(new MatcherEngine(enabled)).ScanAsync(new FileEnumerationOptions
+        var scan = await new ScanOrchestrator(matcherFactory is null ? new MatcherEngine(enabled) : matcherFactory(enabled)).ScanAsync(new FileEnumerationOptions
         {
             Root = root,
             ScanHistory = settings.ScanHistory,
