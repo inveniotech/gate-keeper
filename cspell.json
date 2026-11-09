@@ -25,7 +25,8 @@
     "artifacts/**",
     "package-lock.json",
     "packages.lock.json",
-    "tests/corpus/**/repo/**"
+    "tests/corpus/**/repo/**",
+    "tests/conformance/vectors.json"
   ],
   "words": [
     "javac",
