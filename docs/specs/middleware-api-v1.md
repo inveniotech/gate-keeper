@@ -132,6 +132,12 @@ non-string values and any redaction failure, including invalid text or the
 section 5 scalar cap, MUST fail the protected response before body bytes are
 written. Transformations MUST be atomic, not a partially redacted body.
 
+A present JSON `null` is a non-string value, not a missing property. For
+`/user/phone`, `{}` selects nothing; `{"user":null}` fails because traversal
+encounters a non-container, and `{"user":{"phone":null}}` fails because the
+selected leaf is not a string. A nullable protected field therefore requires
+the application to omit that field or supply a string under this contract.
+
 **Owner decision, 8 November 2026:** add an explicit wildcard extension and
 filter every selected array element. A complete unescaped path segment `*`
 MUST select every element of an array, for example `/customers/*/phone`.
@@ -146,12 +152,15 @@ Paths selecting the same string MUST redact it once. Selection and redaction
 MUST complete on a private copy before any transformed body can be committed.
 
 Only bounded JSON responses are supported. A configured protected response that
-is streaming, exceeds the cap or has a non-JSON content type MUST fail before
+is streaming, exceeds the cap or has a missing, empty or non-JSON content type MUST fail before
 headers or body are sent. Streaming means the length is unknown or the host has
 already started the body. If headers are already committed when a protected
 response fails, the adapter MUST abort the response/connection; it MUST NOT send
 the original or partially transformed body. A response without configured
 protected paths MUST pass through unchanged.
+Because an already started body is streaming, committed headers on a protected
+response require an abort even when every selected value could be redacted.
+The adapter MUST NOT infer a JSON content type when the host supplies none.
 Adapters MUST NOT buffer an unbounded stream or silently return unfiltered
 protected content. JSON Pointer and this bounded-response policy are contract
 requirements; acceptance does not establish existing adapter conformance.
@@ -160,7 +169,7 @@ requirements; acceptance does not establish existing adapter conformance.
 
 The consent helper is for processing whose lawful basis is consent. Consent is
 one of several lawful bases under the Nigeria Data Protection Act 2023; this
-surface does not decide which basis applies. An application MUST NOT treat its
+surface does not decide which basis applies. An application MUST NOT treat
 absence of this surface as a finding for processing based on another lawful basis.
 
 The application supplies a consent provider. The adapter MUST NOT store, cache
@@ -184,6 +193,8 @@ stack's argument error immediately, without calling the provider.
 On a provider exception, the adapter MUST write one diagnostic containing the
 purpose and exception type name only. It MUST NOT log the message, stack trace
 or subject. Caller cancellation MUST propagate and MUST NOT become `unknown`.
+A provider's own timeout or internal cancellation is a provider exception, not
+caller cancellation, unless the caller's cancellation token or signal is set.
 The adapter MUST NOT introduce retries or timeouts; they belong to the provider.
 Providers MUST be safe to call concurrently, and adapter documentation MUST
 state this requirement.
