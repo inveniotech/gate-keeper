@@ -61,6 +61,10 @@ class CheckRuntime {
             }
         }
         String limit = "😀".repeat(65536); equal(runtime.redact(limit), limit, "scalar cap");
+        for (String seed : List.of("a@.", "bvn 22222222222222222222 ", "😀[REDACTED:previous.rule] ")) {
+            int[] points = seed.repeat(65536).codePoints().limit(65536).toArray();
+            String input = new String(points, 0, points.length); equal(runtime.redact(input), input, "cap-sized adversarial near miss");
+        }
         fails(() -> runtime.redact(limit + "x"), RuntimeMatcher.InputLimitException.class);
         fails(() -> runtime.redact("\ud800"), IllegalArgumentException.class);
         fails(() -> runtime.classify("", "migration", null), IllegalArgumentException.class);

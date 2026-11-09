@@ -68,12 +68,13 @@ public final class RuntimeMatcher {
 
     /** The optional path is used only by scanner parity tests. */
     public List<Finding> matches(String text, String path) {
-        int[] chars = scalars(text); List<Finding> result = new ArrayList<>(); int cursor = 0;
+        int[] chars = scalars(text); List<Finding> result = new ArrayList<>(); int cursor = 0, utf16Cursor = 0;
         var masks = MASK.matcher(text);
         while (masks.find()) {
-            int start = text.codePointCount(0, masks.start());
+            int start = cursor + text.codePointCount(utf16Cursor, masks.start());
             matchSegment(Arrays.copyOfRange(chars, cursor, start), cursor, path, result);
             cursor = start + text.codePointCount(masks.start(), masks.end());
+            utf16Cursor = masks.end();
         }
         matchSegment(Arrays.copyOfRange(chars, cursor, chars.length), cursor, path, result);
         result.sort(Comparator.comparingInt((Finding item) -> item.start).thenComparing(item -> item.ruleId).thenComparingInt(item -> item.length));
@@ -118,13 +119,14 @@ public final class RuntimeMatcher {
 
     private void matchSegment(int[] chars, int base, String path, List<Finding> result) {
         String text = new String(chars, 0, chars.length), folded = fold(text);
+        int[] scalarOffsets = new int[text.length() + 1]; int utf16 = 0;
+        for (int at = 0; at < chars.length; at++) { scalarOffsets[utf16] = at; utf16 += Character.charCount(chars[at]); scalarOffsets[utf16] = at + 1; }
         for (Rule rule : rules) {
             if (rule.pattern == null) {
                 for (String entry : rule.entries) {
-                    int[] word = entry.codePoints().toArray();
-                    for (int at = 0; at + word.length <= chars.length; at++)
-                        if (equalsAt(chars, at, word, false) && !token(at > 0 ? chars[at - 1] : -1)
-                            && !token(at + word.length < chars.length ? chars[at + word.length] : -1)) result.add(new Finding(rule, base + at, word.length));
+                    for (int at = text.indexOf(entry); at >= 0; at = text.indexOf(entry, at + 1))
+                        if (!token(at > 0 ? text.charAt(at - 1) : -1) && !token(at + entry.length() < text.length() ? text.charAt(at + entry.length()) : -1))
+                            result.add(new Finding(rule, base + scalarOffsets[at], scalarOffsets[at + entry.length()] - scalarOffsets[at]));
                 }
                 continue;
             }
@@ -133,16 +135,30 @@ public final class RuntimeMatcher {
             if (path != null && !paths.isEmpty() && paths.stream().noneMatch(glob -> glob(glob, path))) continue;
             List<String> keywords = strings(p.get("keywords"));
             if (!keywords.isEmpty() && keywords.stream().noneMatch(word -> folded.contains(fold(word)))) continue;
+            if (rule.parts.stream().anyMatch(part -> part.min > 0 && !part.alternatives.isEmpty()
+                && part.alternatives.stream().noneMatch(word -> folded.contains(fold(new String(word, 0, word.length)))))) continue;
+            List<int[]> keywordHits = keywordIndex(chars, keywords);
+            Map<Long, ShapeMatch> memo = new HashMap<>();
+            int[][] runs = new int[rule.parts.size()][];
+            for (int index = 0; index < runs.length; index++) {
+                Part part = rule.parts.get(index); if (!part.alternatives.isEmpty()) continue;
+                runs[index] = new int[chars.length + 1];
+                for (int position = chars.length - 1; position >= 0; position--)
+                    if (part.accepts(chars[position])) runs[index][position] = Math.min(part.max, runs[index][position + 1] + 1);
+            }
             int at = 0;
+            String boundary = string(p.get("boundary"));
             while (at < chars.length) {
-                ShapeMatch found = shapeAt(rule.parts, chars, at);
+                Part first = rule.parts.get(0);
+                if (first.min > 0 && first.alternatives.isEmpty() && !first.accepts(chars[at])) { at++; continue; }
+                if (neighbour(at > 0 ? chars[at - 1] : -1, boundary)) { at++; continue; }
+                ShapeMatch found = walk(rule.parts, chars, 0, at, memo, runs);
                 if (found == null || found.end <= at) { at++; continue; }
                 int start = found.emitStart >= 0 ? found.emitStart : at, length = found.emitStart >= 0 ? found.emitLength : found.end - at;
-                String boundary = string(p.get("boundary"));
                 boolean before = neighbour(at > 0 ? chars[at - 1] : -1, boundary);
                 boolean after = neighbour(found.end < chars.length ? chars[found.end] : -1, boundary);
                 String value = new String(chars, start, length);
-                if (length > 0 && !before && !after && keywordNear(chars, at, found.end, keywords, number(p.get("window"), 0))
+                if (length > 0 && !before && !after && (keywords.isEmpty() || keywordNear(keywordHits, at, found.end, number(p.get("window"), 0)))
                     && (p.get("validator") == null || validate(value, map(p.get("validator")))) && !excluded(chars, start, length, p)) {
                     result.add(new Finding(rule, base + start, length)); at = found.end;
                 } else at++;
@@ -186,27 +202,42 @@ public final class RuntimeMatcher {
         List<Integer> atom(int[] text, int at) {
             List<Integer> ends = new ArrayList<>();
             if (!alternatives.isEmpty()) for (int[] word : alternatives) { if (equalsAt(text, at, word, true)) ends.add(at + word.length); }
-            else if (at < text.length && ("digit".equals(kind) ? digit(text[at]) : "alnum".equals(kind) ? alnum(text[at])
-                : ranges.stream().anyMatch(range -> text[at] >= range[0] && text[at] <= range[1]))) ends.add(at + 1);
+            else if (at < text.length && accepts(text[at])) ends.add(at + 1);
             return ends;
+        }
+        boolean accepts(int c) {
+            if ("digit".equals(kind)) return digit(c);
+            if ("alnum".equals(kind)) return alnum(c);
+            for (int[] range : ranges) if (c >= range[0] && c <= range[1]) return true;
+            return false;
         }
     }
     private static final class ShapeMatch {
         final int end, emitStart, emitLength;
         ShapeMatch(int end, int start, int length) { this.end = end; emitStart = start; emitLength = length; }
     }
-    private static ShapeMatch shapeAt(List<Part> parts, int[] text, int start) { return walk(parts, text, 0, start, new HashMap<>()); }
-    private static ShapeMatch walk(List<Part> parts, int[] text, int index, int at, Map<String, ShapeMatch> memo) {
+    private static ShapeMatch walk(List<Part> parts, int[] text, int index, int at, Map<Long, ShapeMatch> memo, int[][] runs) {
         if (index == parts.size()) return new ShapeMatch(at, -1, 0);
-        String key = index + ":" + at; if (memo.containsKey(key)) return memo.get(key);
-        Part part = parts.get(index); List<List<Integer>> levels = new ArrayList<>(); levels.add(List.of(at));
+        long key = (long) index * (text.length + 1) + at; if (memo.containsKey(key)) return memo.get(key);
+        Part part = parts.get(index);
+        if (runs[index] != null) {
+            for (int count = runs[index][at]; count >= part.min; count--) {
+                ShapeMatch tail = walk(parts, text, index + 1, at + count, memo, runs);
+                if (tail != null) {
+                    ShapeMatch value = part.emit ? new ShapeMatch(tail.end, at, count) : tail;
+                    memo.put(key, value); return value;
+                }
+            }
+            memo.put(key, null); return null;
+        }
+        List<List<Integer>> levels = new ArrayList<>(); levels.add(List.of(at));
         for (int count = 1; count <= part.max; count++) {
             Set<Integer> next = new TreeSet<>(Comparator.reverseOrder());
             for (int position : levels.get(count - 1)) next.addAll(part.atom(text, position));
             levels.add(new ArrayList<>(next)); if (next.isEmpty()) break;
         }
         for (int count = Math.min(part.max, levels.size() - 1); count >= part.min; count--) for (int end : levels.get(count)) {
-            ShapeMatch tail = walk(parts, text, index + 1, end, memo);
+            ShapeMatch tail = walk(parts, text, index + 1, end, memo, runs);
             if (tail != null) {
                 ShapeMatch value = part.emit ? new ShapeMatch(tail.end, at, end - at) : tail;
                 memo.put(key, value); return value;
@@ -235,16 +266,22 @@ public final class RuntimeMatcher {
         }
     }
 
-    private static boolean keywordNear(int[] text, int start, int end, List<String> keywords, int window) {
-        if (keywords.isEmpty()) return true;
+    private static List<int[]> keywordIndex(int[] text, List<String> keywords) {
+        List<int[]> hits = new ArrayList<>();
         for (String word : keywords) {
             int[] points = word.codePoints().toArray();
             for (int at = 0; at + points.length <= text.length; at++) if (equalsAt(text, at, points, true)) {
-                int gap = at + points.length <= start ? start - at - points.length : at >= end ? at - end : 0;
-                if (gap <= window) return true;
+                hits.add(new int[] { at, at + points.length });
             }
         }
-        return false;
+        hits.sort(Comparator.comparingInt(hit -> hit[0])); int furthest = 0;
+        for (int[] hit : hits) { furthest = Math.max(furthest, hit[1]); hit[1] = furthest; }
+        return hits;
+    }
+    private static boolean keywordNear(List<int[]> hits, int start, int end, int window) {
+        int low = 0, high = hits.size();
+        while (low < high) { int mid = (low + high) >>> 1; if (hits.get(mid)[0] <= end + window) low = mid + 1; else high = mid; }
+        return low > 0 && hits.get(low - 1)[1] >= start - window;
     }
     private static boolean excluded(int[] text, int start, int length, Map<String, Object> p) {
         String value = new String(text, start, length);

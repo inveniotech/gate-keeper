@@ -7,6 +7,19 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 public sealed class RuntimeMatcherTests
 {
     [Fact]
+    public void Runtime_Should_PreserveEveryScalarOffset_When_ManyFindingsFollowAstralCharacters()
+    {
+        var runtime = Create([Rule("local.synthetic", "marker", Severity.Note)]);
+        var findings = runtime.Matches(string.Concat(Enumerable.Repeat("😀 label:marker ", 200)));
+        findings.Should().HaveCount(200);
+        for (var at = 0; at < findings.Count; at++)
+        {
+            findings[at].Start.Should().Be(at * 15 + 8);
+            findings[at].Length.Should().Be(6);
+        }
+    }
+
+    [Fact]
     public void Runtime_Should_UseEmitScalarSpansAndIgnorePathScopes_When_RedactingAndClassifying()
     {
         var runtime = Create([Rule("local.synthetic", "marker", Severity.Warning)]);

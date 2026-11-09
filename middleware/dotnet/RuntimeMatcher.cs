@@ -95,9 +95,17 @@ public sealed class RuntimeMatcher
     public IReadOnlyList<RuntimeFinding> Matches(string text)
     {
         ValidateText(text);
+        var scalarOffsets = new int[text.Length + 1];
+        var scalars = 0;
+        for (var at = 0; at < text.Length; at++)
+        {
+            scalarOffsets[at] = scalars;
+            if (char.IsHighSurrogate(text[at])) scalarOffsets[++at] = scalars;
+            scalarOffsets[at + 1] = ++scalars;
+        }
         return NativeMatches(text).Select(match => new RuntimeFinding(match.RuleId, match.Category, match.Severity,
-            text[..match.SpanStart].EnumerateRunes().Count(),
-            text.Substring(match.SpanStart, match.SpanLength).EnumerateRunes().Count())).ToArray();
+            scalarOffsets[match.SpanStart],
+            scalarOffsets[match.SpanStart + match.SpanLength] - scalarOffsets[match.SpanStart])).ToArray();
     }
 
     /// <summary>Selects earliest, longest, then ordinal rule, without filtering by context.</summary>

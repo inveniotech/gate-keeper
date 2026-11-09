@@ -19,6 +19,12 @@ await assert.rejects(cancelled.check('synthetic-subject', 'a.b', caller.signal),
 
 const behaviour = JSON.parse(readFileSync(new URL('./behaviour-vectors.json', import.meta.url), 'utf8'));
 const runtime = new RuntimeMatcher(behaviour.response.rules);
+const vectors = JSON.parse(readFileSync(new URL('./vectors.json', import.meta.url), 'utf8'));
+const fullRuntime = new RuntimeMatcher(vectors.rules);
+for (const seed of ['a@.', 'bvn 22222222222222222222 ', '😀[REDACTED:previous.rule] ']) {
+  const input = [...seed.repeat(65_536)].slice(0, 65_536).join('');
+  assert.equal(fullRuntime.redact(input), input, 'Cap-sized adversarial near misses remain unchanged.');
+}
 const body = { phone: 'marker' };
 const filter = new ResponseFilter(runtime, ['/phone']);
 assert.throws(() => filter.transform(body, { contentType: undefined }), ResponseFilterError);

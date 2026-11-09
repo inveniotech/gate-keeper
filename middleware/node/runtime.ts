@@ -78,28 +78,50 @@ function glob(pattern: string, path: string): boolean {
 }
 
 interface ShapeMatch { readonly end: number; readonly emitStart?: number; readonly emitLength?: number }
+interface PreparedPart { readonly source: ShapePart; readonly alternatives: readonly (readonly string[])[] }
 
-// Memoised bounded-shape interpretation avoids native regex backtracking.
-function shapeAt(parts: readonly ShapePart[], text: readonly string[], start: number): ShapeMatch | null {
-  const memo = new Map<string, ShapeMatch | null>();
-  function atom(part: ShapePart, at: number): number[] {
-    if (part.literal !== undefined || part.oneOf !== undefined) {
-      return [...(part.oneOf ?? [part.literal!])].sort((a, b) => [...b].length - [...a].length || ordinal(a, b))
-        .filter((word) => fold(text.slice(at, at + [...word].length).join('')) === fold(word))
-        .map((word) => at + [...word].length);
-    }
+function prepare(parts: readonly ShapePart[]): PreparedPart[] {
+  return parts.map((source) => ({ source, alternatives: [...(source.oneOf ?? (source.literal !== undefined ? [source.literal] : []))]
+    .sort((a, b) => [...b].length - [...a].length || ordinal(a, b)).map((word) => [...fold(word)]) }));
+}
+
+// One memo per rule/segment shares suffix work across every candidate start.
+function shapeMatcher(parts: readonly PreparedPart[], text: readonly string[]): (start: number) => ShapeMatch | null {
+  const memo = new Map<number, ShapeMatch | null>();
+  const folded = text.map(fold);
+  const accepts = (part: ShapePart, c: string | undefined): boolean => part.class === 'digit' ? digit(c) : part.class === 'alnum' ? alnum(c)
+    : c !== undefined && (part.ranges ?? []).some((r) => c >= r.low && c <= r.high);
+  const runs = parts.map(({ source, alternatives }) => {
+    if (alternatives.length) return null;
+    const run = new Uint16Array(text.length + 1);
+    for (let at = text.length - 1; at >= 0; at--) if (accepts(source, text[at])) run[at] = Math.min(source.max, run[at + 1]! + 1);
+    return run;
+  });
+  function atom(prepared: PreparedPart, at: number): number[] {
+    if (prepared.alternatives.length) return prepared.alternatives
+      .filter((word) => at + word.length <= text.length && word.every((c, i) => folded[at + i] === c)).map((word) => at + word.length);
     const c = text[at];
-    if (part.class === 'digit' ? digit(c) : part.class === 'alnum' ? alnum(c)
-      : c !== undefined && (part.ranges ?? []).some((r) => c >= r.low && c <= r.high)) return [at + 1];
-    return [];
+    return accepts(prepared.source, c) ? [at + 1] : [];
   }
   function walk(index: number, at: number): ShapeMatch | null {
     if (index === parts.length) return { end: at };
-    const key = index + ':' + at;
+    const key = index * (text.length + 1) + at;
     if (memo.has(key)) return memo.get(key)!;
-    const part = parts[index]!; const levels: number[][] = [[at]];
+    const prepared = parts[index]!; const part = prepared.source;
+    const run = runs[index];
+    if (run) {
+      for (let count = run[at]!; count >= part.min; count--) {
+        const tail = walk(index + 1, at + count);
+        if (tail) {
+          const result = part.emit ? { end: tail.end, emitStart: at, emitLength: count } : tail;
+          memo.set(key, result); return result;
+        }
+      }
+      memo.set(key, null); return null;
+    }
+    const levels: number[][] = [[at]];
     for (let count = 1; count <= part.max; count++) {
-      const next = [...new Set(levels[count - 1]!.flatMap((position) => atom(part, position)))].sort((a, b) => b - a);
+      const next = [...new Set(levels[count - 1]!.flatMap((position) => atom(prepared, position)))].sort((a, b) => b - a);
       levels.push(next); if (next.length === 0) break;
     }
     for (let count = Math.min(part.max, levels.length - 1); count >= part.min; count--) {
@@ -113,20 +135,24 @@ function shapeAt(parts: readonly ShapePart[], text: readonly string[], start: nu
     }
     memo.set(key, null); return null;
   }
-  return walk(0, start);
+  return (start) => walk(0, start);
 }
 
-function keywordNear(text: readonly string[], start: number, end: number, pattern: PatternRule): boolean {
-  if (!pattern.keywords?.length) return true;
+function keywordIndex(text: readonly string[], pattern: PatternRule): (start: number, end: number) => boolean {
+  if (!pattern.keywords?.length) return () => true;
+  const folded = text.map(fold); const hits: { start: number; end: number }[] = [];
   for (const keyword of pattern.keywords) {
     const word = [...fold(keyword)];
-    for (let at = 0; at + word.length <= text.length; at++) {
-      if (fold(text.slice(at, at + word.length).join('')) !== word.join('')) continue;
-      const gap = at + word.length <= start ? start - at - word.length : at >= end ? at - end : 0;
-      if (gap <= pattern.window!) return true;
-    }
+    for (let at = 0; at + word.length <= text.length; at++)
+      if (word.every((c, i) => folded[at + i] === c)) hits.push({ start: at, end: at + word.length });
   }
-  return false;
+  hits.sort((a, b) => a.start - b.start); let furthest = 0;
+  for (const hit of hits) { furthest = Math.max(furthest, hit.end); hit.end = furthest; }
+  return (start, end) => {
+    let low = 0; let high = hits.length;
+    while (low < high) { const mid = (low + high) >>> 1; if (hits[mid]!.start <= end + pattern.window!) low = mid + 1; else high = mid; }
+    return low > 0 && hits[low - 1]!.end >= start - pattern.window!;
+  };
 }
 
 function excluded(text: readonly string[], start: number, length: number, pattern: PatternRule): boolean {
@@ -171,6 +197,7 @@ function excluded(text: readonly string[], start: number, length: number, patter
 export class RuntimeMatcher {
   private readonly rules: readonly Rule[];
   private readonly packs: readonly PackVersion[];
+  private readonly shapes: ReadonlyMap<Rule, readonly PreparedPart[]>;
   constructor(rules: readonly Rule[], disabled: readonly string[] = [], diagnostic?: (message: string) => void, packs: readonly PackVersion[] = []) {
     if (rules.length === 0 || new Set(rules.map((rule) => rule.id)).size !== rules.length) throw new PackLoadError();
     for (const id of disabled) if (!rules.some((rule) => rule.id === id && rule.redaction?.optional))
@@ -192,6 +219,7 @@ export class RuntimeMatcher {
         || p.shape.reduce((sum, part) => sum + part.max * (part.literal ? [...part.literal].length : part.oneOf ? Math.max(...part.oneOf.map((word) => [...word].length)) : 1), 0) > 256))
         throw new PackLoadError();
     }
+    this.shapes = new Map(this.rules.filter((rule) => rule.matcher.pattern).map((rule) => [rule, prepare(rule.matcher.pattern!.shape)]));
   }
 
   /** Returns exact loaded identities; application input never enters version reporting. */
@@ -202,37 +230,47 @@ export class RuntimeMatcher {
   /** Returns every rule's own finding. A path is accepted only by scanner parity tests. */
   matches(text: string, path?: string): Finding[] {
     const all = scalars(text); const result: Finding[] = [];
-    const ranges: [number, number][] = []; let cursor = 0;
+    const ranges: [number, number][] = []; let cursor = 0; let utf16Cursor = 0;
     // Regex indices are UTF-16; translate only this fixed reserved-mask grammar.
     for (const found of text.matchAll(mask)) {
-      const start = [...text.slice(0, found.index)].length;
-      ranges.push([cursor, start]); cursor = start + [...found[0]].length;
+      let start = cursor;
+      for (let at = utf16Cursor; at < found.index; at++, start++) if (text.codePointAt(at)! > 0xffff) at++;
+      ranges.push([cursor, start]); cursor = start + found[0].length; utf16Cursor = found.index + found[0].length;
     }
     ranges.push([cursor, all.length]);
     for (const [begin, end] of ranges) {
-      const chars = all.slice(begin, end); const foldedText = fold(chars.join(''));
+      const chars = all.slice(begin, end); const segmentText = chars.join(''); const foldedText = fold(segmentText);
+      const scalarOffsets = new Uint32Array(segmentText.length + 1); let utf16 = 0;
+      for (let at = 0; at < chars.length; at++) { scalarOffsets[utf16] = at; utf16 += chars[at]!.length; scalarOffsets[utf16] = at + 1; }
       for (const rule of this.rules) {
         const add = (start: number, length: number): void => { result.push({ ruleId: rule.id, category: rule.category, severity: rule.severity, start: begin + start, length }); };
         const p = rule.matcher.pattern;
         if (!p) {
           for (const word of [...(rule.matcher.list!.package ?? []), ...(rule.matcher.list!.hostname ?? [])]) {
-            const letters = [...word];
-            for (let at = 0; at + letters.length <= chars.length; at++)
-              if (chars.slice(at, at + letters.length).join('') === word && !token(chars[at - 1]) && !token(chars[at + letters.length])) add(at, letters.length);
+            for (let at = segmentText.indexOf(word); at >= 0; at = segmentText.indexOf(word, at + 1))
+              if (!token(segmentText[at - 1]) && !token(segmentText[at + word.length])) add(scalarOffsets[at]!, scalarOffsets[at + word.length]! - scalarOffsets[at]!);
           }
           continue;
         }
         if (path && p.location?.paths?.length && !p.location.paths.some((pattern) => glob(pattern, path))) continue;
         if (p.keywords?.length && !p.keywords.some((keyword) => foldedText.includes(fold(keyword)))) continue;
+        if (p.shape.some((part) => part.min > 0 && (part.literal !== undefined || part.oneOf !== undefined)
+          && !(part.oneOf ?? [part.literal!]).some((word) => foldedText.includes(fold(word))))) continue;
+        const shapeAt = shapeMatcher(this.shapes.get(rule)!, chars);
+        const keywordNear = keywordIndex(chars, p);
+        const neighbour = p.boundary === 'digit' ? digit : p.boundary === 'alnum' ? alnum : () => false;
         let at = 0;
         while (at < chars.length) {
-          const found = shapeAt(p.shape, chars, at);
+          // A mandatory leading scalar atom cannot begin here; avoid memo entries for impossible starts.
+          const first = p.shape[0]!;
+          if (first.min > 0 && (first.class === 'digit' ? !digit(chars[at]) : first.class === 'alnum' ? !alnum(chars[at]) : false)) { at++; continue; }
+          if (neighbour(chars[at - 1])) { at++; continue; }
+          const found = shapeAt(at);
           if (!found || found.end <= at) { at++; continue; }
           const start = found.emitStart ?? at; const length = found.emitLength ?? found.end - at;
-          const neighbour = p.boundary === 'digit' ? digit : p.boundary === 'alnum' ? alnum : () => false;
           const value = chars.slice(start, start + length).join('');
           if (length > 0 && !neighbour(chars[at - 1]) && !neighbour(chars[found.end])
-            && keywordNear(chars, at, found.end, p) && (!p.validator || validate(value, p.validator)) && !excluded(chars, start, length, p)) {
+            && keywordNear(at, found.end) && (!p.validator || validate(value, p.validator)) && !excluded(chars, start, length, p)) {
             add(start, length); at = found.end;
           } else at++;
         }

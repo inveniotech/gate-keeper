@@ -71,3 +71,22 @@ Existing `PackLoaderTests` exercise the engine's signed-pack failures and
 watermark behaviour; this kit does not pretend its test-fixture JSON reader is
 a production JVM pack loader. Python joins with P3-05. Production keys, releases
 and framework dependencies are not introduced here.
+
+## Observing runtime cost
+
+Run `node tests/conformance/benchmark-runtime.mjs` for the real authored rules
+at 1,000, 10,000 and 65,536 scalars. For the JVM, add
+`tests/conformance/BenchmarkRuntime.java` to the compilation command above, then
+run `java -cp artifacts/conformance-jvm BenchmarkRuntime`. Both scripts verify
+the output and report elapsed time without timing assertions. Deterministic
+conformance separately exercises the cap-sized adversarial inputs.
+
+The review baseline on the local Node 26 runner was about 19 seconds for an
+email near miss at the cap. Sharing shape suffix state across candidate starts,
+preparing alternatives once, indexing keyword occurrences once, rejecting
+impossible mandatory literals, and translating masks incrementally reduced
+that case to about 23 milliseconds. Additional cap-sized email, keyword and
+mask scenarios took 74–122 milliseconds in Node and 9–149 milliseconds on the
+local JVM 21 runner. These observations are machine-dependent, include warm-up
+effects and are not a per-call latency guarantee. .NET builds one scalar-offset
+map instead of counting from the beginning for each finding.
