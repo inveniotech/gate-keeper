@@ -139,7 +139,7 @@
       "properties": {
         "shape": { "$ref": "#/$defs/shape" },
         "validator": { "$ref": "#/$defs/validator" },
-        "boundary": { "enum": ["none", "digit", "alnum"] },
+        "boundary": { "enum": ["none", "digit", "alnum", "email"] },
         "keywords": {
           "$comment": "The literal prefilter: when present, the engine looks for one of these keywords before it runs the shape, and only inside 'window'.",
           "type": "array",
