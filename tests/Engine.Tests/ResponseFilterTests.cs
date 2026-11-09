@@ -12,7 +12,7 @@ public sealed class ResponseFilterTests
     {
         var body = JsonNode.Parse("""{"phone":"marker"}""");
         var filter = new ResponseFilter(_ => throw new EngineToolException("synthetic-sensitive-marker"), ["/phone"]);
-        Action transform = () => filter.Transform(body);
+        Action transform = () => filter.Transform(body, contentType: "application/json");
         var error = transform.Should().ThrowExactly<ResponseFilterException>().Which;
         error.AbortRequired.Should().BeFalse(); error.InnerException.Should().BeNull();
         error.Message.Should().NotContain("synthetic-sensitive-marker");
@@ -32,6 +32,8 @@ public sealed class ResponseFilterTests
         var body = JsonNode.Parse("""{"phone":"marker"}""");
         Action transform = () => new ResponseFilter(Runtime(), ["/phone"]).Transform(body, contentType: null);
         transform.Should().ThrowExactly<ResponseFilterException>().Which.AbortRequired.Should().BeFalse();
+        Action omitted = () => new ResponseFilter(Runtime(), ["/phone"]).Transform(body);
+        omitted.Should().ThrowExactly<ResponseFilterException>();
         body!["phone"]!.GetValue<string>().Should().Be("marker");
     }
 
@@ -40,7 +42,7 @@ public sealed class ResponseFilterTests
     {
         var body = JsonNode.Parse("""{"customers":[{"phone":"marker"},{"phone":"marker"}],"other":"unchanged"}""")!;
         var filter = new ResponseFilter(Runtime(), ["/customers/*/phone"]);
-        var result = filter.Transform(body)!;
+        var result = filter.Transform(body, contentType: "application/json")!;
         result["customers"]![0]!["phone"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["customers"]![1]!["phone"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["other"]!.GetValue<string>().Should().Be("unchanged");
@@ -52,7 +54,7 @@ public sealed class ResponseFilterTests
     {
         var body = JsonNode.Parse("""{"customers":[{"phone":"marker"},{"phone":123}]}""")!;
         var before = body.ToJsonString(); var filter = new ResponseFilter(Runtime(), ["/customers/*/phone"]);
-        Action transform = () => filter.Transform(body);
+        Action transform = () => filter.Transform(body, contentType: "application/json");
         transform.Should().ThrowExactly<ResponseFilterException>(); body.ToJsonString().Should().Be(before);
     }
 
@@ -60,7 +62,7 @@ public sealed class ResponseFilterTests
     public void Response_Should_RequestAbort_When_HeadersAreAlreadyCommitted()
     {
         var filter = new ResponseFilter(Runtime(), ["/phone"]);
-        Action transform = () => filter.Transform(JsonNode.Parse("""{"phone":"marker"}""")!, headersCommitted: true);
+        Action transform = () => filter.Transform(JsonNode.Parse("""{"phone":"marker"}""")!, headersCommitted: true, contentType: "application/json");
         transform.Should().ThrowExactly<ResponseFilterException>().Which.AbortRequired.Should().BeTrue();
     }
 
@@ -77,7 +79,7 @@ public sealed class ResponseFilterTests
     {
         var body = JsonNode.Parse("""{"a/b":{"~":{"*":"marker"}},"groups":[[{"value":"marker"}]]}""")!;
         var filter = new ResponseFilter(Runtime(), ["/a~1b/~0/~2", "/groups/*/*/value"]);
-        var result = filter.Transform(body)!;
+        var result = filter.Transform(body, contentType: "application/json")!;
         result["a/b"]!["~"]!["*"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
         result["groups"]![0]![0]!["value"]!.GetValue<string>().Should().Be("[REDACTED:local.marker]");
     }
@@ -87,7 +89,7 @@ public sealed class ResponseFilterTests
     {
         var body = new JsonObject { ["customers"] = new JsonArray(new JsonObject { ["phone"] = "marker" }, new JsonObject { ["phone"] = new string('x', 65_537) }) };
         var filter = new ResponseFilter(Runtime(), ["/customers/*/phone"]);
-        Action transform = () => filter.Transform(body);
+        Action transform = () => filter.Transform(body, contentType: "application/json");
         transform.Should().ThrowExactly<ResponseFilterException>();
         body["customers"]![0]!["phone"]!.GetValue<string>().Should().Be("marker");
         body["customers"]![1]!["phone"] = "\ud800";

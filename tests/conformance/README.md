@@ -9,7 +9,12 @@ Each classification case includes synthetic input, repository-relative path,
 rule identifiers, severity, line, column and zero-based Unicode scalar spans.
 Positive and near-miss list cases are included alongside pattern rules.
 No matched-text field is emitted. Only committed synthetic corpus inputs enter
-the vectors. Pack digests pin the exact authored source inputs.
+the vectors. Pack digests pin the exact authored source inputs. `runtimeVersions`
+records actual .NET `Versions()` output from the successful signed test load;
+its digests are checked against the source bytes before export. Node and JVM
+compare that output and independently hash those source files. The one
+`contentDigest` field replaces the duplicate hash fields. This proves reporting
+parity at the loader boundary, not production Node/JVM signature verification.
 
 The same file now contains the native rule models, complete runtime matches,
 the selected classification and actual redacted output from the .NET core.
@@ -38,6 +43,7 @@ Adapters must consume these files with their native validator implementations.
 From the repository root in PowerShell:
 
 ```powershell
+./tests/conformance/Sync-RuntimeVersion.ps1 -Check
 $env:GATEKEEPER_WRITE_CONFORMANCE = '1'
 dotnet test tests/Corpus.Tests -c Release --filter FullyQualifiedName~ConformanceExportTests
 Remove-Item Env:GATEKEEPER_WRITE_CONFORMANCE
@@ -54,6 +60,12 @@ with the current engine and compares bytes, failing for stale inputs, digests or
 expectations. The workflow has a five-minute timeout. Node and Java use only
 standard-library facilities; Java source-file execution needs Java 17 or later.
 No production trust, new shipped dependency or matcher capability is introduced.
+
+`middleware/version.txt` is the single adapter version source. Run
+`./tests/conformance/Sync-RuntimeVersion.ps1` to regenerate the three native
+constants and Node package metadata. The .NET project reads the same source;
+CI rejects stale generated metadata. Repository path filtering belongs only to
+the scanner fixture: no public runtime matcher accepts a repository path.
 
 ## Native conformance and release boundary
 

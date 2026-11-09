@@ -31,6 +31,10 @@ empty content types fail closed. Every matcher failure, including the engine's
 regex deadline, becomes a content-free `ResponseFilterException`. Provider
 timeouts become unknown with diagnostics unless the caller token was cancelled.
 
+The project version and generated `RuntimeBuildVersion.cs` use the single
+`middleware/version.txt` source. Run `tests/conformance/Sync-RuntimeVersion.ps1`
+after changing it; `-Check` verifies all stack constants and Node package metadata.
+
 ## Dependencies and validation
 
 The only project dependency is the existing engine. There is no new package.

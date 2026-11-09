@@ -8,9 +8,10 @@ does not claim that unsigned source JSON is a verified installation.
 Node releases execute its erasable syntax directly. `RuntimeMatcher` consumes
 already validated, verified rule models. Its bounded, memoised shape interpreter
 implements all four validators, exclusions, keyword windows, per-rule resume
-semantics and exact list tokens without native regex backtracking. The optional
-path on `matches` is solely for scanner parity; `classify` and `redact` never
-select rules by paths, surface or field name. Scalar offsets, emitted spans,
+semantics and exact list tokens without native regex backtracking. `matches`,
+`classify` and `redact` have no repository-path argument and never select rules
+by paths, surface or field name. Scanner scopes are applied only in test fixtures.
+Scalar offsets, emitted spans,
 mask reservation, overlap selection and the 65,536-scalar cap match .NET.
 
 `consent.ts` supplies the uncached asynchronous tri-state helper.
@@ -20,6 +21,12 @@ honour `abortRequired`; the pure core never writes response bytes. Safe metadata
 diagnostics contain no subjects or provider messages. Scanner configuration and
 consent state cannot alter redaction. `versions()` reports supplied verified
 pack identities without application inputs.
+
+Version constants and package metadata are generated from `middleware/version.txt`
+by `tests/conformance/Sync-RuntimeVersion.ps1`. CI checks regeneration. Conformance
+compares version reporting with actual .NET loader metadata and independently
+hashes the source pack files. Supplied metadata is a loader trust boundary;
+reporting it does not verify a signature or establish rule provenance.
 
 Hosts must supply the actual `contentType`; absent, null and empty values fail
 closed on protected responses. A present null leaf or intermediate container is

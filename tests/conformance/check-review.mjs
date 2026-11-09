@@ -21,6 +21,22 @@ const behaviour = JSON.parse(readFileSync(new URL('./behaviour-vectors.json', im
 const runtime = new RuntimeMatcher(behaviour.response.rules);
 const vectors = JSON.parse(readFileSync(new URL('./vectors.json', import.meta.url), 'utf8'));
 const fullRuntime = new RuntimeMatcher(vectors.rules);
+for (const change of [
+  (p) => { p.boundary = 'unknown'; },
+  (p) => { p.validator = { name: 'unknown' }; },
+  (p) => { p.keywords = ['synthetic']; p.window = 0; },
+  (p) => { p.shape = [{ min: 1, max: 1, class: 'digit', literal: 'x' }]; },
+  (p) => { p.shape = [{ min: 1, max: 1 }]; },
+  (p) => { p.shape = [{ min: 1, max: 1, class: 'unknown' }]; },
+  (p) => { p.shape = [{ min: 1, max: 1, oneOf: [] }]; },
+  (p) => { p.shape = [{ min: 1.5, max: 2, class: 'digit' }]; },
+  (p) => { p.shape = [{ min: 1, max: 1, literal: '' }]; },
+  (p) => { p.shape = [{ min: 1, max: 1, literal: 'x\n' }]; },
+  (p) => { p.shape = [{ min: 1, max: 1, ranges: [{ low: 'z', high: 'a' }] }]; },
+]) {
+  const rule = structuredClone(vectors.rules.find((r) => r.matcher.pattern));
+  change(rule.matcher.pattern); assert.throws(() => new RuntimeMatcher([rule]), PackLoadError);
+}
 for (const seed of ['a@.', 'bvn 22222222222222222222 ', '😀[REDACTED:previous.rule] ']) {
   const input = [...seed.repeat(65_536)].slice(0, 65_536).join('');
   assert.equal(fullRuntime.redact(input), input, 'Cap-sized adversarial near misses remain unchanged.');

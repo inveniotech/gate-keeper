@@ -1,7 +1,37 @@
 {
   "version": 1,
   "scope": "Authored unsigned source packs loaded with in-memory development signatures; not a published bundled pack.",
-  "redactionStatus": "Executable reference core; contract acceptance and framework integration remain separate.",
+  "redactionStatus": "Executable reference core against the owner-accepted contract; framework integration remains separate.",
+  "runtimeVersions": {
+    "adapterVersion": "0.1.0",
+    "packs": [
+      {
+        "id": "invenio.bvn",
+        "version": "2026.11.0",
+        "contentDigest": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
+      },
+      {
+        "id": "invenio.locations",
+        "version": "2026.11.0",
+        "contentDigest": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663"
+      },
+      {
+        "id": "invenio.nin",
+        "version": "2026.11.0",
+        "contentDigest": "ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c"
+      },
+      {
+        "id": "invenio.phone",
+        "version": "2026.11.0",
+        "contentDigest": "70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19"
+      },
+      {
+        "id": "invenio.processors",
+        "version": "2026.11.0",
+        "contentDigest": "bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636"
+      }
+    ]
+  },
   "rules": [
     {
       "id": "pii.bvn",
@@ -3628,36 +3658,31 @@
       "path": "rule-packs/bvn.pack.json",
       "id": "invenio.bvn",
       "version": "2026.11.0",
-      "contentDigest": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe",
-      "sha256": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
+      "contentDigest": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
     },
     {
       "path": "rule-packs/locations.pack.json",
       "id": "invenio.locations",
       "version": "2026.11.0",
-      "contentDigest": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663",
-      "sha256": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663"
+      "contentDigest": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663"
     },
     {
       "path": "rule-packs/nin.pack.json",
       "id": "invenio.nin",
       "version": "2026.11.0",
-      "contentDigest": "ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c",
-      "sha256": "ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c"
+      "contentDigest": "ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c"
     },
     {
       "path": "rule-packs/phone.pack.json",
       "id": "invenio.phone",
       "version": "2026.11.0",
-      "contentDigest": "70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19",
-      "sha256": "70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19"
+      "contentDigest": "70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19"
     },
     {
       "path": "rule-packs/processors.pack.json",
       "id": "invenio.processors",
       "version": "2026.11.0",
-      "contentDigest": "bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636",
-      "sha256": "bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636"
+      "contentDigest": "bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636"
     }
   ],
   "cases": [

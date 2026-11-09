@@ -1,6 +1,7 @@
 // P3-00: real native matcher, validator, scalar-span and redaction agreement.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { RuntimeMatcher, InputLimitError, validate } from '../../middleware/node/runtime.ts';
 import { ConsentCheck } from '../../middleware/node/consent.ts';
 import { ResponseFilter, ResponseFilterError } from '../../middleware/node/response.ts';
@@ -8,7 +9,25 @@ import './check-review.mjs';
 
 const vectors = JSON.parse(readFileSync(new URL('./vectors.json', import.meta.url), 'utf8'));
 const runtime = new RuntimeMatcher(vectors.rules, [], undefined, vectors.packs);
-assert.deepEqual(runtime.versions(), { adapterVersion: '0.1.0', packs: vectors.packs.map(({ id, version, contentDigest }) => ({ id, version, contentDigest })).sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0) });
+assert.deepEqual(runtime.versions(), vectors.runtimeVersions, 'Versions must match actual .NET loaded metadata.');
+assert.equal(runtime.versions().adapterVersion, JSON.parse(readFileSync(new URL('../../middleware/node/package.json', import.meta.url), 'utf8')).version);
+for (const pack of vectors.packs) {
+  const digest = createHash('sha256').update(readFileSync(new URL('../../' + pack.path, import.meta.url))).digest('hex');
+  assert.equal(pack.contentDigest, digest, 'Metadata must identify the actual source bytes.');
+  assert.equal(runtime.versions().packs.find((item) => item.id === pack.id)?.contentDigest, digest);
+}
+// Repository scopes belong to this scanner fixture, never to the runtime surface.
+function glob(pattern, path) {
+  const p = pattern.split('/'); const segments = path.split('/');
+  function walk(i, j) {
+    if (i === p.length) return j === segments.length;
+    if (p[i] === '**') return walk(i + 1, j) || j < segments.length && walk(i, j + 1);
+    const regex = '^' + p[i].split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$';
+    return j < segments.length && new RegExp(regex).test(segments[j]) && walk(i + 1, j + 1);
+  }
+  return walk(0, 0);
+}
+const scannerScopes = new Map();
 let checked = 0;
 function verify(sample, current) {
   assert.deepEqual(current.matches(sample.text), sample.runtimeExpected, `Native findings differ: ${sample.name}`);
@@ -20,7 +39,10 @@ function verify(sample, current) {
   checked++;
 }
 for (const sample of vectors.cases) {
-  const actual = runtime.matches(sample.text, sample.path).map(({ ruleId, severity, start, length }) => ({ ruleId, severity, start, length }));
+  if (!scannerScopes.has(sample.path)) scannerScopes.set(sample.path, new RuntimeMatcher(vectors.rules.filter((rule) => {
+    const paths = rule.matcher.pattern?.location?.paths; return !paths?.length || paths.some((pattern) => glob(pattern, sample.path));
+  })));
+  const actual = scannerScopes.get(sample.path).matches(sample.text).map(({ ruleId, severity, start, length }) => ({ ruleId, severity, start, length }));
   const expected = sample.expected.map(({ ruleId, severity, start, length }) => ({ ruleId, severity, start, length }));
   assert.deepEqual(actual, expected, `Scanner per-rule parity differs: ${sample.name}`);
   verify(sample, runtime);
@@ -89,6 +111,6 @@ for (const sample of behaviour.response.cases) {
 }
 assert.throws(() => new ResponseFilter(responseRuntime, ['/bad~9path']), TypeError);
 const wildcard = new ResponseFilter(responseRuntime, ['/customers/*/phone']);
-assert.throws(() => wildcard.transform({ customers: [{ phone: 'marker' }, { phone: 'x'.repeat(65_537) }] }), ResponseFilterError);
-assert.throws(() => wildcard.transform({ customers: [{ phone: '\ud800' }] }), ResponseFilterError);
+assert.throws(() => wildcard.transform({ customers: [{ phone: 'marker' }, { phone: 'x'.repeat(65_537) }] }, { contentType: 'application/json' }), ResponseFilterError);
+assert.throws(() => wildcard.transform({ customers: [{ phone: '\ud800' }] }, { contentType: 'application/json' }), ResponseFilterError);
 console.log(`Node native matching/redaction passed ${checked} cases; four validators, consent and ${behaviour.response.cases.length} atomic response cases passed.`);

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /** Native runtime matching over already validated and verified rule data. No I/O. */
+import { adapterVersion } from './version.ts';
 export interface ShapePart {
   readonly min: number; readonly max: number; readonly emit?: boolean;
   readonly literal?: string; readonly class?: 'digit' | 'alnum';
@@ -25,6 +26,7 @@ export class InputLimitError extends Error { constructor() { super('Middleware i
 export class PackLoadError extends Error { constructor() { super('Middleware rule data is invalid. Load a verified compatible signed pack.'); this.name = 'PackLoadError'; } }
 
 const fold = (value: string): string => value.replace(/[A-Z]/g, (c) => c.toLowerCase());
+const printable = (value: string): boolean => value.length > 0 && !/[^\x20-\x7e]/.test(value);
 const ordinal = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 const digit = (value: string | undefined): boolean => value !== undefined && /^[0-9]$/.test(value);
 const alnum = (value: string | undefined): boolean => value !== undefined && /^[0-9A-Za-z]$/.test(value);
@@ -62,19 +64,6 @@ export function validate(value: string, parameters: Validator): boolean {
     }
     default: throw new PackLoadError();
   }
-}
-
-/** Matches the existing restricted repository glob, for scanner parity vectors only. */
-function glob(pattern: string, path: string): boolean {
-  const parts = pattern.split('/'); const segments = path.split('/');
-  function walk(i: number, j: number): boolean {
-    if (i === parts.length) return j === segments.length;
-    if (parts[i] === '**') return walk(i + 1, j) || (j < segments.length && walk(i, j + 1));
-    if (j === segments.length) return false;
-    const expression = '^' + parts[i]!.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$';
-    return new RegExp(expression).test(segments[j]!) && walk(i + 1, j + 1);
-  }
-  return walk(0, 0);
 }
 
 interface ShapeMatch { readonly end: number; readonly emitStart?: number; readonly emitLength?: number }
@@ -215,6 +204,10 @@ export class RuntimeMatcher {
       if (p && (p.shape.length < 1 || p.shape.length > 32 || p.shape.filter((part) => part.emit).length > 1
         || p.shape.some((part) => !Number.isInteger(part.min) || !Number.isInteger(part.max)
           || part.min < 0 || part.min > part.max || part.max > 64 || part.max < 1 || part.oneOf && (part.max !== 1 || part.oneOf.length === 0)
+          || part.class !== undefined && !['digit', 'alnum'].includes(part.class)
+          || part.literal !== undefined && !printable(part.literal)
+          || part.oneOf?.some((word) => !printable(word))
+          || part.ranges !== undefined && (part.ranges.length === 0 || part.ranges.some((r) => r.low.length !== 1 || r.high.length !== 1 || !printable(r.low) || !printable(r.high) || r.low > r.high))
           || [part.literal, part.class, part.ranges, part.oneOf].filter((atom) => atom !== undefined).length !== 1)
         || p.shape.reduce((sum, part) => sum + part.max * (part.literal ? [...part.literal].length : part.oneOf ? Math.max(...part.oneOf.map((word) => [...word].length)) : 1), 0) > 256))
         throw new PackLoadError();
@@ -224,11 +217,11 @@ export class RuntimeMatcher {
 
   /** Returns exact loaded identities; application input never enters version reporting. */
   versions(): Readonly<{ adapterVersion: string; packs: readonly PackVersion[] }> {
-    return Object.freeze({ adapterVersion: '0.1.0', packs: Object.freeze([...this.packs]) });
+    return Object.freeze({ adapterVersion, packs: Object.freeze([...this.packs]) });
   }
 
-  /** Returns every rule's own finding. A path is accepted only by scanner parity tests. */
-  matches(text: string, path?: string): Finding[] {
+  /** Returns every rule's own finding; no repository path or scan policy is accepted. */
+  matches(text: string): Finding[] {
     const all = scalars(text); const result: Finding[] = [];
     const ranges: [number, number][] = []; let cursor = 0; let utf16Cursor = 0;
     // Regex indices are UTF-16; translate only this fixed reserved-mask grammar.
@@ -252,7 +245,6 @@ export class RuntimeMatcher {
           }
           continue;
         }
-        if (path && p.location?.paths?.length && !p.location.paths.some((pattern) => glob(pattern, path))) continue;
         if (p.keywords?.length && !p.keywords.some((keyword) => foldedText.includes(fold(keyword)))) continue;
         if (p.shape.some((part) => part.min > 0 && (part.literal !== undefined || part.oneOf !== undefined)
           && !(part.oneOf ?? [part.literal!]).some((word) => foldedText.includes(fold(word))))) continue;

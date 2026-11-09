@@ -15,6 +15,7 @@ jobs:
           dotnet-version: '10.0.403'
       - name: Verify engine-generated vectors and pack digests
         run: |
+          pwsh -NoProfile -File tests/conformance/Sync-RuntimeVersion.ps1 -Check
           dotnet restore --locked-mode
           dotnet test tests/Corpus.Tests -c Release --no-restore --filter FullyQualifiedName~ConformanceExportTests
           dotnet test tests/Engine.Tests -c Release --no-restore --filter 'FullyQualifiedName~RuntimeMatcherTests|FullyQualifiedName~ConsentCheckTests|FullyQualifiedName~ResponseFilterTests'

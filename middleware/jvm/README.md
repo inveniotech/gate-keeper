@@ -28,6 +28,17 @@ types fail closed. All runtime matcher exceptions become content-free response
 failures. Provider cancellation without caller thread interruption returns
 unknown with a diagnostic; caller interruption still propagates.
 
+The core has no repository-path matching overload; scanner scopes live in the
+test fixture. Startup validation rejects unknown boundaries and validators,
+invalid windows and malformed shape atoms. Null disabled-rule sets mean none.
+The host owns bounded parsing; this core adds no stack-specific depth cap and
+passes unprotected responses through without inspecting their trees.
+
+`BuildVersion.java` is generated from `middleware/version.txt` using
+`tests/conformance/Sync-RuntimeVersion.ps1`. Conformance compares reported metadata
+with actual .NET loader output and independently hashed source pack bytes.
+Metadata supplied by the loader remains a trust boundary, not signature proof.
+
 ## Validate
 
 ```sh

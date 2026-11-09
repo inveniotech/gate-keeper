@@ -39,7 +39,21 @@ public sealed partial class ConformanceExportTests
             json.WriteStartObject();
             json.WriteNumber("version", 1);
             json.WriteString("scope", "Authored unsigned source packs loaded with in-memory development signatures; not a published bundled pack.");
-            json.WriteString("redactionStatus", "Executable reference core; contract acceptance and framework integration remain separate.");
+            json.WriteString("redactionStatus", "Executable reference core against the owner-accepted contract; framework integration remains separate.");
+            var versions = runtime.Versions();
+            json.WriteStartObject("runtimeVersions"); json.WriteString("adapterVersion", versions.AdapterVersion); json.WriteStartArray("packs");
+            foreach (var metadata in versions.Packs)
+            {
+                var source = paths.Single(path =>
+                {
+                    using var document = JsonDocument.Parse(File.ReadAllBytes(path));
+                    return document.RootElement.GetProperty("id").GetString() == metadata.Id;
+                });
+                metadata.ContentDigest.Should().Be(Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(source))));
+                json.WriteStartObject(); json.WriteString("id", metadata.Id); json.WriteString("version", metadata.Version);
+                json.WriteString("contentDigest", metadata.ContentDigest); json.WriteEndObject();
+            }
+            json.WriteEndArray(); json.WriteEndObject();
             json.WriteStartArray("rules");
             foreach (var rule in rules) JsonSerializer.Serialize(json, rule, EngineJsonSerializerContext.Default.Rule);
             json.WriteEndArray();
@@ -52,7 +66,6 @@ public sealed partial class ConformanceExportTests
                 json.WriteString("id", pack.RootElement.GetProperty("id").GetString());
                 json.WriteString("version", pack.RootElement.GetProperty("version").GetString());
                 json.WriteString("contentDigest", Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))));
-                json.WriteString("sha256", Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))));
                 json.WriteEndObject();
             }
             json.WriteEndArray();

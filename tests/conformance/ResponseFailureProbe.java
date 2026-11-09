@@ -8,7 +8,7 @@ public final class ResponseFailureProbe {
     public static void run() {
         Map<String, Object> body = Map.of("phone", "marker");
         ResponseFilter filter = new ResponseFilter(text -> { throw new RuntimeMatcher.PackLoadException(); }, List.of("/phone"));
-        try { filter.transform(body); }
+        try { filter.transform(body, true, false, "application/json"); }
         catch (ResponseFilter.ResponseFilterException error) {
             if (error.abortRequired || error.getCause() != null || !body.get("phone").equals("marker")) throw new IllegalStateException("Unsafe protected failure.");
             return;

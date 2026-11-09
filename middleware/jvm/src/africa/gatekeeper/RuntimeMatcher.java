@@ -44,39 +44,37 @@ public final class RuntimeMatcher {
     }
     public RuntimeMatcher(List<Map<String, Object>> input, Set<String> disabled, Consumer<String> diagnostic, List<Map<String, Object>> metadata) {
         if (input == null || input.isEmpty()) throw new PackLoadException();
+        Set<String> off = disabled == null ? Set.of() : Set.copyOf(disabled);
         List<Rule> prepared = new ArrayList<>(); Set<String> ids = new HashSet<>();
         for (Map<String, Object> value : input) {
             Rule rule = new Rule(value); if (!ids.add(rule.id)) throw new PackLoadException(); prepared.add(rule);
         }
-        for (String id : disabled) if (prepared.stream().noneMatch(rule -> rule.id.equals(id) && rule.optional))
+        for (String id : off) if (prepared.stream().noneMatch(rule -> rule.id.equals(id) && rule.optional))
             throw new IllegalArgumentException("Only a loaded optional rule may be disabled.");
-        if (!disabled.isEmpty()) {
+        if (!off.isEmpty()) {
             if (diagnostic == null) throw new IllegalArgumentException("Optional disablement needs a start-up diagnostic.");
-            diagnostic.accept("Disabled optional redaction rules: " + String.join(", ", new TreeSet<>(disabled)));
+            diagnostic.accept("Disabled optional redaction rules: " + String.join(", ", new TreeSet<>(off)));
         }
-        prepared.removeIf(rule -> disabled.contains(rule.id)); rules = List.copyOf(prepared);
+        prepared.removeIf(rule -> off.contains(rule.id)); rules = List.copyOf(prepared);
         List<Map<String, Object>> selected = new ArrayList<>();
         for (Map<String, Object> pack : metadata) selected.add(Map.of("id", pack.get("id"), "version", pack.get("version"), "contentDigest", pack.get("contentDigest")));
         selected.sort(Comparator.comparing(pack -> string(pack.get("id")))); packs = List.copyOf(selected);
     }
 
     /** Version reporting contains only code and loaded-pack identities. */
-    public Map<String, Object> versions() { return Map.of("adapterVersion", "0.1.0", "packs", packs); }
+    public Map<String, Object> versions() { return Map.of("adapterVersion", BuildVersion.VALUE, "packs", packs); }
 
     /** All runtime matches; context and repository paths never select runtime rules. */
-    public List<Finding> matches(String text) { return matches(text, null); }
-
-    /** The optional path is used only by scanner parity tests. */
-    public List<Finding> matches(String text, String path) {
+    public List<Finding> matches(String text) {
         int[] chars = scalars(text); List<Finding> result = new ArrayList<>(); int cursor = 0, utf16Cursor = 0;
         var masks = MASK.matcher(text);
         while (masks.find()) {
             int start = cursor + text.codePointCount(utf16Cursor, masks.start());
-            matchSegment(Arrays.copyOfRange(chars, cursor, start), cursor, path, result);
+            matchSegment(Arrays.copyOfRange(chars, cursor, start), cursor, result);
             cursor = start + text.codePointCount(masks.start(), masks.end());
             utf16Cursor = masks.end();
         }
-        matchSegment(Arrays.copyOfRange(chars, cursor, chars.length), cursor, path, result);
+        matchSegment(Arrays.copyOfRange(chars, cursor, chars.length), cursor, result);
         result.sort(Comparator.comparingInt((Finding item) -> item.start).thenComparing(item -> item.ruleId).thenComparingInt(item -> item.length));
         return List.copyOf(result);
     }
@@ -117,7 +115,7 @@ public final class RuntimeMatcher {
         return text.codePoints().toArray();
     }
 
-    private void matchSegment(int[] chars, int base, String path, List<Finding> result) {
+    private void matchSegment(int[] chars, int base, List<Finding> result) {
         String text = new String(chars, 0, chars.length), folded = fold(text);
         int[] scalarOffsets = new int[text.length() + 1]; int utf16 = 0;
         for (int at = 0; at < chars.length; at++) { scalarOffsets[utf16] = at; utf16 += Character.charCount(chars[at]); scalarOffsets[utf16] = at + 1; }
@@ -131,8 +129,6 @@ public final class RuntimeMatcher {
                 continue;
             }
             Map<String, Object> p = rule.pattern;
-            Map<String, Object> location = map(p.get("location")); List<String> paths = strings(location.get("paths"));
-            if (path != null && !paths.isEmpty() && paths.stream().noneMatch(glob -> glob(glob, path))) continue;
             List<String> keywords = strings(p.get("keywords"));
             if (!keywords.isEmpty() && keywords.stream().noneMatch(word -> folded.contains(fold(word)))) continue;
             if (rule.parts.stream().anyMatch(part -> part.min > 0 && !part.alternatives.isEmpty()
@@ -175,6 +171,13 @@ public final class RuntimeMatcher {
             Map<String, Object> matcher = map(raw.get("matcher"));
             if ((matcher.get("pattern") == null) == (matcher.get("list") == null)) throw new PackLoadException();
             pattern = matcher.get("pattern") == null ? null : map(immutable(matcher.get("pattern")));
+            if (pattern != null) {
+                if (!List.of("none", "digit", "alnum").contains(pattern.get("boundary"))) throw new PackLoadException();
+                if (pattern.get("validator") != null && !List.of("digits-length", "nuban", "ng-phone-prefix", "email-not-example-domain")
+                    .contains(map(pattern.get("validator")).get("name"))) throw new PackLoadException();
+                if (!strings(pattern.get("keywords")).isEmpty() && (!integer(pattern.get("window"))
+                    || number(pattern.get("window"), 0) < 1 || number(pattern.get("window"), 0) > 4096)) throw new PackLoadException();
+            }
             List<Part> parsed = new ArrayList<>(); int width = 0, emits = 0;
             if (pattern != null) for (Object value : list(pattern.get("shape"))) {
                 Part part = new Part(map(value)); parsed.add(part); width += part.max * part.width;
@@ -189,13 +192,20 @@ public final class RuntimeMatcher {
         final int min, max, width; final boolean emit; final String kind;
         final List<int[]> alternatives; final List<int[]> ranges;
         Part(Map<String, Object> raw) {
+            if (!integer(raw.get("min")) || !integer(raw.get("max"))) throw new PackLoadException();
+            int atoms = 0; for (String key : List.of("literal", "class", "ranges", "oneOf")) if (raw.containsKey(key)) atoms++;
+            if (atoms != 1 || raw.containsKey("class") && !List.of("digit", "alnum").contains(raw.get("class"))) throw new PackLoadException();
+            if (raw.containsKey("oneOf") && (!(raw.get("oneOf") instanceof List<?>) || list(raw.get("oneOf")).isEmpty())) throw new PackLoadException();
             min = number(raw.get("min"), -1); max = number(raw.get("max"), -1); emit = Boolean.TRUE.equals(raw.get("emit")); kind = string(raw.get("class"));
             List<String> words = new ArrayList<>(strings(raw.get("oneOf"))); if (raw.get("literal") != null) words.add(string(raw.get("literal")));
             words.sort(Comparator.comparingInt((String value) -> value.codePointCount(0, value.length())).reversed().thenComparing(Comparator.naturalOrder()));
             alternatives = new ArrayList<>(); int size = 1;
-            for (String word : words) { if (word.isEmpty()) throw new PackLoadException(); int[] points = word.codePoints().toArray(); alternatives.add(points); size = Math.max(size, points.length); }
+            for (String word : words) { if (!word.matches("[ -~]+")) throw new PackLoadException(); int[] points = word.codePoints().toArray(); alternatives.add(points); size = Math.max(size, points.length); }
+            if (raw.containsKey("ranges") && (!(raw.get("ranges") instanceof List<?>) || list(raw.get("ranges")).isEmpty())) throw new PackLoadException();
             ranges = new ArrayList<>(); for (Object range : list(raw.get("ranges"))) {
-                Map<String, Object> pair = map(range); ranges.add(new int[] { string(pair.get("low")).codePointAt(0), string(pair.get("high")).codePointAt(0) });
+                Map<String, Object> pair = map(range); String low = string(pair.get("low")), high = string(pair.get("high"));
+                if (!low.matches("[ -~]") || !high.matches("[ -~]") || low.compareTo(high) > 0) throw new PackLoadException();
+                ranges.add(new int[] { low.codePointAt(0), high.codePointAt(0) });
             }
             if (min < 0 || max < 1 || max > 64 || min > max || raw.get("oneOf") != null && max != 1) throw new PackLoadException(); width = size;
         }
@@ -324,14 +334,6 @@ public final class RuntimeMatcher {
         int[] days = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         return y >= 1900 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && d <= days[m - 1];
     }
-    private static boolean glob(String pattern, String path) { return globParts(pattern.split("/", -1), path.split("/", -1), 0, 0); }
-    private static boolean globParts(String[] p, String[] path, int i, int j) {
-        if (i == p.length) return j == path.length;
-        if (p[i].equals("**")) return globParts(p, path, i + 1, j) || j < path.length && globParts(p, path, i, j + 1);
-        if (j == path.length) return false;
-        String expression = "^" + String.join(".*", Arrays.stream(p[i].split("\\*", -1)).map(Pattern::quote).toArray(String[]::new)) + "$";
-        return path[j].matches(expression) && globParts(p, path, i + 1, j + 1);
-    }
     private static boolean equalsAt(int[] text, int at, int[] word, boolean folded) {
         if (at + word.length > text.length) return false;
         for (int i = 0; i < word.length; i++) if ((folded ? fold(text[at + i]) : text[at + i]) != (folded ? fold(word[i]) : word[i])) return false;
@@ -345,6 +347,11 @@ public final class RuntimeMatcher {
     private static String fold(String value) { return value.codePoints().collect(StringBuilder::new, (out, c) -> out.appendCodePoint(fold(c)), StringBuilder::append).toString(); }
     public static String string(Object value) { return value instanceof String ? (String) value : ""; }
     private static int number(Object value, int fallback) { return value instanceof Number ? ((Number) value).intValue() : fallback; }
+    private static boolean integer(Object value) {
+        if (!(value instanceof Number)) return false;
+        double number = ((Number) value).doubleValue();
+        return Double.isFinite(number) && number == Math.rint(number) && number >= Integer.MIN_VALUE && number <= Integer.MAX_VALUE;
+    }
     public static Map<String, Object> map(Object value) {
         Map<String, Object> result = new LinkedHashMap<>();
         if (value instanceof Map<?, ?>) for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {

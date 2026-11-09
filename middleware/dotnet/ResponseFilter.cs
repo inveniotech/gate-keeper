@@ -40,7 +40,7 @@ public sealed class ResponseFilter
     /// <param name="lengthKnown">False means streaming and must fail when protected.</param>
     /// <param name="headersCommitted">True requires the host to abort on failure.</param>
     /// <param name="contentType">Only application/json or application/*+json is supported.</param>
-    public JsonNode? Transform(JsonNode? body, bool lengthKnown = true, bool headersCommitted = false, string? contentType = "application/json")
+    public JsonNode? Transform(JsonNode? body, bool lengthKnown = true, bool headersCommitted = false, string? contentType = null)
     {
         if (paths.Length == 0) return body?.DeepClone();
         var media = (contentType ?? "").Split(';')[0].Trim();

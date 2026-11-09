@@ -23,7 +23,6 @@ public final class ResponseFilter {
         final Map<String, Node> fields;
         final List<Node> elements;
         Node(Object input, int depth) {
-            if (depth > 64) throw new ResponseFilterException(false);
             if (input instanceof Map<?, ?>) {
                 fields = new LinkedHashMap<>(); elements = null;
                 for (Map.Entry<?, ?> entry : ((Map<?, ?>) input).entrySet()) {
@@ -68,9 +67,9 @@ public final class ResponseFilter {
         }
         paths = List.copyOf(parsed);
     }
-    public Object transform(Object body) { return transform(body, true, false, "application/json"); }
+    public Object transform(Object body) { return transform(body, true, false, null); }
     public Object transform(Object body, boolean lengthKnown, boolean headersCommitted, String contentType) {
-        if (paths.isEmpty()) return new Node(body, 0).result();
+        if (paths.isEmpty()) return body;
         String media = contentType == null ? "" : contentType.split(";", -1)[0].trim().toLowerCase(Locale.ROOT);
         if (!lengthKnown || headersCommitted || !(media.equals("application/json") || media.startsWith("application/") && media.endsWith("+json")))
             throw new ResponseFilterException(headersCommitted);

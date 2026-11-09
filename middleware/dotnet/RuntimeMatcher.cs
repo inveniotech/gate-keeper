@@ -83,7 +83,7 @@ public sealed class RuntimeMatcher
                 : rule;
         }).ToArray();
         matcher = new MatcherEngine(rules, shapes: shapes);
-        versions = new RuntimeVersions("0.1.0", Array.AsReadOnly(verified.Packs.OrderBy(pack => pack.Id, StringComparer.Ordinal)
+        versions = new RuntimeVersions(RuntimeBuildVersion.Value, Array.AsReadOnly(verified.Packs.OrderBy(pack => pack.Id, StringComparer.Ordinal)
             .Select(pack => new RuntimePackVersion(pack.Id, pack.Version, pack.ContentDigest)).ToArray()));
     }
 
