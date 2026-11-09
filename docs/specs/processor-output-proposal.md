@@ -1,10 +1,11 @@
 # Processor catalogue output proposal
 
-**Status: draft — not accepted.** P2-12 (#64), IQ-82; NFR-004, NFR-009,
-NFR-020, NFR-027 and NFR-031. This document proposes the remaining user-facing
-catalogue integration. It does not alter results-format v1 or its schemas.
-Owner acceptance is required before implementing the public contract change
-(rules 1, 15 and 24 of [AGENTS.md](../../AGENTS.md)).
+**Status: version policy approved by the owner on 9 November 2026; remaining
+proposal is draft.** P2-12 (#64), IQ-82; NFR-004, NFR-009, NFR-020, NFR-027
+and NFR-031. The owner selected the additive amendment path in pull request
+#124. This records that decision; it does not claim approval of the remaining
+data mapping or legal-adjacent console wording. The current writers and schemas
+are unchanged (rules 1, 15 and 24 of [AGENTS.md](../../AGENTS.md)).
 
 ## Problem and completed work
 
@@ -32,15 +33,12 @@ work is output integration, not a second catalogue. Note severity, the verbatim
 citation and the distinction between technical integration evidence and an
 organisation's actual processing arrangement must remain intact.
 
-## Proposed version policy
+## Owner-approved version policy
 
-Two routes are open. This proposal recommends the first, because it is the
-route the owner already accepted for `packs`. The second is specified in full
-so the owner can choose it instead. Choosing the second means the owner has
-decided that adding the field is an incompatible contract change, which rule 24
-then requires to ship in a product major.
-
-### Recommended: an additive amendment of v1
+On 9 November 2026 the owner approved the additive amendment of v1. The version
+2 alternative is not selected. The compatibility boundary remains explicit:
+validators pinned to older closed schema artefacts reject the new field, while
+existing documents that omit it remain valid against the amended schemas.
 
 Keep evidence schema version 1 and the SARIF profile identifier ending in
 `/sarif-profile/v1.json`. Keep the SARIF standard version at 2.1.0. Publish the
@@ -51,23 +49,6 @@ There is no new CLI flag and no product major. Existing v1 fixtures that omit
 `processor` keep validating. The writer card updates both schemas, this
 proposal's successor text in the results format, and the artefact version in
 the same pull request.
-
-### Alternative: evidence schema 2 and a SARIF profile 2
-
-Use this route when the owner rejects another additive amendment.
-
-Add an evidence schema whose identifier ends in `/gk-results/v2.json`, with
-`schemaVersion` of 2, and a SARIF profile whose identifier ends in
-`/sarif-profile/v2.json`. The SARIF standard version stays 2.1.0. Keep the v1
-schemas and the v1 writer for consumers that pin them. Version 1 output never
-contains `processor`. Version 2 is the only output that carries it. Ship the
-change in a product major.
-
-The CLI surface for that route is one flag, `--results-version`, with values
-`1` and `2`. It selects the contract for the evidence file and the SARIF log
-together. The default is `1` until the major that introduces version 2, and
-`2` from that major on. No second flag is added. Accepting this alternative
-includes accepting that flag and those defaults.
 
 ## Proposed data mapping
 
@@ -112,11 +93,10 @@ the first occurrence. Identical bytes come from writing that loaded rule. A
 second run of the same load matches. Reordering the categories on the winning
 rule reorders the output.
 
-Neither route changes fingerprint inputs or the fingerprint key name. SARIF
+The additive amendment changes neither fingerprint inputs nor the fingerprint key name. SARIF
 `partialFingerprints` keeps its only name, `gatekeeper/v1`. The evidence
 `fingerprint` field stays that same value. A schema or profile version in a
-file name does not rename the key. Under the alternative route, version 2 uses
-`gatekeeper/v1` as well.
+file name does not rename the key.
 
 The object below is copied from the authored rule `transfer.processor.aws`. It
 shows the metadata object only. It is not a complete evidence document, and the
@@ -161,12 +141,12 @@ describe the catalogue snapshot, not a verified inventory of the customer's data
 4. The existing threshold tests still pass. These rules are notes, and this
    card leaves the default error threshold and the error-level false-positive
    gate on their current definitions.
-5. Documents validate against the schema artefact of the accepted policy. Tests
+5. Documents validate against schema artefact 1.3.0 under the approved additive policy. Tests
    reject an unknown metadata key, a category that is not a string, an empty
-   category array and a missing `usualRegion`. Under the recommended policy,
+   category array and a missing `usualRegion`. Under the approved policy,
    current fixtures that omit `processor` still validate, and the v1 schemas
-   gain only the optional object. Under the alternative, the v1 schemas and
-   fixtures stay unchanged and a version 2 document fails version 1 validation.
+   gain only the optional object. Evidence schema version remains 1 and the
+   SARIF standard version remains 2.1.0. No CLI version flag is introduced.
 6. A synthetic marker in matched input never appears in metadata, diagnostics,
    support bundles or documents. No new network code or dependency is added.
 7. Generated reference material is regenerated from rule data. A linked website
@@ -174,15 +154,14 @@ describe the catalogue snapshot, not a verified inventory of the customer's data
 
 ## Implementation handoff
 
-After the owner accepts one of the two version policies, and accepts or amends
-the console sentence, split implementation into a public results-contract and
+The additive version policy is approved. After the owner accepts or amends the
+remaining mapping and console sentence, split implementation into a public results-contract and
 writer card plus a linked website guide card. Extend the existing writer and
 source-generated serialisation; do not add a second result pipeline. Publish
-schema artefact 1.3.0 on the recommended route, or the version 2 schemas on the
-alternative, and add deterministic schema tests in the writer PR. Reuse the
+schema artefact 1.3.0 and add deterministic schema tests in the writer PR. Reuse the
 existing processor corpus and combined synthetic report.
 
-Do not close #64 on this proposal. Owner acceptance of the policy and of the
+Do not close #64 on this proposal. Owner acceptance of the remaining mapping and
 console sentence, the writer and schema work, and the linked website guide
 remain pending. Production signing, catalogue publication and actual customer
 transfer analysis remain outside this card.
