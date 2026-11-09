@@ -8,7 +8,7 @@
     },
     {
       "path": "rulepack.schema.json",
-      "sha256": "1da4d314677c75cae0fb8ff51159a1947b37438e175a38242190cd2aa5b2dacc"
+      "sha256": "c0bad0d297028acfc2b4767f5945a1fbc1a05007391b56d4f7af1cb14677cbc0"
     },
     {
       "path": "sarif-profile.schema.json",
