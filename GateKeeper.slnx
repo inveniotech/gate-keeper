@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/middleware/">
+    <Project Path="middleware/dotnet/InvenioTech.GateKeeper.Middleware.csproj" />
+  </Folder>
   <Folder Name="/cli/">
     <Project Path="cli/InvenioTech.GateKeeper.Cli.csproj" />
   </Folder>
@@ -9,6 +12,7 @@
     <Project Path="src/Signing/InvenioTech.GateKeeper.Signing.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/conformance/NativeProbe/MiddlewareNativeProbe.csproj" />
     <Project Path="tests/InvenioTech.GateKeeper.Tests/InvenioTech.GateKeeper.Tests.csproj" />
     <Project Path="tests/Engine.Tests/InvenioTech.GateKeeper.Engine.Tests.csproj" />
     <Project Path="tests/Signing.Tests/InvenioTech.GateKeeper.Signing.Tests.csproj" />

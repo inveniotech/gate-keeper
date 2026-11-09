@@ -48,19 +48,29 @@ public static class CliModule
     }
 
     /// <summary>Runs an invocation asynchronously. The optional root supplies the repository for baseline; defaults to the current directory. Cancellation propagates.</summary>
-    public static async Task<int> RunAsync(string[] args, TextWriter? output = null, TextWriter? errors = null,
+    public static Task<int> RunAsync(string[] args, TextWriter? output = null, TextWriter? errors = null,
         string? rootPath = null, CancellationToken cancellationToken = default)
+        => RunCoreAsync(args, output, errors, rootPath, null, cancellationToken);
+
+    // Internal composition seam: semantic corpus tests retain real matching without elapsed-time assumptions.
+    internal static Task<int> RunWithMatcherFactoryAsync(string[] args, TextWriter output, TextWriter errors,
+        string rootPath, Func<IReadOnlyList<Rule>, MatcherEngine> matcherFactory, CancellationToken cancellationToken = default)
+        => RunCoreAsync(args, output, errors, rootPath, matcherFactory, cancellationToken);
+
+    private static async Task<int> RunCoreAsync(string[] args, TextWriter? output, TextWriter? errors,
+        string? rootPath, Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory, CancellationToken cancellationToken)
     {
         output ??= Console.Out;
         errors ??= Console.Error;
-        var parsed = PrepareInvocation(args, output, errors, rootPath);
+        var parsed = PrepareInvocation(args, output, errors, rootPath, matcherFactory);
         return parsed is null ? (int)ExitOutcome.ToolError
             : await parsed.InvokeAsync(new InvocationConfiguration { Output = output, Error = errors }, cancellationToken).ConfigureAwait(false);
     }
 
-    private static ParseResult? PrepareInvocation(string[] args, TextWriter output, TextWriter errors, string? rootPath)
+    private static ParseResult? PrepareInvocation(string[] args, TextWriter output, TextWriter errors, string? rootPath,
+        Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory = null)
     {
-        var rootCommand = BuildCommandTree(output, errors, rootPath);
+        var rootCommand = BuildCommandTree(output, errors, rootPath, matcherFactory);
         var parsed = rootCommand.Parse(args);
         if (parsed.Errors.Count > 0)
         {
@@ -76,7 +86,8 @@ public static class CliModule
         return parsed;
     }
 
-    private static RootCommand BuildCommandTree(TextWriter output, TextWriter errors, string? rootPath)
+    private static RootCommand BuildCommandTree(TextWriter output, TextWriter errors, string? rootPath,
+        Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory)
     {
         var rootCommand = new RootCommand(
             "Scans a repository for personal data that the Nigeria Data Protection Act 2023 protects. " +
@@ -92,7 +103,7 @@ public static class CliModule
         rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
         rootCommand.Subcommands.Add(BaselineCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(DoctorCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
-        rootCommand.Subcommands.Add(SupportBundleCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
+        rootCommand.Subcommands.Add(SupportBundleCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory(), matcherFactory));
         rootCommand.Subcommands.Add(new Command("version", "Prints the product version and the bundled pack version")
         {
             Action = new PrintVersionAction(output),

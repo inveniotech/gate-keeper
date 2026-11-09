@@ -58,7 +58,9 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage"
+        # The detection-quality job measures coverage with its pinned tool and enforces the floor.
+        # This matrix has no XPlat collector dependency; every test still runs on every platform.
+        run: dotnet test --configuration Release --no-restore
 
   aot:
     name: AOT and trim warnings as errors
