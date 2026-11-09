@@ -10,6 +10,11 @@ across classes. It includes generated engine code and does not remove uncovered
 lines. Missing, malformed, empty or ambiguous reports fail closed. Exactly
 80 per cent passes; 79.9 per cent fails without rounding.
 
+The platform test matrix runs every test without requesting the uninstalled
+`XPlat Code Coverage` collector. Coverage collection and the unchanged 80 per cent
+gate belong to the dedicated detection-quality job above. No collector package
+is added to shipped code or test projects.
+
 ```powershell
 ./ci/guardrails/Test-EngineCoverageGate.ps1
 dotnet-coverage collect 'dotnet test -c Release --no-restore' -f cobertura -o artifacts/coverage/solution.cobertura.xml
