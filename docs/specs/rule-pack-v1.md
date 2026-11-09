@@ -29,6 +29,7 @@ Normative text in this specification comes from the recorded decisions listed he
 | IQ-76 | Decided | `redaction.optional` defaults to false; only a pack may set it true. |
 | IQ-80 | Decided | `contentDigest` is lowercase-hex SHA-256 of the content bytes. |
 | IQ-82 | Decided | The optional `processor` block: `dataCategories` and `usualRegion`. Catalogue findings are data, not an engine special case. |
+| IQ-91 | Decided by the owner in the implementation session, 9 November 2026 | The `email` match boundary (sections 5.1 and 7.5): the leading neighbour set is ASCII letters, digits and `.`, `_`, `%`, `+`, `-`; the trailing set leaves out `.` so a sentence-ending dot after the domain does not reject the match. A pack that carries `boundary: "email"` sets `minEngineVersion` to 0.2.0 or newer. |
 | P0-16 | Decided | The spike report [`spikes/aot/report.md`](../../spikes/aot/report.md) measured `RegexOptions.NonBacktracking` inside the per-file budget and is the input this card depends on. |
 
 The register entry recording IQ-14 and IQ-36 as decided is an owner task. This specification cites the identifier; it does not write down the register location, because no public document may describe or link to a private repository (rule 29).
@@ -42,6 +43,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 | Version | Date | Change |
 |---|---|---|
 | 1 (draft) | 1 November 2026 | First draft. |
+| 2 (draft) | 9 November 2026 | Added the `email` match boundary to sections 5.1 and 7.5 (IQ-91, issue 112). Additive against schema version 1. |
 
 ---
 
@@ -193,7 +195,7 @@ A rule has exactly one matcher.
 |---|---|---|---|
 | `shape` | array | yes | The structured shape (section 7). |
 | `validator` | object | no | A named validator (section 8). |
-| `boundary` | string | yes | `none`, `digit` or `alnum`. |
+| `boundary` | string | yes | `none`, `digit`, `alnum` or `email`. |
 | `keywords` | array | no | The literal prefilter (section 7.4). |
 | `window` | integer | no | The prefilter window in scalar values; at most 4,096 (section 7.4). |
 | `location` | object | no | `kind` plus path globs (section 5.3). |
@@ -201,7 +203,7 @@ A rule has exactly one matcher.
 | `excludePrefixes` | array | no | Prefixes that void a match (section 8). |
 | `excludeValues` | array | no | Exact values that void a match (section 8). |
 
-`boundary` is one of `none`, `digit` or `alnum`. It is a field, not a look-around: the shape language has no place to write a zero-width assertion.
+`boundary` is one of `none`, `digit`, `alnum` or `email`. It is a field, not a look-around: the shape language has no place to write a zero-width assertion.
 
 ### 5.2 List matcher
 
@@ -253,7 +255,9 @@ Keywords stay a separate list from the shape. They are the literal prefilter: wh
 
 ### 7.5 Indexes and the resume rule
 
-Input is a sequence of Unicode scalar values. Indexes, windows and the 64 KiB middleware cap are counted in scalar values, so a match never splits a character and the four languages agree on positions. `boundary` is a field (`none`, `digit`, `alnum`). The resume rule is: a rejected match resumes at match start plus one scalar value; an accepted match resumes at match end. This is what stops a 12-digit run from hiding an 11-digit value. P1-06 implements the search; P3-00 carries the vectors.
+Input is a sequence of Unicode scalar values. Indexes, windows and the 64 KiB middleware cap are counted in scalar values, so a match never splits a character and the four languages agree on positions. `boundary` is a field (`none`, `digit`, `alnum`, `email`). The resume rule is: a rejected match resumes at match start plus one scalar value; an accepted match resumes at match end. This is what stops a 12-digit run from hiding an 11-digit value. P1-06 implements the search; P3-00 carries the vectors.
+
+The `email` boundary carries its own neighbour sets (IQ-91). A rejected span is one whose character immediately before the shape is in the leading set, or whose character immediately after the shape is in the trailing set; the ends of the text count as boundaries. The leading set is ASCII letters, digits and `.`, `_`, `%`, `+`, `-`: keeping `.` on the leading side stops a shape from starting inside a longer local part after an internal dot, which is the partial-match weakness that blocked address detection on `alnum`. The trailing set is the leading set without `.`: a sentence-ending dot after the domain (`contact@ledger-ops.example.`) must not reject the whole match, while a trailing letter, digit, `_`, `%`, `+` or `-` still rejects it, because the span cut through a longer token. The value is an engine capability that landed in engine version 0.2.0, so a pack that carries `boundary: "email"` MUST set `minEngineVersion` to `0.2.0` or newer, and engines older than that refuse the pack.
 
 ### 7.6 Equivalence
 
@@ -265,7 +269,7 @@ Every allowed shape is a regular language inside the October profile, and the P0
 
 ### 8.1 Validators
 
-A named validator is a closed set. A new name is an engine capability under rule 9, and needs a schema change plus `minEngineVersion`.
+A named validator is a closed set. A new name is an engine capability under rule 9, and needs a schema change plus `minEngineVersion`. The same holds for a new `boundary` value (section 7.5): the `email` boundary is an engine capability that landed in version 0.2.0 (IQ-91).
 
 | Name | Pack data |
 |---|---|
