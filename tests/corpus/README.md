@@ -324,6 +324,18 @@ Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Eve
 | `p2-bvn-distant-label` | No finding |
 | `p2-bvn-label-after-value` | `pii.bvn` |
 | `p2-bvn-without-label` | No finding |
+| `p2-email-missing-at` | No finding |
+| `p2-email-missing-domain` | No finding |
+| `p2-email-missing-local-part` | No finding |
+| `p2-email-oversized-local-part` | No finding |
+| `p2-email-reserved-domain-0` | No finding |
+| `p2-email-reserved-domain-1` | No finding |
+| `p2-email-reserved-domain-2` | No finding |
+| `p2-email-reserved-domain-3` | No finding |
+| `p2-email-reserved-domain-4` | No finding |
+| `p2-email-reserved-domain-5` | No finding |
+| `p2-email-sentence-dot-tail` | `pii.email` |
+| `p2-email-trailing-label-tail` | No finding |
 | `p2-nin-distant-label` | No finding |
 | `p2-nin-incidental-keyword` | No finding |
 | `p2-nin-label-after-value` | `pii.nin` |

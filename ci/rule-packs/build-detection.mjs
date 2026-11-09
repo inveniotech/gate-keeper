@@ -13,7 +13,7 @@ export async function detectionFiles() {
   for (const file of readdirSync(sources).filter(name => name.endsWith('.mjs')).sort()) {
     const { default: source } = await import(new URL(file, sources));
     if (!source.description?.trim() || !source.limits?.trim() || !source.fix?.trim()) throw new Error('Every detection source needs reference documentation.');
-    const metadata = { id: `invenio.${source.family}`, version: packVersion, provenance: 'bundled', minEngineVersion: '0.1.0',
+    const metadata = { id: `invenio.${source.family}`, version: packVersion, provenance: 'bundled', minEngineVersion: source.minEngineVersion ?? '0.1.0',
       coverageDate: packDate, contentIssuedAt: packDate, keyId: 'unsigned-source' };
     const input = { schemaVersion: 1, ...metadata, rules: source.rules };
     delete input.keyId;
