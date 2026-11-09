@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
+using System.Text.Json.Serialization;
+
 namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
@@ -12,6 +14,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// <param name="column">The 1-based column.</param>
 /// <exception cref="ArgumentException">The path is empty or whitespace.</exception>
 /// <exception cref="ArgumentOutOfRangeException">The line or the column is below 1.</exception>
+[JsonConverter(typeof(LocationJsonConverter))]
 public readonly record struct Location(string path, int line, int column)
 {
     /// <summary>Gets the repository-relative path with forward-slash separators.</summary>
