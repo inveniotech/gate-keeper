@@ -11,4 +11,4 @@ This folder holds the specifications for the open formats. Each is a written con
 | Evidence sink | [evidence-sink-v1.md](evidence-sink-v1.md) | None in this draft. The contract is a path, a sidecar and a pipeline step. | Draft — not accepted (P0-07) |
 | Quality budgets: false positives and performance | [quality-budgets.md](quality-budgets.md) | None in this draft. The gate and the budgets are measured, not serialised; the arithmetic is fixed in the text. | Draft — not accepted (P0-17) |
 
-| Middleware API | [middleware-api-v1.md](middleware-api-v1.md) | None. The API contract defines native stack types. | Draft — not accepted (P3-01) |
+| Middleware API | [middleware-api-v1.md](middleware-api-v1.md) | None. The API contract defines native stack types. | Accepted by the owner, 9 November 2026 (P3-01; #123) |

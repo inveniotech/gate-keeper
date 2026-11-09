@@ -1,9 +1,9 @@
 # Middleware API, version 1
 
-**Status: draft — not accepted.** P3-01 proposes this contract for owner review.
-The normative words MUST, MUST NOT and SHOULD describe the proposed contract;
-they do not claim approval. The legal-adjacent paragraph in section 8 needs
-separate owner review. Adapter implementation is P3-02 to P3-05.
+**Status: accepted by the owner on 9 November 2026.** The owner approved the
+changes in pull request #123, including the section 8 consent wording.
+The normative words MUST, MUST NOT and SHOULD define the accepted contract.
+Adapter implementation is P3-02 to P3-05.
 
 Traces: R-1, F-005, UC-003, NFR-001, NFR-004, NFR-028, NFR-031;
 IQ-09, IQ-31, IQ-32, IQ-33, IQ-54, IQ-76, IQ-78 and IQ-79.
@@ -125,7 +125,7 @@ none. Classification MUST NOT modify the input or record its contents.
 
 ## 7. Response filtering
 
-The object-field path proposal is RFC 6901 JSON Pointer. Configured paths MUST
+The object-field path syntax is RFC 6901 JSON Pointer. Configured paths MUST
 be validated at start-up; `~0` and `~1` decode to tilde and slash. Missing object
 properties MAY be ignored. Selected strings MUST pass through `redact`; selected
 non-string values and any redaction failure, including invalid text or the
@@ -153,16 +153,15 @@ response fails, the adapter MUST abort the response/connection; it MUST NOT send
 the original or partially transformed body. A response without configured
 protected paths MUST pass through unchanged.
 Adapters MUST NOT buffer an unbounded stream or silently return unfiltered
-protected content. JSON Pointer and this bounded-response policy are proposals
-for owner acceptance, not existing adapter behaviour.
+protected content. JSON Pointer and this bounded-response policy are contract
+requirements; acceptance does not establish existing adapter conformance.
 
 ## 8. Consent check
 
 The consent helper is for processing whose lawful basis is consent. Consent is
 one of several lawful bases under the Nigeria Data Protection Act 2023; this
 surface does not decide which basis applies. An application MUST NOT treat its
-absence of this surface as a finding for processing based on another lawful basis. This
-paragraph is draft legal-adjacent wording for owner review.
+absence of this surface as a finding for processing based on another lawful basis.
 
 The application supplies a consent provider. The adapter MUST NOT store, cache
 or copy consent state. A provider SHOULD return `denied` when it holds no record
@@ -177,8 +176,7 @@ returning true for `granted` and false for `denied` and `unknown`, with the same
 diagnostic and cancellation behaviour. A caller MUST treat `unknown` as not granted.
 
 `subjectId` MUST be an opaque string of 1 to 1,024 Unicode scalars; applications
-SHOULD use an internal surrogate. This subject bound is a proposed API limit
-for owner review. Purpose MUST match
+SHOULD use an internal surrogate. Purpose MUST match
 `^[a-z][a-z0-9-]{0,31}(\.[a-z][a-z0-9-]{0,31}){1,4}$`, with at most 164 ASCII
 characters, for example `acme.marketing-sms`. Invalid arguments MUST raise the
 stack's argument error immediately, without calling the provider.
@@ -262,7 +260,7 @@ The IQ-31 integration set is owner direction pending interview validation. The
 named frameworks and logging libraries are the closed integration list. Samples
 below show core operations, not framework-hook registration. Registration
 examples belong to individual adapter guides and cannot be claimed implemented
-from these samples. These are proposed signatures, not installed packages or
+from these samples. These are contract signatures, not installed packages or
 runnable adapter code.
 
 ### .NET
@@ -393,9 +391,9 @@ through its current major and name its replacement in documentation.
 IQ-32, IQ-33, IQ-54, IQ-76, IQ-78 and IQ-79 are recorded as decided in the source
 card. The owner's 8 November review makes replacement same-ID and signed-only,
 fixes the cap to rule-pack section 7.5, and requires the corrections recorded
-above. IQ-31 remains pending interview validation. The owner must review the
-proposed subject bound, mask reservation, output
-expansion policy and section 8 legal-adjacent wording. No acceptance is claimed.
+above. On 9 November 2026 the owner approved the changes in pull request #123,
+including the subject bound, mask reservation, output expansion policy and
+section 8 legal-adjacent wording. IQ-31 remains pending interview validation.
 The current engine exposes UTF-16 spans internally;
 the middleware boundary must translate them rather than change existing results.
 
@@ -404,3 +402,5 @@ Change log: 8 November 2026 — first complete P3-01 draft for owner review.
 grammar, runtime context, signed replacement, response failures, consent mapping
 and named API errors. The owner selected explicit wildcard protection of every
 array element; section 7 records its proposed concrete path syntax.
+9 November 2026 — recorded the owner's approval of pull request #123 and
+acceptance of this contract. No adapter release or conformance is implied.
