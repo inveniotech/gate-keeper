@@ -54,6 +54,7 @@ public sealed class DetectionPackTests(ITestOutputHelper output)
     [InlineData("phone")]
     [InlineData("processors")]
     [InlineData("locations")]
+    [InlineData("email")]
     public async Task DetectionPack_Should_MatchExactExpectations_When_RunAgainstEverySyntheticCase(string family)
     {
         var rules = Load(family);

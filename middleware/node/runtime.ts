@@ -9,7 +9,7 @@ export interface ShapePart {
 }
 export interface Validator { readonly name: string; readonly length?: number; readonly prefixes?: readonly string[] }
 export interface PatternRule {
-  readonly shape: readonly ShapePart[]; readonly boundary: 'none' | 'digit' | 'alnum';
+  readonly shape: readonly ShapePart[]; readonly boundary: 'none' | 'digit' | 'alnum' | 'email';
   readonly validator?: Validator; readonly keywords?: readonly string[]; readonly window?: number;
   readonly location?: { readonly kind: string; readonly paths?: readonly string[] };
   readonly exclusions?: readonly string[]; readonly excludePrefixes?: readonly string[]; readonly excludeValues?: readonly string[];
@@ -31,6 +31,9 @@ const ordinal = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 const digit = (value: string | undefined): boolean => value !== undefined && /^[0-9]$/.test(value);
 const alnum = (value: string | undefined): boolean => value !== undefined && /^[0-9A-Za-z]$/.test(value);
 const token = (value: string | undefined): boolean => value !== undefined && /^[0-9A-Za-z._+\-]$/.test(value);
+// The email boundary is asymmetric (IQ-91): a leading '.' blocks a match, but a trailing '.' does not.
+const emailLeading = (value: string | undefined): boolean => value !== undefined && /^[0-9A-Za-z._%+\-]$/.test(value);
+const emailTrailing = (value: string | undefined): boolean => value !== undefined && /^[0-9A-Za-z_%+\-]$/.test(value);
 const mask = /\[REDACTED:[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)*\]/g;
 
 /** Validates Unicode and the rule-pack section 7.5 scalar cap. */
@@ -198,7 +201,7 @@ export class RuntimeMatcher {
     for (const rule of this.rules) {
       const p = rule.matcher.pattern;
       if (Boolean(p) === Boolean(rule.matcher.list)) throw new PackLoadError();
-      if (p && (!['none', 'digit', 'alnum'].includes(p.boundary)
+      if (p && (!['none', 'digit', 'alnum', 'email'].includes(p.boundary)
         || p.validator && !['digits-length', 'nuban', 'ng-phone-prefix', 'email-not-example-domain'].includes(p.validator.name)
         || p.keywords?.length && (!Number.isInteger(p.window) || p.window! < 1 || p.window! > 4096))) throw new PackLoadError();
       if (p && (p.shape.length < 1 || p.shape.length > 32 || p.shape.filter((part) => part.emit).length > 1
@@ -250,18 +253,19 @@ export class RuntimeMatcher {
           && !(part.oneOf ?? [part.literal!]).some((word) => foldedText.includes(fold(word))))) continue;
         const shapeAt = shapeMatcher(this.shapes.get(rule)!, chars);
         const keywordNear = keywordIndex(chars, p);
-        const neighbour = p.boundary === 'digit' ? digit : p.boundary === 'alnum' ? alnum : () => false;
+        const leading = p.boundary === 'digit' ? digit : p.boundary === 'alnum' ? alnum : p.boundary === 'email' ? emailLeading : () => false;
+        const trailing = p.boundary === 'email' ? emailTrailing : leading;
         let at = 0;
         while (at < chars.length) {
           // A mandatory leading scalar atom cannot begin here; avoid memo entries for impossible starts.
           const first = p.shape[0]!;
           if (first.min > 0 && (first.class === 'digit' ? !digit(chars[at]) : first.class === 'alnum' ? !alnum(chars[at]) : false)) { at++; continue; }
-          if (neighbour(chars[at - 1])) { at++; continue; }
+          if (leading(chars[at - 1])) { at++; continue; }
           const found = shapeAt(at);
           if (!found || found.end <= at) { at++; continue; }
           const start = found.emitStart ?? at; const length = found.emitLength ?? found.end - at;
           const value = chars.slice(start, start + length).join('');
-          if (length > 0 && !neighbour(chars[at - 1]) && !neighbour(chars[found.end])
+          if (length > 0 && !leading(chars[at - 1]) && !trailing(chars[found.end])
             && keywordNear(at, found.end) && (!p.validator || validate(value, p.validator)) && !excluded(chars, start, length, p)) {
             add(start, length); at = found.end;
           } else at++;

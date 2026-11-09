@@ -11,6 +11,11 @@
         "contentDigest": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
       },
       {
+        "id": "invenio.email",
+        "version": "2026.11.0",
+        "contentDigest": "c4f5ed86e3bc5fe7b7ccfc2d68e72a981aae102a406c308dd8249f6676be6d35"
+      },
+      {
         "id": "invenio.locations",
         "version": "2026.11.0",
         "contentDigest": "5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663"
@@ -550,6 +555,123 @@
           "excludeValues": [
             "12345678901"
           ]
+        }
+      }
+    },
+    {
+      "id": "pii.email",
+      "severity": "error",
+      "category": "pii.email",
+      "citation": {
+        "title": "Review protection of identifying email addresses.",
+        "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65",
+        "gaid": "Article 29(1)-(2)"
+      },
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ],
+      "matcher": {
+        "pattern": {
+          "shape": [
+            {
+              "min": 1,
+              "max": 64,
+              "ranges": [
+                {
+                  "low": "a",
+                  "high": "z"
+                },
+                {
+                  "low": "A",
+                  "high": "Z"
+                },
+                {
+                  "low": "0",
+                  "high": "9"
+                },
+                {
+                  "low": ".",
+                  "high": "."
+                },
+                {
+                  "low": "_",
+                  "high": "_"
+                },
+                {
+                  "low": "%",
+                  "high": "%"
+                },
+                {
+                  "low": "+",
+                  "high": "+"
+                },
+                {
+                  "low": "-",
+                  "high": "-"
+                }
+              ],
+              "emit": false
+            },
+            {
+              "min": 1,
+              "max": 1,
+              "literal": "@",
+              "emit": false
+            },
+            {
+              "min": 1,
+              "max": 64,
+              "ranges": [
+                {
+                  "low": "a",
+                  "high": "z"
+                },
+                {
+                  "low": "A",
+                  "high": "Z"
+                },
+                {
+                  "low": "0",
+                  "high": "9"
+                },
+                {
+                  "low": "-",
+                  "high": "-"
+                },
+                {
+                  "low": ".",
+                  "high": "."
+                }
+              ],
+              "emit": false
+            },
+            {
+              "min": 1,
+              "max": 1,
+              "literal": ".",
+              "emit": false
+            },
+            {
+              "min": 2,
+              "max": 24,
+              "ranges": [
+                {
+                  "low": "a",
+                  "high": "z"
+                },
+                {
+                  "low": "A",
+                  "high": "Z"
+                }
+              ],
+              "emit": false
+            }
+          ],
+          "boundary": "email",
+          "validator": {
+            "name": "email-not-example-domain"
+          }
         }
       }
     },
@@ -3661,6 +3783,12 @@
       "contentDigest": "da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe"
     },
     {
+      "path": "rule-packs/email.pack.json",
+      "id": "invenio.email",
+      "version": "2026.11.0",
+      "contentDigest": "c4f5ed86e3bc5fe7b7ccfc2d68e72a981aae102a406c308dd8249f6676be6d35"
+    },
+    {
       "path": "rule-packs/locations.pack.json",
       "id": "invenio.locations",
       "version": "2026.11.0",
@@ -3966,8 +4094,24 @@
       "name": "p2-email-dotnet-source/src/example.cs",
       "path": "src/example.cs",
       "text": "var email = \"amaka.ogbonna-42@ledger-ops.example\";\n",
-      "expected": [],
+      "expected": [
+        {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 14,
+          "start": 13,
+          "length": 35
+        }
+      ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 13,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -3998,20 +4142,36 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 13,
         "length": 35
       },
-      "redacted": "var email = \"[REDACTED:pii.email.api]\";\n"
+      "redacted": "var email = \"[REDACTED:pii.email]\";\n"
     },
     {
       "name": "p2-email-jvm-source/src/example.kt",
       "path": "src/example.kt",
       "text": "val email = \"amaka.ogbonna-42@ledger-ops.example\";\n",
-      "expected": [],
+      "expected": [
+        {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 14,
+          "start": 13,
+          "length": 35
+        }
+      ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 13,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -4042,18 +4202,272 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 13,
         "length": 35
       },
-      "redacted": "val email = \"[REDACTED:pii.email.api]\";\n"
+      "redacted": "val email = \"[REDACTED:pii.email]\";\n"
+    },
+    {
+      "name": "p2-email-missing-at/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42ledger-ops.example\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42ledger-ops.example\";\n"
+    },
+    {
+      "name": "p2-email-missing-domain/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@\";\n"
+    },
+    {
+      "name": "p2-email-missing-local-part/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"@ledger-ops.example\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"@ledger-ops.example\";\n"
     },
     {
       "name": "p2-email-node-source/src/example.ts",
       "path": "src/example.ts",
       "text": "const email = \"amaka.ogbonna-42@ledger-ops.example\";\n",
+      "expected": [
+        {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 35
+        }
+      ],
+      "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        },
+        {
+          "ruleId": "pii.email.api",
+          "category": "pii.in-api-models",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        },
+        {
+          "ruleId": "pii.email.configuration",
+          "category": "pii.in-configuration",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        },
+        {
+          "ruleId": "pii.email.fixture",
+          "category": "pii.in-fixtures",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        },
+        {
+          "ruleId": "pii.email.migration",
+          "category": "pii.in-migrations",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        }
+      ],
+      "classification": {
+        "ruleId": "pii.email",
+        "category": "pii.email",
+        "severity": "error",
+        "start": 15,
+        "length": 35
+      },
+      "redacted": "const email = \"[REDACTED:pii.email]\";\n"
+    },
+    {
+      "name": "p2-email-oversized-local-part/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxamaka.ogbonna-42@ledger-ops.example\";\n",
+      "expected": [],
+      "runtimeExpected": [
+        {
+          "ruleId": "pii.email.api",
+          "category": "pii.in-api-models",
+          "severity": "error",
+          "start": 86,
+          "length": 29
+        },
+        {
+          "ruleId": "pii.email.configuration",
+          "category": "pii.in-configuration",
+          "severity": "error",
+          "start": 86,
+          "length": 29
+        },
+        {
+          "ruleId": "pii.email.fixture",
+          "category": "pii.in-fixtures",
+          "severity": "error",
+          "start": 86,
+          "length": 29
+        },
+        {
+          "ruleId": "pii.email.migration",
+          "category": "pii.in-migrations",
+          "severity": "error",
+          "start": 86,
+          "length": 29
+        }
+      ],
+      "classification": {
+        "ruleId": "pii.email.api",
+        "category": "pii.in-api-models",
+        "severity": "error",
+        "start": 86,
+        "length": 29
+      },
+      "redacted": "const email = \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxamaka.[REDACTED:pii.email.api]\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-0/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.example.com\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.example.com\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-1/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.example.org\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.example.org\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-2/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.example.net\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.example.net\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-3/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.test\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.test\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-4/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.invalid\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.invalid\";\n"
+    },
+    {
+      "name": "p2-email-reserved-domain-5/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@mail.localhost\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"amaka.ogbonna-42@mail.localhost\";\n"
+    },
+    {
+      "name": "p2-email-sentence-dot-tail/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@ledger-ops.example.\";\n",
+      "expected": [
+        {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 16,
+          "start": 15,
+          "length": 35
+        }
+      ],
+      "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 15,
+          "length": 35
+        },
+        {
+          "ruleId": "pii.email.api",
+          "category": "pii.in-api-models",
+          "severity": "error",
+          "start": 15,
+          "length": 36
+        },
+        {
+          "ruleId": "pii.email.configuration",
+          "category": "pii.in-configuration",
+          "severity": "error",
+          "start": 15,
+          "length": 36
+        },
+        {
+          "ruleId": "pii.email.fixture",
+          "category": "pii.in-fixtures",
+          "severity": "error",
+          "start": 15,
+          "length": 36
+        },
+        {
+          "ruleId": "pii.email.migration",
+          "category": "pii.in-migrations",
+          "severity": "error",
+          "start": 15,
+          "length": 36
+        }
+      ],
+      "classification": {
+        "ruleId": "pii.email.api",
+        "category": "pii.in-api-models",
+        "severity": "error",
+        "start": 15,
+        "length": 36
+      },
+      "redacted": "const email = \"[REDACTED:pii.email.api]\";\n"
+    },
+    {
+      "name": "p2-email-shape-near-miss/src/example.ts",
+      "path": "src/example.ts",
+      "text": "const email = \"not-an-identifier\";\n",
+      "expected": [],
+      "runtimeExpected": [],
+      "classification": null,
+      "redacted": "const email = \"not-an-identifier\";\n"
+    },
+    {
+      "name": "p2-email-trailing-label-tail/src/context.ts",
+      "path": "src/context.ts",
+      "text": "const email = \"amaka.ogbonna-42@ledger-ops.example-ng\";\n",
       "expected": [],
       "runtimeExpected": [
         {
@@ -4092,16 +4506,7 @@
         "start": 15,
         "length": 35
       },
-      "redacted": "const email = \"[REDACTED:pii.email.api]\";\n"
-    },
-    {
-      "name": "p2-email-shape-near-miss/src/example.ts",
-      "path": "src/example.ts",
-      "text": "const email = \"not-an-identifier\";\n",
-      "expected": [],
-      "runtimeExpected": [],
-      "classification": null,
-      "redacted": "const email = \"not-an-identifier\";\n"
+      "redacted": "const email = \"[REDACTED:pii.email.api]-ng\";\n"
     },
     {
       "name": "p2-email-validator-near-miss/src/example.ts",
@@ -6170,6 +6575,14 @@
       "text": "export const customerResponse = { email: \"amaka.ogbonna-42@ledger-ops.example\" };\n",
       "expected": [
         {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 43,
+          "start": 42,
+          "length": 35
+        },
+        {
           "ruleId": "pii.email.api",
           "severity": "error",
           "line": 1,
@@ -6179,6 +6592,13 @@
         }
       ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 42,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -6209,13 +6629,13 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 42,
         "length": 35
       },
-      "redacted": "export const customerResponse = { email: \"[REDACTED:pii.email.api]\" };\n"
+      "redacted": "export const customerResponse = { email: \"[REDACTED:pii.email]\" };\n"
     },
     {
       "name": "p2-location-email-api-model-shape-near-miss/api/models/customer-response.ts",
@@ -6241,6 +6661,14 @@
       "text": "{\"email\":\"amaka.ogbonna-42@ledger-ops.example\"}\n",
       "expected": [
         {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 35
+        },
+        {
           "ruleId": "pii.email.configuration",
           "severity": "error",
           "line": 1,
@@ -6250,6 +6678,13 @@
         }
       ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 10,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -6280,13 +6715,13 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 10,
         "length": 35
       },
-      "redacted": "{\"email\":\"[REDACTED:pii.email.api]\"}\n"
+      "redacted": "{\"email\":\"[REDACTED:pii.email]\"}\n"
     },
     {
       "name": "p2-location-email-configuration-shape-near-miss/config/appsettings.json",
@@ -6312,6 +6747,14 @@
       "text": "{\"email\":\"amaka.ogbonna-42@ledger-ops.example\"}\n",
       "expected": [
         {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 11,
+          "start": 10,
+          "length": 35
+        },
+        {
           "ruleId": "pii.email.fixture",
           "severity": "error",
           "line": 1,
@@ -6321,6 +6764,13 @@
         }
       ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 10,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -6351,13 +6801,13 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 10,
         "length": 35
       },
-      "redacted": "{\"email\":\"[REDACTED:pii.email.api]\"}\n"
+      "redacted": "{\"email\":\"[REDACTED:pii.email]\"}\n"
     },
     {
       "name": "p2-location-email-fixture-shape-near-miss/fixtures/customer.json",
@@ -6383,6 +6833,14 @@
       "text": "console.log(\"email\", \"amaka.ogbonna-42@ledger-ops.example\");\n",
       "expected": [
         {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 23,
+          "start": 22,
+          "length": 35
+        },
+        {
           "ruleId": "pii.email.log",
           "severity": "error",
           "line": 1,
@@ -6392,6 +6850,13 @@
         }
       ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 22,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -6429,13 +6894,13 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 22,
         "length": 35
       },
-      "redacted": "console.log(\"email\", \"[REDACTED:pii.email.api]\");\n"
+      "redacted": "console.log(\"email\", \"[REDACTED:pii.email]\");\n"
     },
     {
       "name": "p2-location-email-log-shape-near-miss/src/logging.ts",
@@ -6461,6 +6926,14 @@
       "text": "INSERT INTO customer (bank_code, email) VALUES ('011', 'amaka.ogbonna-42@ledger-ops.example');\n",
       "expected": [
         {
+          "ruleId": "pii.email",
+          "severity": "error",
+          "line": 1,
+          "column": 57,
+          "start": 56,
+          "length": 35
+        },
+        {
           "ruleId": "pii.email.migration",
           "severity": "error",
           "line": 1,
@@ -6470,6 +6943,13 @@
         }
       ],
       "runtimeExpected": [
+        {
+          "ruleId": "pii.email",
+          "category": "pii.email",
+          "severity": "error",
+          "start": 56,
+          "length": 35
+        },
         {
           "ruleId": "pii.email.api",
           "category": "pii.in-api-models",
@@ -6500,13 +6980,13 @@
         }
       ],
       "classification": {
-        "ruleId": "pii.email.api",
-        "category": "pii.in-api-models",
+        "ruleId": "pii.email",
+        "category": "pii.email",
         "severity": "error",
         "start": 56,
         "length": 35
       },
-      "redacted": "INSERT INTO customer (bank_code, email) VALUES ('011', '[REDACTED:pii.email.api]');\n"
+      "redacted": "INSERT INTO customer (bank_code, email) VALUES ('011', '[REDACTED:pii.email]');\n"
     },
     {
       "name": "p2-location-email-migration-shape-near-miss/migrations/001_customer.sql",
