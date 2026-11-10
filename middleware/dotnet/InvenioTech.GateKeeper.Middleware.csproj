@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../version.txt').Trim())</Version>
+    <!-- The framework-hook projects live in subdirectories; their sources and obj files belong to their own projects. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);AspNetCore/**;Compliance/**;Serilog/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="InvenioTech.GateKeeper.Engine.Tests" />

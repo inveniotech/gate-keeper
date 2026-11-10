@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>InvenioTech.GateKeeper.AspNetCore</RootNamespace>
+    <AssemblyName>InvenioTech.GateKeeper.AspNetCore</AssemblyName>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../version.txt').Trim())</Version>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- ASP.NET Core is a shared framework, not a package (card P3-02). -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../InvenioTech.GateKeeper.Middleware.csproj" />
+  </ItemGroup>
+</Project>

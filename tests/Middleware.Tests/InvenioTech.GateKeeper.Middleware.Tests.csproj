@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <RootNamespace>InvenioTech.GateKeeper.Middleware.Tests</RootNamespace>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- Already approved in AGENTS.md rule 8 by the owner on 3 November 2026. Test-only: the assertion library for this project. -->
+    <PackageReference Include="AwesomeAssertions" />
+    <!-- Already approved in AGENTS.md rule 8. Only the tests sign the in-memory acceptance pack with the labelled development key. -->
+    <PackageReference Include="BouncyCastle.Cryptography" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="AwesomeAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Engine\InvenioTech.GateKeeper.Engine.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\InvenioTech.GateKeeper.Middleware.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\AspNetCore\InvenioTech.GateKeeper.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\Compliance\InvenioTech.GateKeeper.Compliance.Redaction.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\Serilog\InvenioTech.GateKeeper.Serilog.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The development pack vectors, so RuntimePacksTests consumes the real committed files. -->
+    <None Include="..\vectors\pack\*.pack.json" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\vectors\pack\*.manifest.armour" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\vectors\pack\*.signature.hex" Link="vectors\pack\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\vectors\pack\development-public-key.json" Link="vectors\pack\development-public-key.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The real authored pack the acceptance sample signs in memory; the signature is never written into rule-packs/. -->
+    <None Include="..\..\rule-packs\bvn.pack.json" Link="packs\bvn.pack.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
