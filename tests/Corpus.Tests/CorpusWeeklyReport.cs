@@ -18,14 +18,19 @@ public sealed record CorpusPackStamp(string PackId, string Version, string Sha25
 
 /// <summary>
 /// One pinned validation repository, exactly as the weekly report records it
-/// from <c>tests/corpus/validation/repos.json</c>. The row names the pin so a
-/// reader can reproduce the measurement; it is not a rate input until the
-/// replay card after P2-06 lands.
+/// from <c>tests/corpus/validation/repos.json</c>: the fields section 4.3 of
+/// the quality-budgets specification fixes for a pin. Triage is per finding
+/// in the validation records, not a property of the pin, so no triage field
+/// is read here. The row names the pin so a reader can reproduce the
+/// measurement; it is not a rate input until the replay card after P2-06
+/// lands.
 /// </summary>
 /// <param name="Repository">The repository name in <c>owner/repository</c> form.</param>
 /// <param name="Revision">The pinned commit, 40 lowercase hexadecimal characters.</param>
-/// <param name="Triage">The corpus-level triage status the pin file records.</param>
-public sealed record CorpusValidationPin(string Repository, string Revision, string Triage);
+/// <param name="Licence">The repository's licence at the pin, from the permissive list.</param>
+/// <param name="PinnedOn">The UTC date the pin was set, in the <c>yyyy-MM-dd</c> form.</param>
+/// <param name="Role">The role the pinned list gives the repository.</param>
+public sealed record CorpusValidationPin(string Repository, string Revision, string Licence, string PinnedOn, string Role);
 
 /// <summary>
 /// Every input the dated weekly report records so a reader can reproduce the
@@ -106,9 +111,17 @@ public static class CorpusWeeklyReportWriter
                     throw new ArgumentException(
                         $"The pinned revision of '{pin.Repository}' is not 40 lowercase hexadecimal characters; record the full commit the pin fixes.",
                         nameof(input));
-                if (string.IsNullOrWhiteSpace(pin.Triage))
+                if (string.IsNullOrWhiteSpace(pin.Licence))
                     throw new ArgumentException(
-                        $"The validation pin for '{pin.Repository}' is missing its corpus triage status.",
+                        $"The validation pin for '{pin.Repository}' is missing its licence; a pin names the licence the repository carries at its commit (section 4.3).",
+                        nameof(input));
+                if (!IsCalendarDate(pin.PinnedOn))
+                    throw new ArgumentException(
+                        $"The pin date of '{pin.Repository}' is not a UTC date in the yyyy-MM-dd form; a pin records the UTC date it was set (section 4.3).",
+                        nameof(input));
+                if (string.IsNullOrWhiteSpace(pin.Role))
+                    throw new ArgumentException(
+                        $"The validation pin for '{pin.Repository}' is missing its role; the pinned list records the role each repository plays (section 4.3).",
                         nameof(input));
             }
         }
@@ -137,13 +150,13 @@ public static class CorpusWeeklyReportWriter
         else
         {
             foreach (var pin in input.ValidationPins.OrderBy(item => item.Repository, StringComparer.Ordinal))
-                report.Append($"- Validation repository `{pin.Repository}` pinned at `{pin.Revision}` with corpus triage status `{pin.Triage}`.\n");
-            report.Append("- The rates below still cover the synthetic golden corpus only; replaying the pinned repositories and their triage records is the follow-up measurement card after P2-06 (issue #32) merges.\n");
+                report.Append($"- Validation repository `{pin.Repository}` pinned at `{pin.Revision}` on {pin.PinnedOn} (licence {pin.Licence}, role {pin.Role}).\n");
+            report.Append("- The rates below still cover the synthetic golden corpus only; replaying the pinned repositories and their per-finding triage records is the follow-up measurement card after P2-06 (issue #32) merges.\n");
         }
         report.Append($"- Synthetic cases scanned: {input.ScannedCaseCount}.\n\n");
         report.Append(input.Measurements.FalsePositiveGatePassed
             ? "**Gate: pass** (per rule and overall, exact integer arithmetic).\n\n"
-            : "**Gate: fail** (per rule and overall, exact integer arithmetic).\n\n");
+            : "**Gate: fail.** The run fails NFR-013; the table's gate column names whether the overall row or a single rule breached the boundary.\n\n");
         if (!input.Measurements.FalsePositiveGatePassed)
         {
             var top = input.Measurements.PerRule
@@ -165,14 +178,15 @@ public static class CorpusWeeklyReportWriter
 
     private static void ValidateDate(string evaluationDate)
     {
-        var valid = evaluationDate is { Length: 10 }
-            && evaluationDate[4] == '-' && evaluationDate[7] == '-'
-            && DateTime.TryParseExact(evaluationDate, DatePattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
-        if (!valid)
+        if (!IsCalendarDate(evaluationDate))
             throw new ArgumentException(
                 $"The evaluation date '{evaluationDate}' is not a UTC date in the yyyy-MM-dd form; pass the measurement's evaluation date from the run metadata, for example 2026-11-16.",
                 nameof(evaluationDate));
     }
+
+    private static bool IsCalendarDate(string? value) => value is { Length: 10 }
+        && value[4] == '-' && value[7] == '-'
+        && DateTime.TryParseExact(value, DatePattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
     private static void ValidateRevision(string measurementRevision)
     {

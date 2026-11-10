@@ -43,15 +43,15 @@ public sealed class CorpusWeeklyReportTests
     {
         var pins = new[]
         {
-            new CorpusValidationPin("zeta-maintained/tool", Revision, "pending"),
-            new CorpusValidationPin("alpha-maintained/tool", Revision, "pending"),
+            new CorpusValidationPin("zeta-maintained/tool", Revision, "Apache-2.0", "2026-11-05", "data-access"),
+            new CorpusValidationPin("alpha-maintained/tool", Revision, "MIT", "2026-11-05", "framework"),
         };
         var report = CorpusWeeklyReportWriter.Write(Input(validationPins: pins));
-        report.Should().Contain("- Validation repository `alpha-maintained/tool` pinned at `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` with corpus triage status `pending`.\n");
+        report.Should().Contain("- Validation repository `alpha-maintained/tool` pinned at `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` on 2026-11-05 (licence MIT, role framework).\n");
         var alphaIndex = report.IndexOf("alpha-maintained/tool", StringComparison.Ordinal);
         var zetaIndex = report.IndexOf("zeta-maintained/tool", StringComparison.Ordinal);
         (alphaIndex < zetaIndex).Should().BeTrue("the pins sort by repository name ordinal (rule 6)");
-        report.Should().Contain("The rates below still cover the synthetic golden corpus only; replaying the pinned repositories and their triage records is the follow-up measurement card after P2-06 (issue #32) merges.\n");
+        report.Should().Contain("The rates below still cover the synthetic golden corpus only; replaying the pinned repositories and their per-finding triage records is the follow-up measurement card after P2-06 (issue #32) merges.\n");
     }
 
     [Fact]
@@ -67,9 +67,20 @@ public sealed class CorpusWeeklyReportTests
     {
         var measurements = Measure(("local.a", 20, 10), ("local.c", 20, 6), ("local.b", 20, 6), ("local.d", 20, 2));
         var report = CorpusWeeklyReportWriter.Write(Input(measurements: measurements));
-        report.Should().Contain("**Gate: fail** (per rule and overall, exact integer arithmetic).\n");
+        report.Should().Contain("**Gate: fail.** The run fails NFR-013; the table's gate column names whether the overall row or a single rule breached the boundary.\n");
         report.Should().Contain("Top three rules by false positives: `local.a` (10), `local.b` (6), `local.c` (6).\n");
         report.Should().NotContain("`local.d` (2)");
+    }
+
+    [Fact]
+    public void CorpusWeeklyReport_Should_ReportAFailingRun_When_OneRuleFailsAndTheOverallRowPasses()
+    {
+        var measurements = Measure(("local.a", 100, 10), ("local.b", 200, 0));
+        measurements.Overall.FalsePositiveGatePassed.Should().BeTrue("the fabricated overall rate sits inside the boundary");
+        measurements.FalsePositiveGatePassed.Should().BeFalse("only the single rule breaches it");
+        var report = CorpusWeeklyReportWriter.Write(Input(measurements: measurements));
+        report.Should().Contain("**Gate: fail.** The run fails NFR-013; the table's gate column names whether the overall row or a single rule breached the boundary.\n");
+        report.Should().Contain("Top three rules by false positives: `local.a` (10).\n");
     }
 
     [Fact]
@@ -122,11 +133,12 @@ public sealed class CorpusWeeklyReportTests
     }
 
     [Fact]
-    public void CorpusWeeklyReport_Should_RejectAMalformedValidationPin_When_TheRepositoryOrRevisionIsWrong()
+    public void CorpusWeeklyReport_Should_RejectAMalformedValidationPin_When_TheRepositoryOrPinDateIsWrong()
     {
-        var pins = new[] { new CorpusValidationPin("no-owner-slash", Revision, "pending") };
-        Action write = () => CorpusWeeklyReportWriter.Write(Input(validationPins: pins));
-        write.Should().ThrowExactly<ArgumentException>().WithMessage("*owner/repository*");
+        Action missingOwner = () => CorpusWeeklyReportWriter.Write(Input(validationPins: [new CorpusValidationPin("no-owner-slash", Revision, "MIT", "2026-11-05", "framework")]));
+        Action malformedPinDate = () => CorpusWeeklyReportWriter.Write(Input(validationPins: [new CorpusValidationPin("alpha/tool", Revision, "MIT", "20261105", "framework")]));
+        missingOwner.Should().ThrowExactly<ArgumentException>().WithMessage("*owner/repository*");
+        malformedPinDate.Should().ThrowExactly<ArgumentException>().WithMessage("*yyyy-MM-dd*");
     }
 
     private static CorpusWeeklyReportInput Input(
