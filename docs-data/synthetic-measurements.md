@@ -7,16 +7,17 @@ These measurements cover synthetic repositories only. Real-repository findings a
 The error-level gate is `20 × false positives <= true positives + false positives`, per rule and overall. Warning and note counts are separate. Recall includes only the currently authored rules; other planned rules remain outside this measurement.
 
 - `invenio.bvn` version `2026.11.0`, SHA-256 `da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe`.
+- `invenio.email` version `2026.11.0`, SHA-256 `c4f5ed86e3bc5fe7b7ccfc2d68e72a981aae102a406c308dd8249f6676be6d35`.
 - `invenio.locations` version `2026.11.0`, SHA-256 `5712c0e936df2728e7b24754f15a421f605778571ba0e9128872b9cbd8bcf663`.
 - `invenio.nin` version `2026.11.0`, SHA-256 `ca44e2cf72797ccc8cdafea27dc6bab592a44dd5771a878689f30f99563ba74c`.
 - `invenio.phone` version `2026.11.0`, SHA-256 `70ab566873b61f51057d73a21119588b5d626316b914c9da0bf5b1f41320dd19`.
 - `invenio.processors` version `2026.11.0`, SHA-256 `bf9aa868676396046facd6fa59e33e86ce1a62b60131a9e8f76c0957ee29d636`.
 
-Scanned 279 synthetic repositories. Rates are percentages; `n/a` means no denominator.
+Scanned 291 synthetic repositories. Rates are percentages; `n/a` means no denominator.
 
 rule id | expected | produced | matched | unexpected | precision | recall | error true positives | error false positives | warnings | notes | gate | error false-positive rate
 --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-(overall) | 171 | 171 | 171 | 0 | 100 | 100 | 129 | 0 | 0 | 42 | pass | 0
+(overall) | 185 | 185 | 185 | 0 | 100 | 100 | 143 | 0 | 0 | 42 | pass | 0
 pii.bvn | 16 | 16 | 16 | 0 | 100 | 100 | 16 | 0 | 0 | 0 | pass | 0
 pii.bvn.api | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
 pii.bvn.configuration | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
@@ -26,6 +27,7 @@ pii.bvn.field.migration | 3 | 3 | 3 | 0 | 100 | 100 | 3 | 0 | 0 | 0 | pass | 0
 pii.bvn.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
 pii.bvn.log | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
 pii.bvn.migration | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
+pii.email | 14 | 14 | 14 | 0 | 100 | 100 | 14 | 0 | 0 | 0 | pass | 0
 pii.email.api | 1 | 1 | 1 | 0 | 100 | 100 | 1 | 0 | 0 | 0 | pass | 0
 pii.email.configuration | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0
 pii.email.fixture | 2 | 2 | 2 | 0 | 100 | 100 | 2 | 0 | 0 | 0 | pass | 0

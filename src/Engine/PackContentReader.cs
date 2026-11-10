@@ -660,7 +660,7 @@ internal static class PackContentReader
         var boundary = properties["boundary"];
         if (boundary.ValueKind is not JsonValueKind.String)
         {
-            Fail(packName, $"The rule '{ruleId}' does not set boundary to a string ('none', 'digit' or 'alnum'). " +
+            Fail(packName, $"The rule '{ruleId}' does not set boundary to a string ('none', 'digit', 'alnum' or 'email'). " +
                 "The boundary is a field, not a look-around (section 5.1).");
         }
 
@@ -670,8 +670,9 @@ internal static class PackContentReader
             "none" => MatchBoundary.None,
             "digit" => MatchBoundary.Digit,
             "alnum" => MatchBoundary.Alnum,
+            "email" => MatchBoundary.Email,
             _ => Fail<MatchBoundary>(packName, $"The rule '{ruleId}' sets boundary to '{boundaryWord}', which is not one of " +
-                "'none', 'digit' or 'alnum' (section 5.1)."),
+                "'none', 'digit', 'alnum' or 'email' (section 5.1)."),
         };
 
         RuleValidator? validator = null;

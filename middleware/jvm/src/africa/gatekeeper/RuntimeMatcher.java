@@ -147,12 +147,12 @@ public final class RuntimeMatcher {
             while (at < chars.length) {
                 Part first = rule.parts.get(0);
                 if (first.min > 0 && first.alternatives.isEmpty() && !first.accepts(chars[at])) { at++; continue; }
-                if (neighbour(at > 0 ? chars[at - 1] : -1, boundary)) { at++; continue; }
+                if (neighbour(at > 0 ? chars[at - 1] : -1, boundary, false)) { at++; continue; }
                 ShapeMatch found = walk(rule.parts, chars, 0, at, memo, runs);
                 if (found == null || found.end <= at) { at++; continue; }
                 int start = found.emitStart >= 0 ? found.emitStart : at, length = found.emitStart >= 0 ? found.emitLength : found.end - at;
-                boolean before = neighbour(at > 0 ? chars[at - 1] : -1, boundary);
-                boolean after = neighbour(found.end < chars.length ? chars[found.end] : -1, boundary);
+                boolean before = neighbour(at > 0 ? chars[at - 1] : -1, boundary, false);
+                boolean after = neighbour(found.end < chars.length ? chars[found.end] : -1, boundary, true);
                 String value = new String(chars, start, length);
                 if (length > 0 && !before && !after && (keywords.isEmpty() || keywordNear(keywordHits, at, found.end, number(p.get("window"), 0)))
                     && (p.get("validator") == null || validate(value, map(p.get("validator")))) && !excluded(chars, start, length, p)) {
@@ -172,7 +172,7 @@ public final class RuntimeMatcher {
             if ((matcher.get("pattern") == null) == (matcher.get("list") == null)) throw new PackLoadException();
             pattern = matcher.get("pattern") == null ? null : map(immutable(matcher.get("pattern")));
             if (pattern != null) {
-                if (!List.of("none", "digit", "alnum").contains(pattern.get("boundary"))) throw new PackLoadException();
+                if (!List.of("none", "digit", "alnum", "email").contains(pattern.get("boundary"))) throw new PackLoadException();
                 if (pattern.get("validator") != null && !List.of("digits-length", "nuban", "ng-phone-prefix", "email-not-example-domain")
                     .contains(map(pattern.get("validator")).get("name"))) throw new PackLoadException();
                 if (!strings(pattern.get("keywords")).isEmpty() && (!integer(pattern.get("window"))
@@ -339,7 +339,13 @@ public final class RuntimeMatcher {
         for (int i = 0; i < word.length; i++) if ((folded ? fold(text[at + i]) : text[at + i]) != (folded ? fold(word[i]) : word[i])) return false;
         return true;
     }
-    private static boolean neighbour(int c, String boundary) { return boundary.equals("digit") ? digit(c) : boundary.equals("alnum") && alnum(c); }
+    // The email boundary is asymmetric (IQ-91): a leading '.' blocks a match, but a trailing '.' does not.
+    private static boolean neighbour(int c, String boundary, boolean trailing) {
+        if (boundary.equals("digit")) return digit(c);
+        if (boundary.equals("alnum")) return alnum(c);
+        if (boundary.equals("email")) return alnum(c) || c == '_' || c == '%' || c == '+' || c == '-' || (!trailing && c == '.');
+        return false;
+    }
     private static boolean digit(int c) { return c >= '0' && c <= '9'; }
     private static boolean alnum(int c) { return digit(c) || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'; }
     private static boolean token(int c) { return alnum(c) || c == '.' || c == '-' || c == '_' || c == '+'; }

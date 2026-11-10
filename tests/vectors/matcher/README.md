@@ -10,6 +10,7 @@ The behaviours the other engines have to reproduce, because the rule-pack format
 - A keyword is a substring. The window is the number of scalar values between the keyword and the shape, on either side.
 - A rejected match resumes one scalar value after its start. An accepted match resumes at its end.
 - `digit` and `alnum` boundaries look at the ASCII neighbour on each side of the shape. The ends of the text are boundaries.
+- The `email` boundary rejects a shape whose leading neighbour is an ASCII letter, digit, `.`, `_`, `%`, `+` or `-`, and whose trailing neighbour is an ASCII letter, digit, `_`, `%`, `+` or `-`. The trailing set leaves out `.` so a sentence-ending dot after the domain does not reject the match (IQ-91). A pack that uses the boundary must set `minEngineVersion` to 0.2.0 or newer.
 - A list entry matches only as a whole token. A token is a maximal run of ASCII letters, digits, `.`, `-`, `_` and `+`. A shorter entry does not match inside a longer one.
 - `suppressionHints` are help text. They never suppress a match.
 

@@ -100,7 +100,8 @@ public sealed class MatcherConformanceVectorTests
             "none" => MatchBoundary.None,
             "digit" => MatchBoundary.Digit,
             "alnum" => MatchBoundary.Alnum,
-            _ => throw new InvalidOperationException("A vector boundary is none, digit or alnum."),
+            "email" => MatchBoundary.Email,
+            _ => throw new InvalidOperationException("A vector boundary is none, digit, alnum or email."),
         };
         RuleValidator? validator = null;
 

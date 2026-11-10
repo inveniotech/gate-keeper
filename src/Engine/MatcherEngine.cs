@@ -350,7 +350,14 @@ public sealed class MatcherEngine
 
         var end = start + length;
 
-        return end >= text.Length || !IsBoundaryNeighbour(text[end], boundary);
+        if (end >= text.Length)
+        {
+            return true;
+        }
+
+        return boundary == MatchBoundary.Email
+            ? !IsEmailTrailingNeighbour(text[end])
+            : !IsBoundaryNeighbour(text[end], boundary);
     }
 
     private static bool IsBoundaryNeighbour(char character, MatchBoundary boundary)
@@ -362,7 +369,22 @@ public sealed class MatcherEngine
             return digit;
         }
 
+        if (boundary == MatchBoundary.Email)
+        {
+            // The leading side keeps '.', so a match can never start inside a
+            // longer local part after an internal dot (IQ-91, issue 112).
+            return digit || character is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z')
+                or '.' or '_' or '%' or '+' or '-';
+        }
+
         return digit || character is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z');
+    }
+
+    /// <summary>The trailing neighbour set leaves out '.', so a sentence-ending dot after the domain does not reject the match (IQ-91).</summary>
+    private static bool IsEmailTrailingNeighbour(char character)
+    {
+        return character is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z')
+            or (>= '0' and <= '9') or '_' or '%' or '+' or '-';
     }
 
     private static bool ContainsKeyword(string text, string[] foldedKeywords)

@@ -42,7 +42,7 @@ public sealed class ScanCliTests
         var result = await repo.Run("scan", "--evaluated-on", "2026-11-01");
         result.Code.Should().Be(1, result.Errors);
         result.Output.Replace("\r\n", "\n").Should().Be("""
-            Gate-Keeper 0.1.0
+            Gate-Keeper 0.2.0
             Rule pack local.example: 1
             a.txt
               2:1 error local.token (new)
