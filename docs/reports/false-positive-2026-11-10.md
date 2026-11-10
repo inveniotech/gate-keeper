@@ -6,7 +6,7 @@ This report records the week's false-positive measurement for the release notes 
 
 **Inputs.**
 
-- Harness revision `a32594e35396e8cfaf805c7c7e9e1632ce3e5ce4`, the commit this measurement ran at.
+- Harness revision `d353c3cf36cda477956d9671e8477aa12f6ebf70`, the commit this measurement ran at.
 - Product version of `gatekeeper-ndpa-check`: `0.2.0` (the constant every artefact stamps, NFR-031).
 - Rule pack `invenio.bvn` version `2026.11.0`, SHA-256 `da6a37ef6f854989e4ce719f4fee81f0c670aab1b1f938ad3d3eb2af921f59fe`.
 - Rule pack `invenio.email` version `2026.11.0`, SHA-256 `c4f5ed86e3bc5fe7b7ccfc2d68e72a981aae102a406c308dd8249f6676be6d35`.
