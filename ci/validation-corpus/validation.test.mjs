@@ -23,9 +23,20 @@ test('checkout eligibility enforces exact file and byte bounds', () => {
     assert.throws(() => checkInspection(inspection));
   }
 });
-test('committed proposed pins cover each launch stack and a Nigerian-company publisher', () => {
+test('the committed pins cover each launch stack and a Nigerian-company publisher', () => {
   const manifest = JSON.parse(readFileSync(new URL('../../tests/corpus/validation/repos.json', import.meta.url)));
   validateManifest(manifest);
   assert.ok(manifest.repositories.some(repo => repo.role === 'nigerian-company'));
   for (const stack of ['dotnet', 'jvm', 'node']) assert.ok(manifest.repositories.some(repo => repo.stack === stack));
+});
+test('the committed pins record the owner selection acceptance with reviewer metadata', () => {
+  const manifest = JSON.parse(readFileSync(new URL('../../tests/corpus/validation/repos.json', import.meta.url)));
+  const accepted = new Date(`${manifest.reviewedOn}T00:00:00Z`);
+  assert.ok(!Number.isNaN(accepted.getTime()));
+  assert.equal(accepted.toISOString().slice(0, 10), manifest.reviewedOn);
+  assert.equal(manifest.status, 'accepted');
+  assert.equal(manifest.reviewedBy, 'owner');
+  for (const repo of manifest.repositories) {
+    assert.ok(accepted >= new Date(`${repo.pinnedOn}T00:00:00Z`), 'The acceptance cannot precede its pin date.');
+  }
 });

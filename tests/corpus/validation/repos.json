@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
-  "status": "proposed-for-owner-review",
+  "status": "accepted",
+  "reviewedBy": "owner",
+  "reviewedOn": "2026-11-10",
   "repositories": [
     { "repository": "JetBrains/Exposed", "revision": "0957638c87e7a6ffae3835b0e11414ab2c8c65ac", "licence": "Apache-2.0", "licencePath": "LICENSE.txt", "licenceSha256": "86464d52caaea8fd1515c42229ffdda86a786e7b5152fee74cec7cfcff24918a", "pinnedOn": "2026-11-05", "stack": "jvm", "role": "data-access", "triage": "pending" },
     { "repository": "PaystackOSS/openapi", "revision": "07c5abc8c34536e98a7755a5338178b4f430b09b", "licence": "MIT", "licencePath": "LICENSE", "licenceSha256": "1edd6ae0b9bf7f622c83dea2121e4343654d4a1cd932a9ff46eac2d8a45b3920", "pinnedOn": "2026-11-05", "stack": "node", "role": "nigerian-company", "triage": "pending" },

@@ -1,6 +1,6 @@
 # Validation corpus preparation
 
-P2-06 (issue #32) downloads immutable public repository snapshots in a separate scheduled job. No download code is added to the scanner. The proposed pins cover .NET, JVM, Node.js and a Nigerian-company publisher. Pin acceptance and every finding's triage belong to the owner. No scan, precision result or completed triage is claimed while production rules are unavailable.
+P2-06 (issue #32) downloads immutable public repository snapshots in a separate scheduled job. No download code is added to the scanner. The accepted pins cover .NET, JVM, Node.js and a Nigerian-company publisher; the owner accepted the selection on 10 November 2026, and every finding's triage still belongs to them. No scan, precision result or completed triage is claimed while production rules are unavailable.
 
 `validation.mjs` validates the ordered manifest, performs shallow fetches of exact commits into temporary directories, verifies licence-file SHA-256 pins and asks `Inspect` for eligible-file counts using the product's existing `FileEnumerator`. It refuses checkouts outside 200–20,000 eligible files or above 256 MiB including Git metadata. Git runs with isolated global/system configuration, no checkout hooks or inherited filters, no submodule recursion and a bounded subprocess lifetime. Source files are never installed, built or executed, committed, logged or uploaded. Temporary checkouts are removed in `finally`. Only counts, commit and licence pins are retained. Changed licence bytes require review, not an automatic licence assumption.
 
