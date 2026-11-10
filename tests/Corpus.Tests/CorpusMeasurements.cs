@@ -111,7 +111,7 @@ public static class CorpusMeasurements
         diffs.Sum(diff => diff.WarningCount), diffs.Sum(diff => diff.NoteCount));
 
     /// <summary>
-    /// Prints the per-rule report the harness hands to the test's output:
+    /// Renders the per-rule report the harness hands to the test's output:
     /// expected, produced, matched, unexpected and the two rates. While the
     /// engine's matching stage is not in the build, recall is printed as
     /// <c>unmeasured</c> rather than zero, because a scan that cannot see any
@@ -130,6 +130,26 @@ public static class CorpusMeasurements
         {
             WriteRow(writer, measurement, matcherStagePresent);
         }
+    }
+
+    /// <summary>
+    /// Renders the per-rule table as the Markdown rows the committed reports
+    /// embed: the header row, a separator row sized to the columns, then the
+    /// overall and per-rule rows in the report's own order, without the plain
+    /// section headers the console report prints. The weekly report and the
+    /// synthetic report share this one rendering, so the two artefacts cannot
+    /// disagree about a count.
+    /// </summary>
+    /// <param name="runMeasurements">The per-rule measurements and the overall totals.</param>
+    /// <param name="matcherStagePresent">Whether the build carries the engine's matching stage.</param>
+    /// <returns>The Markdown table text, with newline-feed line endings.</returns>
+    public static string WriteMarkdownTable(CorpusRunMeasurements runMeasurements, bool matcherStagePresent)
+    {
+        var table = new StringWriter { NewLine = "\n" };
+        WriteReport(table, runMeasurements, matcherStagePresent);
+        var lines = table.ToString().Split('\n').Where(line => line.Length > 0 && !line.StartsWith("--", StringComparison.Ordinal)).ToList();
+        lines.Insert(1, string.Join(" | ", Enumerable.Repeat("---", lines[0].Split('|').Length)));
+        return string.Join('\n', lines);
     }
 
     private static void WriteRow(TextWriter writer, CorpusRuleMeasurement measurement, bool matcherStagePresent)
