@@ -13,7 +13,8 @@ function civilDate(value) {
     || new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) !== value) throw new Error('Supply valid civil dates.');
 }
 
-function sorted(value) {
+/** Writes every property bag in sorted key order so generated JSON is byte-stable (rule 6). */
+export function sorted(value) {
   if (Array.isArray(value)) return value.map(sorted);
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(Object.keys(value).sort().map(key => [key, sorted(value[key])]));
