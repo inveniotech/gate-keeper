@@ -31,10 +31,7 @@ try {
     } else {
         Remove-Item env:GATEKEEPER_WEEKLY_REPORT_DATE, env:GATEKEEPER_HARNESS_REVISION -ErrorAction SilentlyContinue
     }
-    $filter = 'FullyQualifiedName~DetectionReport_Should_MatchTheCommittedReport'
-    if ($EvaluationDate -ne '') {
-        $filter = "$filter | FullyQualifiedName~WeeklyReport_Should_WriteTheDatedReport"
-    }
+    $filter = 'FullyQualifiedName~DetectionReport_Should_MatchTheCommittedReportAndWriteTheWeeklyReport'
     $project = Join-Path $PSScriptRoot '../../tests/Corpus.Tests'
     dotnet test $project -c Release --filter $filter --logger 'console;verbosity=detailed'
     $result = $LASTEXITCODE
