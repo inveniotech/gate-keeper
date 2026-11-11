@@ -17,7 +17,7 @@ jobs:
       - name: Publish the real Linux binary
         run: dotnet publish cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -o artifacts/native
       - name: Compare every corpus case with networking disabled
-        run: bash ci/zero-egress/Test-ZeroEgress.sh artifacts/native/gatekeeper-ndpa-check
+        run: bash ci/zero-egress/Test-ZeroEgress.sh artifacts/native/gatekeeper
       - uses: actions/upload-artifact@v4
         if: always()
         with:

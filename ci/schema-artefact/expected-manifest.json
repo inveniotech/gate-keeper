@@ -1,6 +1,6 @@
 {
   "name": "gate-keeper-schemas",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "files": [
     {
       "path": "gk-results.schema.json",
@@ -12,7 +12,7 @@
     },
     {
       "path": "sarif-profile.schema.json",
-      "sha256": "080472dfd0e18d4c851d82dee18a86762ea66eebcb44a200136b9f55a7413c79"
+      "sha256": "fbadd8f652f591f29b0047c6f67adc3653d00bae4403dd0964b78761db601594"
     }
   ]
 }

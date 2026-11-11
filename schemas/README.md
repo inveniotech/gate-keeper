@@ -23,3 +23,5 @@ pwsh ./ci/schema-artefact/Pack-SchemaArtefact.ps1 -ManifestOutput ci/schema-arte
 The check fails if that command would change `ci/schema-artefact/expected-manifest.json`. See `ci/schema-artefact/README.md`.
 
 Version `1.2.0` adds loaded-pack stamps to SARIF run properties. New writers emit `properties.packs` on every scan, including clean scans. The field is optional in the schema so older logs remain valid; an absent field means unknown provenance, whereas an empty array means no loaded packs. SARIF itself remains version 2.1.0.
+
+Version `2.0.0` renames the SARIF driver from `gatekeeper-ndpa-check` to `gatekeeper`, because product names carry no jurisdiction (IQ-92). A log written by an earlier build does not validate against this profile. No release had been published before this change.

@@ -21,9 +21,9 @@ public sealed class CorpusSupportBundleTests
         {
             var scan = await new CorpusScanRunner(item).RunAsync();
             using var cleanup = new CorpusScanScavenger(scan);
-            var folder = Path.Combine(scan.CopyRoot, ".ndpa-check");
+            var folder = Path.Combine(scan.CopyRoot, ".gatekeeper");
             Directory.CreateDirectory(folder);
-            await File.WriteAllTextAsync(Path.Combine(folder, "ndpa-check.toml"), $"schemaVersion = 1\n[repository]\nid = \"synthetic/{identifiers[0]}\"\n[scan]\nexclude = [\"private/{identifiers[1]}/**\"]\n[packs]\nlocal = [\".ndpa-check/privacy.json\"]\n");
+            await File.WriteAllTextAsync(Path.Combine(folder, "gatekeeper.toml"), $"schemaVersion = 1\n[repository]\nid = \"synthetic/{identifiers[0]}\"\n[scan]\nexclude = [\"private/{identifiers[1]}/**\"]\n[packs]\nlocal = [\".gatekeeper/privacy.json\"]\n");
             File.Copy(Path.Combine(AppContext.BaseDirectory, "support-probe.pack.json"), Path.Combine(folder, "privacy.json"));
             await File.WriteAllTextAsync(Path.Combine(folder, "fingerprint.key"), new string('a', 64) + "\n");
             await File.WriteAllTextAsync(Path.Combine(scan.CopyRoot, "privacy-probe.txt"), "gatekeeper-corpus-probe\n");

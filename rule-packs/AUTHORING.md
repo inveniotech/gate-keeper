@@ -22,15 +22,15 @@ Use exactly one `matcher.pattern` or `matcher.list`. A pattern is a sequence of 
 
 ## Exercise a throwaway rule end to end
 
-Create an empty directory outside this checkout, with `.ndpa-check/` inside it. Copy [templates/local.pack.json](templates/local.pack.json) to `.ndpa-check/local.json` there. Write this `.ndpa-check/ndpa-check.toml`:
+Create an empty directory outside this checkout, with `.gatekeeper/` inside it. Copy [templates/local.pack.json](templates/local.pack.json) to `.gatekeeper/local.json` there. Write this `.gatekeeper/gatekeeper.toml`:
 
 ```toml
 schemaVersion = 1
 [packs]
-local = [".ndpa-check/local.json"]
+local = [".gatekeeper/local.json"]
 ```
 
-Write `example.txt` containing `gatekeeper-authoring-probe` followed by a newline. Build the CLI from this checkout with `dotnet build cli -c Release -p:RestoreLockedMode=true`. From the throwaway directory, run `dotnet <absolute-checkout-path>/cli/bin/Release/net10.0/gatekeeper-ndpa-check.dll scan --json --evaluated-on 2026-11-05`. Expect exit 1 and exactly one `local.authoring.marker` finding at `example.txt`, line 1, column 1. The result must not contain the marker's value. Replace the input with `prefix-gatekeeper-authoring-probe-suffix` and expect exit 0 with no findings. Do not copy this probe into a production pack.
+Write `example.txt` containing `gatekeeper-authoring-probe` followed by a newline. Build the CLI from this checkout with `dotnet build cli -c Release -p:RestoreLockedMode=true`. From the throwaway directory, run `dotnet <absolute-checkout-path>/cli/bin/Release/net10.0/gatekeeper.dll scan --json --evaluated-on 2026-11-05`. Expect exit 1 and exactly one `local.authoring.marker` finding at `example.txt`, line 1, column 1. The result must not contain the marker's value. Replace the input with `prefix-gatekeeper-authoring-probe-suffix` and expect exit 0 with no findings. Do not copy this probe into a production pack.
 
 The automated acceptance test performs both scans through the real loader, matcher, policy and results writer:
 

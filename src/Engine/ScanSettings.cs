@@ -4,7 +4,7 @@ namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
 /// The effective settings of one scan, resolved from
-/// <c>.ndpa-check/ndpa-check.toml</c> (configuration specification, section 4).
+/// <c>.gatekeeper/gatekeeper.toml</c> (configuration specification, section 4).
 /// The record carries every key the specification lists, with the
 /// profile-dependent defaults (IQ-23) and the
 /// <c>scan</c>/<c>baseline</c> floor and ceiling rules already applied. Flags

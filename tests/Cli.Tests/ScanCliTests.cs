@@ -11,9 +11,9 @@ internal sealed class CliRepository : IDisposable
 
     internal CliRepository()
     {
-        var folder = Path.Combine(Root, ".ndpa-check");
+        var folder = Path.Combine(Root, ".gatekeeper");
         Directory.CreateDirectory(folder);
-        File.WriteAllText(Path.Combine(folder, "ndpa-check.toml"), "schemaVersion = 1\n[repository]\nid = \"synthetic/console\"\n[packs]\nlocal = [\".ndpa-check/local.json\"]\n");
+        File.WriteAllText(Path.Combine(folder, "gatekeeper.toml"), "schemaVersion = 1\n[repository]\nid = \"synthetic/console\"\n[packs]\nlocal = [\".gatekeeper/local.json\"]\n");
         File.WriteAllText(Path.Combine(folder, "local.json"), """
             {"schemaVersion":1,"id":"local.example","version":1,"minEngineVersion":"0.1.0","provenance":"local","rules":[
             {"id":"local.token","severity":"error","category":"synthetic","citation":{"title":"Synthetic test citation."},"sinceVersion":1,"matcher":{"list":{"package":["marker"]}}}]}
@@ -101,7 +101,7 @@ public sealed class ScanCliTests
     public async Task Scan_Should_WriteOnlyDiagnostics_When_ConfigurationIsInvalid()
     {
         using var repo = new CliRepository();
-        File.WriteAllText(Path.Combine(repo.Root, ".ndpa-check", "ndpa-check.toml"), "schemaVersion = 9\n");
+        File.WriteAllText(Path.Combine(repo.Root, ".gatekeeper", "gatekeeper.toml"), "schemaVersion = 9\n");
         var result = await repo.Run("scan", "--json");
         result.Code.Should().Be(2);
         result.Output.Should().BeEmpty();

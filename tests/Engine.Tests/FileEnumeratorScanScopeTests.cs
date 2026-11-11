@@ -150,7 +150,7 @@ public sealed class FileEnumeratorScanScopeTests
         repository.WriteFile("dist/machine/a.txt", "a\n");
         repository.WriteFile("build/machine/a.txt", "a\n");
         repository.WriteFile("vendor/machine/a.txt", "a\n");
-        repository.WriteFile(".ndpa-check/pack.json", "{}\n");
+        repository.WriteFile(".gatekeeper/pack.json", "{}\n");
         repository.Stage(
             "node_modules/dep/index.js",
             "bin/machine/a.txt",
@@ -158,7 +158,7 @@ public sealed class FileEnumeratorScanScopeTests
             "dist/machine/a.txt",
             "build/machine/a.txt",
             "vendor/machine/a.txt",
-            ".ndpa-check/pack.json");
+            ".gatekeeper/pack.json");
         repository.Commit("one: add the built-in exclusion fixtures");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
@@ -171,16 +171,16 @@ public sealed class FileEnumeratorScanScopeTests
     public async Task Enumerator_Should_KeepTrackedPathsThatOnlyLookSimilar_When_TheSegmentIsNotAnExactExclusion()
     {
         var repository = GitTestRepository.Create();
-        repository.WriteFile("location.ndpa-check/reader.md", "Synthetic reader fixture.\n");
+        repository.WriteFile("location.gatekeeper/reader.md", "Synthetic reader fixture.\n");
         repository.WriteFile("distributor/outer/a.md", "Synthetic outer fixture.\n");
-        repository.Stage("location.ndpa-check/reader.md", "distributor/outer/a.md");
+        repository.Stage("location.gatekeeper/reader.md", "distributor/outer/a.md");
         repository.Commit("one: add the look-alike fixtures");
 
         var result = await new FileEnumerator().EnumerateAsync(repository.Options(), CancellationToken.None);
 
         result.Files.Should().Equal(
             new EnumeratedFile("distributor/outer/a.md", "Synthetic outer fixture.\n"),
-            new EnumeratedFile("location.ndpa-check/reader.md", "Synthetic reader fixture.\n"));
+            new EnumeratedFile("location.gatekeeper/reader.md", "Synthetic reader fixture.\n"));
     }
 
     [Fact]

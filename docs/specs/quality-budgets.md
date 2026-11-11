@@ -25,7 +25,7 @@ The register entry for each identifier is an owner record. This specification ci
 
 ### 0.2 Normative keywords
 
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper-ndpa-check`. When it writes "a measurement run", it means one invocation of the binary, or of the measurement harness, under the conditions this document fixes. When it writes "a finding", it means one item in the findings output of a scan, in the shape the results specification ([results-format-v1.md](results-format-v1.md)) defines.
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper`. When it writes "a measurement run", it means one invocation of the binary, or of the measurement harness, under the conditions this document fixes. When it writes "a finding", it means one item in the findings output of a scan, in the shape the results specification ([results-format-v1.md](results-format-v1.md)) defines.
 
 Percentages in this document are exact rational numbers. The gate in section 5 is decided by integer arithmetic, never by rounding and never by floating-point comparison. "10 MB" means 10,485,760 bytes and "256 MB" means 268,435,456 bytes, because the configuration specification already fixes the byte-exact meaning of a megabyte ([config-v1.md](config-v1.md)).
 
