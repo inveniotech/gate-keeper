@@ -116,6 +116,12 @@
 - A co-author trailer that names a person and does not mention Cursor may remain.
 - Do not attribute commits or pull requests to any other AI agent, such as OpenCode or Claude.
 
+#### Pull requests linked to issues
+
+- When a pull request is opened for an issue, its description must contain a GitHub closing keyword, such as `Closes #37`, if the pull request, or the stack of pull requests it belongs to, fully addresses the issue.
+- If the work only partly addresses the issue, reference the issue with `Refs #37` instead, so that the issue stays open.
+- In a stack, place the closing keyword on the pull request that merges into the default branch. GitHub closes an issue only when a pull request that targets the default branch is merged.
+
 ---
 
 ## Part B — Stack rules
