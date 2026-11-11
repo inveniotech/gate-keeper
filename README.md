@@ -1,6 +1,6 @@
 # Gate-Keeper
 
-Gate-Keeper scans source code for personal data that the Nigeria Data Protection Act 2023 protects, and proves that a repository is safe to build. This repository is the public monorepo: everything free ships here under the Apache-2.0 licence, including the command-line interface, the rule engine, the bundled rule packs, the schemas, the middleware and the CI integrations. The first release ships middleware for .NET, Node and the JVM. The Python adapter follows that release. The command-line interface ships for Windows, Linux and macOS.
+Gate-Keeper scans source code for the personal data that its rule packs describe, and proves that a repository is safe to build. The engine, the command-line interface and the file formats carry no jurisdiction: each law is a set of rule packs. The bundled rule packs cover the Nigeria Data Protection Act 2023 (NDPA) and the General Application and Implementation Directive (GAID). This repository is the public monorepo: everything free ships here under the Apache-2.0 licence, including the command-line interface, the rule engine, the bundled rule packs, the schemas, the middleware and the CI integrations. The first release ships middleware for .NET, Node and the JVM. The Python adapter follows that release. The command-line interface ships for Windows, Linux and macOS.
 
 The scan command now runs configured local rule packs and prints a console summary or evidence JSON. Baseline, installation diagnostics and a local masked support bundle are available. The bundled detection pack arrives in Phase 2.
 
@@ -8,7 +8,7 @@ The scan command now runs configured local rule packs and prints a console summa
 
 | Path | What it is |
 |---|---|
-| `cli/` | The `gatekeeper-ndpa-check` command-line interface. Argument surface and version output (P1-01). |
+| `cli/` | The `gatekeeper` command-line interface. Argument surface and version output (P1-01). |
 | `src/Engine/` | The rule engine library, shared by the CLI and the .NET middleware. Domain model and JSON source generation (P1-01). |
 | `src/Signing/` | The internal Ed25519 signature verification behind `ISignatureVerifier` (P1-04). |
 | `rule-packs/` | The bundled rule packs. Empty until Phase 2. |
