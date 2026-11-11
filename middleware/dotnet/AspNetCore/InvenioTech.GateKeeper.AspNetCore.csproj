@@ -11,4 +11,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="../InvenioTech.GateKeeper.Middleware.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- The shared bounded-buffer helper is internal; the adapter tests exercise its cap and failure paths directly. -->
+    <InternalsVisibleTo Include="InvenioTech.GateKeeper.Middleware.Tests" />
+  </ItemGroup>
 </Project>
