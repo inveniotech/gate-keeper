@@ -15,7 +15,7 @@ public sealed class CorpusWeeklyReportTests
         var report = CorpusWeeklyReportWriter.Write(Input());
         report.Should().StartWith("# False-positive report 2026-11-16\n");
         report.Should().Contain($"- Harness revision `{Revision}`, the commit this measurement ran at.\n");
-        report.Should().Contain($"- Product version of `gatekeeper-ndpa-check`: `{EngineProduct.EngineVersion}` (the constant every artefact stamps, NFR-031).\n");
+        report.Should().Contain($"- Product version of `gatekeeper`: `{EngineProduct.EngineVersion}` (the constant every artefact stamps, NFR-031).\n");
         report.Should().Contain($"- Rule pack `invenio.bvn` version `2026.11.0`, SHA-256 `{ContentDigest}`.\n");
         report.Should().Contain("- Synthetic cases scanned: 3.\n");
     }

@@ -65,7 +65,7 @@ public static class SeverityPolicy
         }
         foreach (var entry in settings.DisabledRules)
             if (!known.Contains(entry.Id)) Unknown(entry.Id);
-        static void Unknown(string id) => throw new EngineToolException($"ndpa-check.toml names unknown rule '{id}'. Load its pack or remove the rule setting.");
+        static void Unknown(string id) => throw new EngineToolException($"gatekeeper.toml names unknown rule '{id}'. Load its pack or remove the rule setting.");
     }
 
     private static bool Meets(Severity severity, Severity threshold) => threshold switch

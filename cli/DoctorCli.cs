@@ -11,7 +11,7 @@ internal static class DoctorCli
     {
         var command = new Command("doctor", "Checks configuration, rule packs, Git and output access without scanning source");
         var date = new Option<string?>("--evaluated-on") { Description = "The evaluation date in YYYY-MM-DD form" };
-        var destination = new Option<string>("--output") { Description = "The repository-relative output directory to check", DefaultValueFactory = _ => ".ndpa-check" };
+        var destination = new Option<string>("--output") { Description = "The repository-relative output directory to check", DefaultValueFactory = _ => ".gatekeeper" };
         command.Options.Add(date);
         command.Options.Add(destination);
         command.SetAction(async (parse, token) =>
@@ -38,12 +38,12 @@ internal static class DoctorCli
                 }
                 catch (EngineToolException exception) { await errors.WriteLineAsync(exception.Message).ConfigureAwait(false); failed = true; }
                 catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-                { await errors.WriteLineAsync("The pack or policy check could not read a repository file. Check .ndpa-check paths and access permissions, then run doctor again.").ConfigureAwait(false); failed = true; }
+                { await errors.WriteLineAsync("The pack or policy check could not read a repository file. Check .gatekeeper paths and access permissions, then run doctor again.").ConfigureAwait(false); failed = true; }
             }
             var git = await RepositoryGitState.ReadAsync(root, token).ConfigureAwait(false);
             await output.WriteLineAsync(git.Available ? (git.InsideWorkTree ? "git: available; work tree detected" : "git: available; outside a work tree") : "git: unavailable; scans use the directory walk").ConfigureAwait(false);
             if (git.FingerprintKeyTracked)
-                await errors.WriteLineAsync("Git is tracking .ndpa-check/fingerprint.key. Anyone who can read the repository can reverse a fingerprint of a short identifier. Stop tracking the file, remove it from history, and replace the key.").ConfigureAwait(false);
+                await errors.WriteLineAsync("Git is tracking .gatekeeper/fingerprint.key. Anyone who can read the repository can reverse a fingerprint of a short identifier. Stop tracking the file, remove it from history, and replace the key.").ConfigureAwait(false);
             try
             {
                 var path = ResolveOutput(root, parse.GetValue(destination)!);

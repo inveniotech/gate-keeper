@@ -90,7 +90,8 @@ public static class CliModule
         Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory)
     {
         var rootCommand = new RootCommand(
-            "Scans a repository for personal data that the Nigeria Data Protection Act 2023 protects. " +
+            "Scans a repository for personal data that its rule packs describe. " +
+            "The bundled rule packs cover the Nigeria Data Protection Act 2023. " +
             "The detection rules ship as data in rule packs. Running the binary with no arguments runs the scan.");
 
         ReplaceDefaultVersionOption(rootCommand, new PrintVersionAction(output));
@@ -100,7 +101,7 @@ public static class CliModule
         var scan = new Command("scan", "Scans a repository and writes a console summary or evidence JSON");
         ScanCli.Configure(scan, output, errors, rootPath ?? Directory.GetCurrentDirectory());
         rootCommand.Subcommands.Add(scan);
-        rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
+        rootCommand.Subcommands.Add(NotImplementedCommand("init", "Creates .gatekeeper/ with a starter configuration and the fingerprint key; not implemented in this build", errors));
         rootCommand.Subcommands.Add(BaselineCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(DoctorCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
         rootCommand.Subcommands.Add(SupportBundleCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory(), matcherFactory));

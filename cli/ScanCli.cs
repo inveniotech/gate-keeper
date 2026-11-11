@@ -35,7 +35,7 @@ internal static class ScanCli
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                await errors.WriteLineAsync("The scan could not read a repository file. Check .ndpa-check paths and access permissions, then run the scan again.").ConfigureAwait(false);
+                await errors.WriteLineAsync("The scan could not read a repository file. Check .gatekeeper paths and access permissions, then run the scan again.").ConfigureAwait(false);
                 return (int)ExitOutcome.ToolError;
             }
         });
@@ -68,7 +68,7 @@ internal static class ScanCli
         var policy = FindingPolicy.Apply(scan, settings, state, day, token);
         var metadata = await RepositoryMetadata.ReadAsync(root, settings.RepositoryId, token).ConfigureAwait(false);
         var warnings = policy.Warnings.Concat(PackAgeWarning.Evaluate(packs.Packs, day)).Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();
-        if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in ndpa-check.toml."));
+        if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in gatekeeper.toml."));
         policy = policy with { Warnings = warnings.OrderBy(w => w.Code, StringComparer.Ordinal).ThenBy(w => w.Message, StringComparer.Ordinal).ToArray() };
         return new(new ResultsInput(policy, settings, packs.Packs, metadata.Id, metadata.Revision,
             settings.ScanHistory && scan.Enumeration.IsInsideGitWorkTree, SeverityPolicy.Evaluate(policy, settings.FailOn)), packs);

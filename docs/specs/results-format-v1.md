@@ -37,6 +37,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 |---|---|---|
 | 1 (draft) | 2 November 2026 | First draft. |
 | 1 (additive amendment) | 5 November 2026 | The owner approved pack-version stamps in SARIF as well as evidence. Schema artefact 1.2.0 adds the optional run property `packs`; new producers always emit it. The SARIF standard version remains 2.1.0 and the evidence schema version remains 1. This approval covers the amendment, not acceptance of the whole specification. |
+| 1 (breaking amendment before the first release) | 11 November 2026 | The owner decided that product names carry no jurisdiction (IQ-92). The SARIF driver name becomes `gatekeeper` and the fingerprint key moves to `.gatekeeper/fingerprint.key`. No release had been published, so the evidence schema version remains 1, and schema artefact 2.0.0 records the incompatible change to the SARIF profile. This approval covers the amendment, not acceptance of the whole specification. |
 
 ### 0.4 Details this draft fixes
 
@@ -82,14 +83,14 @@ A producer writes both files as UTF-8 with no byte-order mark, LF line endings, 
 | Fact | Type | Meaning |
 |---|---|---|
 | `evaluatedOn` | civil date `YYYY-MM-DD` | The date input from IQ-01. It is not read from the clock at write time. |
-| Engine version | semantic version `major.minor.patch` | The version of `gatekeeper-ndpa-check` that scanned (NFR-031). |
+| Engine version | semantic version `major.minor.patch` | The version of `gatekeeper` that scanned (NFR-031). |
 | Repository identity | string | `repository.id` from configuration, or the normalised git remote. Empty when neither is available. |
 | Revision | 40 lowercase hex characters, or empty | The commit that was scanned. Empty outside a git work tree. |
 | Profile | `default` or `deep` | The profile that selected files and rules. |
 | History scanned | boolean | True only when history scanning ran. |
 | Failure threshold | `error`, `warning` or `note` | The `fail-on` value used for this scan. |
 
-The product name in the evidence file is `gatekeeper`. The SARIF driver name is `gatekeeper-ndpa-check`.
+The product name in the evidence file is `gatekeeper`. The SARIF driver name is `gatekeeper`.
 
 ---
 
@@ -109,7 +110,7 @@ Run keys, in order: `tool`, `invocations`, `results`, `properties`.
 
 | Property | Value |
 |---|---|
-| `name` | `gatekeeper-ndpa-check` |
+| `name` | `gatekeeper` |
 | `version` | The engine version. |
 | `informationUri` | `https://gatekeeper.africa/` |
 | `rules` | One entry per rule that produced a work-tree result, sorted by rule identifier. A clean scan has an empty array. |
@@ -155,7 +156,7 @@ When `citation.ndpa` is present, `properties.ndpa` carries that string. When `ci
 
 ### 4.4 Fingerprints
 
-The fingerprint is HMAC-SHA-256 (RFC 2104, SHA-256). The HMAC key is the 32 bytes decoded from `.ndpa-check/fingerprint.key`. The message is UTF-8, four lines, each ended by LF: the rule identifier, the repository-relative path, the matched span, and the 0-based occurrence index of that same span for that rule in that file. Line numbers and line text are not inputs.
+The fingerprint is HMAC-SHA-256 (RFC 2104, SHA-256). The HMAC key is the 32 bytes decoded from `.gatekeeper/fingerprint.key`. The message is UTF-8, four lines, each ended by LF: the rule identifier, the repository-relative path, the matched span, and the 0-based occurrence index of that same span for that rule in that file. Line numbers and line text are not inputs.
 
 The log never contains the key or the matched span. When the key file is absent, every result omits `partialFingerprints`, and the evidence file records the missing-key warning. History findings have no fingerprint.
 
@@ -263,10 +264,10 @@ The entry whose lines are `exc-fixture-bvn`, `pii.bvn`, an empty line, `tests/fi
 | Code | Message |
 |---|---|
 | `baseline.not-applied` | `The baseline was not applied. Findings that the baseline would have hidden are reported.` |
-| `config.unknown-key` | `ndpa-check.toml contains the unknown key {key}. It was ignored.` |
+| `config.unknown-key` | `gatekeeper.toml contains the unknown key {key}. It was ignored.` |
 | `fingerprint.missing` | `No fingerprint key is available, so fingerprints are omitted from the results.` |
 | `pack.stale` | `Rule pack {packId} was issued {n} days before the evaluation date, which is past the 90-day threshold.` |
-| `repository.identity-empty` | `No repository identity could be derived. Set repository.id in ndpa-check.toml.` |
+| `repository.identity-empty` | `No repository identity could be derived. Set repository.id in gatekeeper.toml.` |
 | `scan.history-without-git` | `History scanning was requested and this directory is not a git work tree, so history was not scanned.` |
 | `scan.outside-git` | `This directory is not a git work tree. The scan walked the directory and applied the built-in exclusions.` |
 | `scan.shallow-history` | `History scanning covered only the commits in this shallow clone.` |

@@ -42,8 +42,8 @@ existing documents that omit it remain valid against the amended schemas.
 
 Keep evidence schema version 1 and the SARIF profile identifier ending in
 `/sarif-profile/v1.json`. Keep the SARIF standard version at 2.1.0. Publish the
-optional `processor` object in schema artefact 1.3.0, the next minor after
-1.2.0. New producers write the object whenever the effective rule has a
+optional `processor` object in schema artefact 2.1.0, the next minor after
+2.0.0. New producers write the object whenever the effective rule has a
 processor block, and omit it otherwise. Documents that omit it stay valid.
 There is no new CLI flag and no product major. Existing v1 fixtures that omit
 `processor` keep validating. The writer card updates both schemas, this
@@ -141,7 +141,7 @@ describe the catalogue snapshot, not a verified inventory of the customer's data
 4. The existing threshold tests still pass. These rules are notes, and this
    card leaves the default error threshold and the error-level false-positive
    gate on their current definitions.
-5. Documents validate against schema artefact 1.3.0 under the approved additive policy. Tests
+5. Documents validate against schema artefact 2.1.0 under the approved additive policy. Tests
    reject an unknown metadata key, a category that is not a string, an empty
    category array and a missing `usualRegion`. Under the approved policy,
    current fixtures that omit `processor` still validate, and the v1 schemas
@@ -158,7 +158,7 @@ The additive version policy is approved. After the owner accepts or amends the
 remaining mapping and console sentence, split implementation into a public results-contract and
 writer card plus a linked website guide card. Extend the existing writer and
 source-generated serialisation; do not add a second result pipeline. Publish
-schema artefact 1.3.0 and add deterministic schema tests in the writer PR. Reuse the
+schema artefact 2.1.0 and add deterministic schema tests in the writer PR. Reuse the
 existing processor corpus and combined synthetic report.
 
 Do not close #64 on this proposal. Owner acceptance of the remaining mapping and

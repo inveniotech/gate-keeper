@@ -8,7 +8,7 @@ report=$(realpath -m "${3:-artifacts/zero-egress}")
 work=$(mktemp -d /tmp/gate-keeper-egress.XXXXXXXX)
 trap 'rm -rf -- "$work"' EXIT
 mkdir -p "$report"
-cp "$binary" "$work/gatekeeper-ndpa-check"
+cp "$binary" "$work/gatekeeper"
 cp "$(dirname "$0")/Dockerfile" "$work/Dockerfile"
 docker build --tag gate-keeper-zero-egress:test "$work"
 count=0
@@ -16,10 +16,10 @@ for source in "$corpus"/*/repo; do
   [[ -d "$source" ]] || continue
   name=$(basename "$(dirname "$source")")
   root="$work/$name"
-  mkdir -p "$root/.ndpa-check"
+  mkdir -p "$root/.gatekeeper"
   cp -a "$source/." "$root/"
-  cp "$(dirname "$0")/probe.pack.json" "$root/.ndpa-check/probe.json"
-  printf 'schemaVersion = 1\n[repository]\nid = "synthetic/zero-egress"\n[packs]\nlocal = [".ndpa-check/probe.json"]\n' > "$root/.ndpa-check/ndpa-check.toml"
+  cp "$(dirname "$0")/probe.pack.json" "$root/.gatekeeper/probe.json"
+  printf 'schemaVersion = 1\n[repository]\nid = "synthetic/zero-egress"\n[packs]\nlocal = [".gatekeeper/probe.json"]\n' > "$root/.gatekeeper/gatekeeper.toml"
   printf 'gatekeeper-corpus-probe\n' > "$root/egress-probe.txt"
   for network in bridge none; do
     set +e

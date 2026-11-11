@@ -18,7 +18,7 @@ internal static class SupportBundleCli
     {
         var command = new Command("support-bundle", "Writes a local ZIP of masked configuration, versions and finding counts");
         var date = new Option<string?>("--evaluated-on") { Description = "The evaluation date in YYYY-MM-DD form" };
-        var destination = new Option<string>("--output") { Description = "The repository-relative ZIP filename", DefaultValueFactory = _ => ".ndpa-check/support-bundle.zip" };
+        var destination = new Option<string>("--output") { Description = "The repository-relative ZIP filename", DefaultValueFactory = _ => ".gatekeeper/support-bundle.zip" };
         command.Options.Add(date);
         command.Options.Add(destination);
         command.SetAction(async (parse, token) =>
@@ -43,7 +43,7 @@ internal static class SupportBundleCli
             catch (EngineToolException exception)
             { await errors.WriteLineAsync(exception.Message).ConfigureAwait(false); return (int)ExitOutcome.ToolError; }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-            { await errors.WriteLineAsync("The support bundle could not read its inputs or write the output ZIP. Check .ndpa-check paths and output permissions, then run support-bundle again.").ConfigureAwait(false); return (int)ExitOutcome.ToolError; }
+            { await errors.WriteLineAsync("The support bundle could not read its inputs or write the output ZIP. Check .gatekeeper paths and output permissions, then run support-bundle again.").ConfigureAwait(false); return (int)ExitOutcome.ToolError; }
             finally { if (temporary is not null && File.Exists(temporary)) File.Delete(temporary); }
         });
         return command;
