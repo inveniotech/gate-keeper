@@ -127,10 +127,10 @@ packages are `Microsoft.Extensions.Compliance.Redaction` (10.11.0, MIT) and
 ```powershell
 dotnet test tests/Middleware.Tests -c Release
 dotnet test tests/Engine.Tests -c Release --filter 'FullyQualifiedName~RuntimeMatcherTests|FullyQualifiedName~ConsentCheckTests|FullyQualifiedName~ResponseFilterTests'
-dotnet publish tests/conformance/NativeProbe -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/middleware-native
+dotnet publish tests/conformance/NativeProbe -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/middleware-native
 ./artifacts/middleware-native/MiddlewareNativeProbe.exe
-dotnet publish samples/aspnetcore -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -o artifacts/sample-native
-./artifacts/sample-native/GateKeeperSample.AspNetCore.exe <pack-directory> <key-file>
+dotnet publish samples/aspnetcore -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -o artifacts/sample-native
+./artifacts/sample-native/InvenioTech.GateKeeper.Sample.AspNetCore.exe <pack-directory> <key-file>
 ```
 
 The native probe runs on Linux in CI with trim and ahead-of-time warnings treated

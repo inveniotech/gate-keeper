@@ -81,5 +81,6 @@ internal static class TestRuntimes
         null,
         null,
         null,
-        new RuleMatcher(null, new RuleListMatcher(["customervalue"], null)));
+        new RuleMatcher(null, new RuleListMatcher(["customerValue"], null)));
 }
+
