@@ -2,7 +2,7 @@
   "name": "gate-keeper-docs-data",
   "version": "0.2.0",
   "packVersion": "2026.11.0",
-  "schemasVersion": "1.2.0",
+  "schemasVersion": "2.0.0",
   "files": [
     {
       "path": "citations.json",
@@ -10,39 +10,39 @@
     },
     {
       "path": "cli/baseline.md",
-      "sha256": "4d0e89d215e090b0954d81c0d0ae817dc74ea3a1ef863ad1d42ccaadcb9fc5cd"
+      "sha256": "adf87f4d2f368330e6d99caf6c9e17894a5ec5cff38eca72ba398ab32e6ee165"
     },
     {
       "path": "cli/doctor.md",
-      "sha256": "5581b54e287ca66b651b656ea61bd95f006b73750d6f310f6800cd2779da5d8e"
+      "sha256": "6af4f20c5c5f36c8e0d3587898736796177e8cd10489aa0a9c169bbadd8c1127"
     },
     {
       "path": "cli/index.md",
-      "sha256": "abc51156031bf143ca37eca4e9abb7c7048ed80becb23dd43a3a5c277ca7fa63"
+      "sha256": "646f5290b3e2124ff347b076a7b97b2bdd3a19c2686abb8dcfb894483780d6dc"
     },
     {
       "path": "cli/init.md",
-      "sha256": "5f3fe70635caf8d9e9eca3c28ac58c70d4deb489797d5804d36ae73ee5ae5d9b"
+      "sha256": "342412fd5d8fd5a26b69038512dbd53af564e768cccfb186556b1e13307cdba9"
     },
     {
       "path": "cli/scaffold-consent.md",
-      "sha256": "4c62cb0c1a07bc95cd71e169fda57a3b1b70ae403252062983760c3ba5178baf"
+      "sha256": "06f58ea29724c8caf12f4d54426df90acff1c488346fca9dbaaf32bf0de81166"
     },
     {
       "path": "cli/scaffold.md",
-      "sha256": "06f0b7be93a48614d5921959ae9a8ea80b8eaaa9a48126d574152f6a94c0b99a"
+      "sha256": "b0294dbd8a1115a7abeb096c55f8da867611cbc83c356eaf2c82f072f8d8667f"
     },
     {
       "path": "cli/scan.md",
-      "sha256": "97d39ad60cfa555c1a2cedaeb430678bbf23eebe6b785e4c019ba40f39260649"
+      "sha256": "6901d899b2afd4a8141ad98249f205660b2894610cdbbc0061f576e0f2ea1642"
     },
     {
       "path": "cli/support-bundle.md",
-      "sha256": "441a325ee5c08f383a1c28dcac556f7ae6aff9f0760dd8d6d011ccb3faa92b9f"
+      "sha256": "dd89decf205f81b9aa214e00dd46169d61e6747017ade19f62645c88a553aeda"
     },
     {
       "path": "cli/version.md",
-      "sha256": "15b796a7e8660ab0dfd5f975c60c17a27047c52b90cfdc3a17767892b4a3231e"
+      "sha256": "ff675ca4fd1436119080d8cd4027458a224220e353fb90106ba97dbc8ae8d1e9"
     },
     {
       "path": "rules.json",
@@ -74,7 +74,7 @@
     },
     {
       "path": "schemas/VERSION",
-      "sha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d"
+      "sha256": "c28fcca53637bc88e124af1725df13cb98c69dedefd62fb3cdbe1cdb6b760624"
     },
     {
       "path": "schemas/gk-results.schema.json",
@@ -86,7 +86,7 @@
     },
     {
       "path": "schemas/sarif-profile.schema.json",
-      "sha256": "080472dfd0e18d4c851d82dee18a86762ea66eebcb44a200136b9f55a7413c79"
+      "sha256": "fbadd8f652f591f29b0047c6f67adc3653d00bae4403dd0964b78761db601594"
     }
   ]
 }
