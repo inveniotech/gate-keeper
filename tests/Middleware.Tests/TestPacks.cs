@@ -45,7 +45,11 @@ internal static class TestPacks
             WatermarkSignature: watermarkStem is null ? null : ReadSignature(watermarkStem));
 
     /// <summary>Signs one content sequence in memory with the development manifest key.</summary>
-    internal static SignedPackInput SignInMemory(byte[] content, string name, string keyId = SigningKeyId)
+    /// <param name="content">The exact content bytes.</param>
+    /// <param name="name">The name the loader reports in errors.</param>
+    /// <param name="keyId">The key identifier the manifest names.</param>
+    /// <param name="seedKeyId">The key whose seed signs the payload, when it differs from the named key.</param>
+    internal static SignedPackInput SignInMemory(byte[] content, string name, string keyId = SigningKeyId, string? seedKeyId = null)
     {
         using var document = JsonDocument.Parse(content);
         var packId = document.RootElement.GetProperty("id").GetString()!;
@@ -54,7 +58,7 @@ internal static class TestPacks
         var sha512 = Convert.ToHexStringLower(SHA512.HashData(content));
         var payload = Encoding.UTF8.GetBytes(
             $"{{\"keyId\":\"{keyId}\",\"packId\":\"{packId}\",\"version\":\"{version}\",\"contentHashes\":{{\"sha256\":\"{sha256}\",\"sha512\":\"{sha512}\"}}}}");
-        var signature = Sign(payload, keyId);
+        var signature = Sign(payload, seedKeyId ?? keyId);
         var armour = $"-----BEGIN GATE-KEEPER RULE PACK MANIFEST-----\nKey-Id: {keyId}\n{Encoding.UTF8.GetString(payload)}\n-----END GATE-KEEPER RULE PACK MANIFEST-----\n";
         return new SignedPackInput(name, content, armour, signature);
     }

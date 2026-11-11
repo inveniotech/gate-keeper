@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\middleware\dotnet\AspNetCore\InvenioTech.GateKeeper.AspNetCore.csproj" />
     <ProjectReference Include="..\..\middleware\dotnet\Compliance\InvenioTech.GateKeeper.Compliance.Redaction.csproj" />
     <ProjectReference Include="..\..\middleware\dotnet\Serilog\InvenioTech.GateKeeper.Serilog.csproj" />
+    <ProjectReference Include="..\..\samples\aspnetcore\InvenioTech.GateKeeper.Sample.AspNetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

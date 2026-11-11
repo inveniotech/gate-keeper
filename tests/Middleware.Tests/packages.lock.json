@@ -143,6 +143,14 @@
           "InvenioTech.GateKeeper.Engine": "[1.0.0, )"
         }
       },
+      "inveniotech.gatekeeper.sample.aspnetcore": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.AspNetCore": "[0.1.0, )",
+          "InvenioTech.GateKeeper.Compliance.Redaction": "[0.1.0, )",
+          "InvenioTech.GateKeeper.Serilog": "[0.1.0, )"
+        }
+      },
       "inveniotech.gatekeeper.serilog": {
         "type": "Project",
         "dependencies": {
