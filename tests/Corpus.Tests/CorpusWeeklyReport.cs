@@ -140,7 +140,7 @@ public static class CorpusWeeklyReportWriter
         report.Append("Findings at `warning` and `note` severity are reported but sit outside the gate (section 5.3). No report line names a matched value (rule 10).\n\n");
         report.Append("**Inputs.**\n\n");
         report.Append($"- Harness revision `{input.MeasurementRevision}`, the commit this measurement ran at.\n");
-        report.Append($"- Product version of `gatekeeper-ndpa-check`: `{EngineProduct.EngineVersion}` (the constant every artefact stamps, NFR-031).\n");
+        report.Append($"- Product version of `gatekeeper`: `{EngineProduct.EngineVersion}` (the constant every artefact stamps, NFR-031).\n");
         foreach (var stamp in input.PackStamps.OrderBy(item => item.PackId, StringComparer.Ordinal))
             report.Append($"- Rule pack `{stamp.PackId}` version `{stamp.Version}`, SHA-256 `{stamp.Sha256}`.\n");
         if (input.ValidationPins is null || input.ValidationPins.Count == 0)

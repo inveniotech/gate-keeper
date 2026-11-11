@@ -6,7 +6,7 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 
 /// <summary>
 /// Behaviour tests for the loader of the settings file
-/// <c>.ndpa-check/ndpa-check.toml</c> (configuration specification, section 4;
+/// <c>.gatekeeper/gatekeeper.toml</c> (configuration specification, section 4;
 /// IQ-02, IQ-17, IQ-23). Every key the specification lists gets at least one
 /// test, per the card's acceptance test.
 /// </summary>
@@ -42,7 +42,7 @@ public sealed class ConfigurationLoaderTests
     public void ConfigurationLoader_Should_ApplyEveryDefault_When_TheCheckFolderExistsWithoutTheSettingsFile()
     {
         using var repository = new TemporaryRepository();
-        Directory.CreateDirectory(Path.Combine(repository.Root, ".ndpa-check"));
+        Directory.CreateDirectory(Path.Combine(repository.Root, ".gatekeeper"));
 
         var load = ConfigurationLoader.Load(repository.Root);
 
@@ -75,7 +75,7 @@ public sealed class ConfigurationLoaderTests
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Settings.Should().BeNull();
-        load.Errors.Should().Contain(e => e.Contains("ndpa-check.toml") && e.Contains("schemaVersion"));
+        load.Errors.Should().Contain(e => e.Contains("gatekeeper.toml") && e.Contains("schemaVersion"));
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public sealed class ConfigurationLoaderTests
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Settings.Should().BeNull();
-        load.Errors.Should().Contain(e => e.Contains("ndpa-check.toml"));
+        load.Errors.Should().Contain(e => e.Contains("gatekeeper.toml"));
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public sealed class ConfigurationLoaderTests
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Settings.Should().BeNull();
-        load.Errors.Should().Contain(e => e.Contains("ndpa-check.toml") && e.Contains("byte-order mark"));
+        load.Errors.Should().Contain(e => e.Contains("gatekeeper.toml") && e.Contains("byte-order mark"));
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public sealed class ConfigurationLoaderTests
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Settings.Should().BeNull();
-        load.Errors.Should().Contain(e => e.Contains("ndpa-check.toml") && e.Contains("1,048,576"));
+        load.Errors.Should().Contain(e => e.Contains("gatekeeper.toml") && e.Contains("1,048,576"));
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public sealed class ConfigurationLoaderTests
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Settings.Should().BeNull();
-        load.Errors.Should().Contain(e => e.Contains("ndpa-check.toml"));
+        load.Errors.Should().Contain(e => e.Contains("gatekeeper.toml"));
     }
 
     [Fact]
@@ -562,13 +562,13 @@ public sealed class ConfigurationLoaderTests
     {
         using var repository = new TemporaryRepository();
         repository.WriteSettings(
-            "schemaVersion = 1\n\n[packs]\nlocal = [\".ndpa-check/packs/acme-customer-id.json\"]\n");
+            "schemaVersion = 1\n\n[packs]\nlocal = [\".gatekeeper/packs/acme-customer-id.json\"]\n");
 
         var load = ConfigurationLoader.Load(repository.Root);
 
         load.Errors.Should().BeEmpty();
         var settings = load.Settings.Should().BeOfType<ScanSettings>().Which;
-        settings.LocalPacks.Should().Contain(".ndpa-check/packs/acme-customer-id.json");
+        settings.LocalPacks.Should().Contain(".gatekeeper/packs/acme-customer-id.json");
     }
 
     [Fact]
@@ -637,7 +637,7 @@ public sealed class ConfigurationLoaderTests
             reason = "Fixture values are synthetic and reviewed each quarter."
 
             [packs]
-            local = [".ndpa-check/packs/acme-customer-id.json"]
+            local = [".gatekeeper/packs/acme-customer-id.json"]
             """);
 
         var load = ConfigurationLoader.Load(repository.Root);
@@ -655,7 +655,7 @@ public sealed class ConfigurationLoaderTests
         settings.FailOn.Should().Be(Severity.Warning);
         settings.SeverityOverrides["pii.phone"].Should().Be(Severity.Warning);
         settings.DisabledRules.Should().Contain(e => e.Id == "pii.email");
-        settings.LocalPacks.Should().Contain(".ndpa-check/packs/acme-customer-id.json");
+        settings.LocalPacks.Should().Contain(".gatekeeper/packs/acme-customer-id.json");
     }
 
     /// <summary>
@@ -689,9 +689,9 @@ public sealed class ConfigurationLoaderTests
 
         private string SettingsPath()
         {
-            var folder = Path.Combine(Root, ".ndpa-check");
+            var folder = Path.Combine(Root, ".gatekeeper");
             Directory.CreateDirectory(folder);
-            return Path.Combine(folder, "ndpa-check.toml");
+            return Path.Combine(folder, "gatekeeper.toml");
         }
 
         public void Dispose()

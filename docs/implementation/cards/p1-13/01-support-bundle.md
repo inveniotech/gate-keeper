@@ -4,7 +4,7 @@ Implementation note for issue #23. IQ-55 concerns support and service-level agre
 
 ## First engineering version
 
-Create a local ZIP file at `.ndpa-check/support-bundle.zip`, with an optional repository-relative `--output` filename. Nothing is uploaded automatically. The user reviews the archive and chooses whether to send it through their support channel.
+Create a local ZIP file at `.gatekeeper/support-bundle.zip`, with an optional repository-relative `--output` filename. Nothing is uploaded automatically. The user reviews the archive and chooses whether to send it through their support channel.
 
 The archive contains exactly three UTF-8 JSON entries, in ordinal entry-name order. Entry names are fixed, so no source path can enter an archive name. ZIP entry timestamps use a fixed date, and documents use the scan's declared evaluation date.
 

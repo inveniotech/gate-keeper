@@ -4,21 +4,21 @@ Set-StrictMode -Version Latest
 $root = Join-Path ([IO.Path]::GetTempPath()) ('gate-keeper-package-test-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $root | Out-Null
 try {
-  $binary = Join-Path $root 'gatekeeper-ndpa-check.exe'
+  $binary = Join-Path $root 'gatekeeper.exe'
   [IO.File]::WriteAllBytes($binary, @(1, 2, 3))
   $destination = Join-Path $root 'package'
   & "$PSScriptRoot/Pack-Native.ps1" -Binary $binary -RuntimeIdentifier win-x64 -Destination $destination -ProductVersion 0.1.0
-  $record = Get-Content (Join-Path $destination 'gatekeeper-ndpa-check-win-x64.json') -Raw | ConvertFrom-Json
+  $record = Get-Content (Join-Path $destination 'gatekeeper-win-x64.json') -Raw | ConvertFrom-Json
   if ($record.binaryBytes -ne 3 -or $record.productVersion -cne '0.1.0') { throw 'The package measurement or product stamp is incorrect.' }
   $archive = Join-Path $destination $record.archive
   if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -cne $record.sha256) { throw 'The package checksum is incorrect.' }
   $unpacked = Join-Path $root 'unpacked'
   Expand-Archive -LiteralPath $archive -DestinationPath $unpacked
-  if ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $unpacked 'gatekeeper-ndpa-check.exe'))) -cne [Convert]::ToBase64String([byte[]]@(1, 2, 3))) { throw 'The package changed the executable bytes.' }
+  if ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $unpacked 'gatekeeper.exe'))) -cne [Convert]::ToBase64String([byte[]]@(1, 2, 3))) { throw 'The package changed the executable bytes.' }
   [IO.File]::SetLastWriteTimeUtc($binary, [DateTime]::new(2025, 1, 1, 0, 0, 0, [DateTimeKind]::Utc))
   $second = Join-Path $root 'second-package'
   & "$PSScriptRoot/Pack-Native.ps1" -Binary $binary -RuntimeIdentifier win-x64 -Destination $second -ProductVersion 0.1.0
-  $secondRecord = Get-Content (Join-Path $second 'gatekeeper-ndpa-check-win-x64.json') -Raw | ConvertFrom-Json
+  $secondRecord = Get-Content (Join-Path $second 'gatekeeper-win-x64.json') -Raw | ConvertFrom-Json
   if ($secondRecord.sha256 -cne $record.sha256) { throw 'Archive bytes must not depend on the input file timestamp.' }
   $stream = [IO.File]::OpenWrite($binary)
   try { $stream.SetLength(10MB) } finally { $stream.Dispose() }

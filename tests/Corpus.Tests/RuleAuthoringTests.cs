@@ -12,13 +12,13 @@ public sealed class RuleAuthoringTests
     public async Task AuthoringTemplate_Should_ReportOnlyTheExactToken_When_RunThroughTheCli(string text, int code, int count)
     {
         var root = Path.Combine(Path.GetTempPath(), "gate-keeper-authoring", Guid.NewGuid().ToString("N"));
-        var settings = Path.Combine(root, ".ndpa-check");
+        var settings = Path.Combine(root, ".gatekeeper");
         Directory.CreateDirectory(settings);
         try
         {
             var repository = Path.GetDirectoryName(Path.GetDirectoryName(CorpusPaths.Root))!;
             File.Copy(Path.Combine(repository, "rule-packs", "templates", "local.pack.json"), Path.Combine(settings, "local.json"));
-            File.WriteAllText(Path.Combine(settings, "ndpa-check.toml"), "schemaVersion = 1\n[packs]\nlocal = [\".ndpa-check/local.json\"]\n");
+            File.WriteAllText(Path.Combine(settings, "gatekeeper.toml"), "schemaVersion = 1\n[packs]\nlocal = [\".gatekeeper/local.json\"]\n");
             File.WriteAllText(Path.Combine(root, "example.txt"), text + "\n");
             var output = new StringWriter();
             var errors = new StringWriter();

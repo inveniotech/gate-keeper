@@ -3,7 +3,7 @@
 namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
-/// The outcome of loading <c>.ndpa-check/ndpa-check.toml</c>. Errors are tool
+/// The outcome of loading <c>.gatekeeper/gatekeeper.toml</c>. Errors are tool
 /// errors: what happened, why it matters and what to do next, naming the
 /// settings file (rule 23). Warnings such as an unknown key never fail the
 /// scan (IQ-17) and each names the file or key it refers to. When

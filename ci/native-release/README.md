@@ -8,8 +8,8 @@ macOS binaries are unsigned and are not notarised. macOS may display an operatin
 
 ```powershell
 dotnet publish cli -c Release -r win-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -o artifacts/native
-./ci/native-release/Test-PublishedCorpus.ps1 -Binary artifacts/native/gatekeeper-ndpa-check.exe
-./ci/native-release/Pack-Native.ps1 -Binary artifacts/native/gatekeeper-ndpa-check.exe -RuntimeIdentifier win-x64 -Destination artifacts/release -ProductVersion 0.1.0
+./ci/native-release/Test-PublishedCorpus.ps1 -Binary artifacts/native/gatekeeper.exe
+./ci/native-release/Pack-Native.ps1 -Binary artifacts/native/gatekeeper.exe -RuntimeIdentifier win-x64 -Destination artifacts/release -ProductVersion 0.1.0
 ```
 
 The corpus smoke test verifies the native scanner and its JSON output. It does not claim recall against the future bundled detection rules. The original corpus is copied before test configuration and a mandatory synthetic probe are added.
@@ -37,5 +37,7 @@ git diff --unified=0 707df6d -- Directory.Build.props cli/ScanCli.cs src/Engine/
 $paths = @('Directory.Build.props', 'cli/ScanCli.cs', 'src/Engine/MatcherEngine.cs', 'src/Engine/ScanOrchestrator.cs')
 $paths | ForEach-Object { "$(git rev-parse "707df6d:$_") $_" } > ci/native-release/baseline-instrumentation-base.txt
 ```
+
+A baseline that predates the jurisdiction-neutral names (IQ-92) still builds `gatekeeper-ndpa-check` and reads `.ndpa-check/`. `Rename-BaselineNames.ps1` renames those string constants in the baseline's `cli/` and `src/` sources, so both arms scan the same generated tree. It changes no matching or scanning code, and it does nothing to a baseline that already uses `gatekeeper`, `.gatekeeper/` and `gatekeeper.toml`.
 
 The synthetic reference pack drives repeated shape matching and named-validator rejection over the generated alphabetic text, with no findings or matched values emitted. This provides measurable per-file work and live regex counters without changing either comparison arm's input. Counter tests assert exact search counts and input-byte sums and prove that findings are unchanged. Run them with `dotnet test tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests`.

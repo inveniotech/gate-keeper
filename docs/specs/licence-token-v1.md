@@ -26,7 +26,7 @@ The register entry for each identifier is an owner record. This specification ci
 
 ### 0.2 Normative keywords
 
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper-ndpa-check`. When it writes "the token", it means one licence file in the format below. Ed25519 means the pure Ed25519 signature scheme, with a 32-byte public key and a 64-byte signature.
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper`. When it writes "the token", it means one licence file in the format below. Ed25519 means the pure Ed25519 signature scheme, with a 32-byte public key and a 64-byte signature.
 
 ### 0.3 Change log
 

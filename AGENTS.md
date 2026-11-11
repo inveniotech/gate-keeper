@@ -80,7 +80,7 @@
 
 ### A6. Language, naming and documentation
 
-4. **Glossary conformance.** Doc 15's vocabulary and banned terms apply to identifiers, docs, UI copy and messages (NFR-028 lints it): "rule pack" never "ruleset"; "posture" never "compliance score"; "updates plan" never "subscription"; the binary is `gatekeeper-ndpa-check`. **Name forms:** "Gate-Keeper" in prose; `gate-keeper` for repositories, packages and images; `GateKeeper` in .NET namespaces and type names; `gatekeeper` for domains, the binary and the licence product ID; never "Gatekeeper", "Gate Keeper" or "gate_keeper" (Doc 15).
+4. **Glossary conformance.** Doc 15's vocabulary and banned terms apply to identifiers, docs, UI copy and messages (NFR-028 lints it): "rule pack" never "ruleset"; "posture" never "compliance score"; "updates plan" never "subscription"; the binary is `gatekeeper`. **Name forms:** "Gate-Keeper" in prose; `gate-keeper` for repositories, packages and images; `GateKeeper` in .NET namespaces and type names; `gatekeeper` for domains, the binary and the licence product ID; never "Gatekeeper", "Gate Keeper" or "gate_keeper" (Doc 15).
 
 17. **Language: en-NG / en-GB.** All prose you produce — docs, READMEs, comments, commit messages, UI copy, error messages — uses Nigerian/British English: -ise spellings, "licence" as the noun and "license" as the verb, dates as "27 October 2026". Code identifiers follow each stack's idiom and are exempt.
 

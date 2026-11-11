@@ -17,15 +17,15 @@ try {
     if (-not (Test-Path -LiteralPath $source)) { continue }
     $root = Join-Path $work $case.Name
     Copy-Item -LiteralPath $source -Destination $root -Recurse
-    $folder = Join-Path $root '.ndpa-check'
+    $folder = Join-Path $root '.gatekeeper'
     New-Item -ItemType Directory -Path $folder -Force | Out-Null
     Copy-Item -LiteralPath "$PSScriptRoot/../zero-egress/probe.pack.json" -Destination (Join-Path $folder 'probe.json')
-    [IO.File]::WriteAllText((Join-Path $folder 'ndpa-check.toml'), (@('schemaVersion = 1', '[repository]', 'id = "synthetic/native-corpus"', '[packs]', 'local = [".ndpa-check/probe.json"]', '') -join [char]10))
+    [IO.File]::WriteAllText((Join-Path $folder 'gatekeeper.toml'), (@('schemaVersion = 1', '[repository]', 'id = "synthetic/native-corpus"', '[packs]', 'local = [".gatekeeper/probe.json"]', '') -join [char]10))
     [IO.File]::WriteAllText((Join-Path $root 'egress-probe.txt'), "gatekeeper-corpus-probe`n")
     Push-Location $root
     try {
       if ($ContainerImage) {
-        $result = & docker run --rm --network none --mount "type=bind,src=$root,dst=/scan,readonly" --mount "type=bind,src=$binaryPath,dst=/gatekeeper-ndpa-check,readonly" -w /scan $ContainerImage /gatekeeper-ndpa-check scan --json --evaluated-on 2026-11-01 2> (Join-Path $work 'diagnostics.txt')
+        $result = & docker run --rm --network none --mount "type=bind,src=$root,dst=/scan,readonly" --mount "type=bind,src=$binaryPath,dst=/gatekeeper,readonly" -w /scan $ContainerImage /gatekeeper scan --json --evaluated-on 2026-11-01 2> (Join-Path $work 'diagnostics.txt')
       } else {
         $result = & $binaryPath scan --json --evaluated-on 2026-11-01 2> (Join-Path $work 'diagnostics.txt')
       }

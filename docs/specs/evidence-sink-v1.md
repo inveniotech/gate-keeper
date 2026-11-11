@@ -26,7 +26,7 @@ The register entry for each identifier is an owner record. This specification ci
 
 ### 0.2 Normative keywords
 
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper-ndpa-check`. When it writes "the evidence file", it means the Gate-Keeper evidence JSON for one scan. SHA-256 means the 256-bit hash from FIPS 180-4, written as 64 lowercase hexadecimal characters.
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper`. When it writes "the evidence file", it means the Gate-Keeper evidence JSON for one scan. SHA-256 means the 256-bit hash from FIPS 180-4, written as 64 lowercase hexadecimal characters.
 
 ### 0.3 Change log
 

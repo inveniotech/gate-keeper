@@ -17,9 +17,9 @@ Normative text in this specification comes from the recorded decisions listed he
 | Identifier | Status | What it settles |
 |---|---|---|
 | IQ-01 | Decided | Exception expiry and baseline age use `evaluatedOn`, an explicit date input. They do not use the commit timestamp. |
-| IQ-02 | Decided | Everything read from a customer repository lives in `.ndpa-check/`. There is no root-level configuration file and no `.gk/` directory. |
-| IQ-17 | Decided | Unknown keys in `ndpa-check.toml` produce a warning and do not fail the scan. |
-| IQ-19 | Decided | `baseline` writes `.ndpa-check/baseline.json` containing fingerprints and the date each entry was added, never a matched value. Baselined findings are reported and do not fail continuous integration. `baseline.maxAgeDays` makes entries older than that fail again. |
+| IQ-02 | Decided | Everything read from a customer repository lives in `.gatekeeper/`. There is no root-level configuration file and no `.gk/` directory. |
+| IQ-17 | Decided | Unknown keys in `gatekeeper.toml` produce a warning and do not fail the scan. |
+| IQ-19 | Decided | `baseline` writes `.gatekeeper/baseline.json` containing fingerprints and the date each entry was added, never a matched value. Baselined findings are reported and do not fail continuous integration. `baseline.maxAgeDays` makes entries older than that fail again. |
 | IQ-20 | Decided | A fingerprint is a hash-based message authentication code using SHA-256 (HMAC-SHA-256) over the rule identifier, the repository-relative path, the matched value and the occurrence index. The key is never written to any output. |
 | IQ-21 | Decided | Work-tree enumeration, the built-in exclusions, the size limit, binary and encoding rules, submodules, Git LFS pointers, and `--changed-since`. |
 | IQ-22 | Decided | Severities are `error`, `warning` and `note`. The default failure threshold is `fail-on = "error"`. A severity change is recorded in the evidence. |
@@ -35,7 +35,7 @@ The register entry for each identifier is an owner record. This specification ci
 
 ### 0.2 Normative keywords
 
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper-ndpa-check`. When it writes "a scan", it means an invocation of that binary that scans a tree. `init`, `baseline` and `doctor` are named subcommands.
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are to be interpreted as described in RFC 2119. When this document writes "the binary", it means `gatekeeper`. When it writes "a scan", it means an invocation of that binary that scans a tree. `init`, `baseline` and `doctor` are named subcommands.
 
 ### 0.3 Change log
 
@@ -56,7 +56,7 @@ The decisions name the behaviour and, in several places, the key. They do not al
 7. **A missing fingerprint key does not apply the baseline.** Findings stay visible. IQ-86 says a missing key does not fail the scan; hiding findings without a key would do the opposite of what the baseline is for.
 8. **Flag names** `--profile`, `--include-submodules`, `--changed-since` and `--evaluated-on`.
 9. **The fingerprint message and the exception `entryHash` line order** in sections 11.4 and 13.2. The test vectors in those sections are computed from that order.
-10. **The built-in exclusion list** in section 6, including the closed lock-file names, the minified suffixes, and the rule that `.ndpa-check/` is not scanned.
+10. **The built-in exclusion list** in section 6, including the closed lock-file names, the minified suffixes, and the rule that `.gatekeeper/` is not scanned.
 11. **`--changed-since` does not turn history off.** It only limits the work tree. History follows `scan.history` and the profile. A pull-request scan that also runs history is outside the 30-second budget.
 
 ---
@@ -65,7 +65,7 @@ The decisions name the behaviour and, in several places, the key. They do not al
 
 ### 1.1 In scope
 
-The directory `.ndpa-check/`, the keys and defaults of `ndpa-check.toml`, the two scan profiles, the exceptions file, the baseline file, the fingerprint key, and the scan-scope options that change which files are read. The lifecycle of an exception expiry and of a baseline entry that has passed `baseline.maxAgeDays`.
+The directory `.gatekeeper/`, the keys and defaults of `gatekeeper.toml`, the two scan profiles, the exceptions file, the baseline file, the fingerprint key, and the scan-scope options that change which files are read. The lifecycle of an exception expiry and of a baseline entry that has passed `baseline.maxAgeDays`.
 
 ### 1.2 Not in scope
 
@@ -78,22 +78,22 @@ The directory `.ndpa-check/`, the keys and defaults of `ndpa-check.toml`, the tw
 
 ## 2. Directory and discovery
 
-A scan reads customer configuration only from a directory named `.ndpa-check` at the root of the tree being scanned. The root is the git work-tree root when the tree is a git work tree, and the directory the user asked to scan otherwise. The binary MUST NOT walk parent directories to find a configuration file, and it MUST NOT read a configuration file at the repository root. The name `.gk` is not a configuration directory.
+A scan reads customer configuration only from a directory named `.gatekeeper` at the root of the tree being scanned. The root is the git work-tree root when the tree is a git work tree, and the directory the user asked to scan otherwise. The binary MUST NOT walk parent directories to find a configuration file, and it MUST NOT read a configuration file at the repository root. The name `.gk` is not a configuration directory.
 
 | Path | Role | Required |
 |---|---|---|
-| `.ndpa-check/ndpa-check.toml` | Settings. | No. When the file is absent, the defaults in section 4 apply. |
-| `.ndpa-check/exceptions.toml` | Exceptions. | No. When the file is absent, there are no exceptions. |
-| `.ndpa-check/baseline.json` | Baseline fingerprints. | No. When the file is absent, no finding is baselined. |
-| `.ndpa-check/fingerprint.key` | The per-repository fingerprint key. | No. When the file is absent, section 13.4 applies. |
-| `.ndpa-check/.gitignore` | Written by `init` so that git ignores the key. | No. |
-| `.ndpa-check/packs/` | The conventional place for local packs. The loader reads only the paths in `packs.local`. | No. |
+| `.gatekeeper/gatekeeper.toml` | Settings. | No. When the file is absent, the defaults in section 4 apply. |
+| `.gatekeeper/exceptions.toml` | Exceptions. | No. When the file is absent, there are no exceptions. |
+| `.gatekeeper/baseline.json` | Baseline fingerprints. | No. When the file is absent, no finding is baselined. |
+| `.gatekeeper/fingerprint.key` | The per-repository fingerprint key. | No. When the file is absent, section 13.4 applies. |
+| `.gatekeeper/.gitignore` | Written by `init` so that git ignores the key. | No. |
+| `.gatekeeper/packs/` | The conventional place for local packs. The loader reads only the paths in `packs.local`. | No. |
 
-Files inside `.ndpa-check/` are configuration. A scan MUST NOT open them as files to be matched for findings, and it MUST NOT write the fingerprint key into any result.
+Files inside `.gatekeeper/` are configuration. A scan MUST NOT open them as files to be matched for findings, and it MUST NOT write the fingerprint key into any result.
 
-Changes to this directory are how a repository accepts risk. Teams that want the Data Protection Officer to approve that risk protect `.ndpa-check/` with code owners. The binary does not read `CODEOWNERS`.
+Changes to this directory are how a repository accepts risk. Teams that want the Data Protection Officer to approve that risk protect `.gatekeeper/` with code owners. The binary does not read `CODEOWNERS`.
 
-The settings file, the exceptions file, the baseline file and the key file, when present, MUST be UTF-8. A byte-order mark is a tool error. `ndpa-check.toml` and `exceptions.toml` MAY use LF or CRLF line endings (line feed, or carriage return followed by line feed). `baseline.json`, as written by `baseline`, uses LF only. The settings file, the exceptions file and the baseline file MUST each be at most 1,048,576 bytes. A larger file is a tool error.
+The settings file, the exceptions file, the baseline file and the key file, when present, MUST be UTF-8. A byte-order mark is a tool error. `gatekeeper.toml` and `exceptions.toml` MAY use LF or CRLF line endings (line feed, or carriage return followed by line feed). `baseline.json`, as written by `baseline`, uses LF only. The settings file, the exceptions file and the baseline file MUST each be at most 1,048,576 bytes. A larger file is a tool error.
 
 ---
 
@@ -115,7 +115,7 @@ The same files, packs, configuration and `evaluatedOn` MUST produce the same dis
 
 ## 4. Settings file
 
-`ndpa-check.toml` is a TOML document. `schemaVersion` MUST be the integer `1`. Any other value is a tool error that tells the user to use a build that supports the version, or to keep the file at version 1. A document the TOML parser rejects is a tool error naming the file and, when the parser reports it, the line.
+`gatekeeper.toml` is a TOML document. `schemaVersion` MUST be the integer `1`. Any other value is a tool error that tells the user to use a build that supports the version, or to keep the file at version 1. A document the TOML parser rejects is a tool error naming the file and, when the parser reports it, the line.
 
 A duplicate key is a tool error. Dates and severities are strings. A TOML date, a float, or a string where an integer is required is a tool error.
 
@@ -136,7 +136,7 @@ Every key is listed with its type, the default when the key is omitted, and an e
 | `fail-on` | string | `"error"` | `"warning"` |
 | `severity.overrides` | table of rule identifier to severity | `{}` | `"pii.phone" = "warning"` |
 | `rules.disabled` | array of `{ id, reason }` | `[]` | `id = "pii.email"`, with a reason |
-| `packs.local` | array of strings | `[]` | `[".ndpa-check/packs/acme-customer-id.json"]` |
+| `packs.local` | array of strings | `[]` | `[".gatekeeper/packs/acme-customer-id.json"]` |
 
 `scan.profile` MUST be `default` or `deep`. `fail-on` and every override value MUST be `error`, `warning` or `note`. `baseline.maxAgeDays` MUST be an integer greater than or equal to 0. `scan.maxFileBytes` MUST be an integer from 1 to 104,857,600. A value outside those sets is a tool error.
 
@@ -155,7 +155,7 @@ Flags override the file for one run. They are not written back to the file.
 | `--changed-since <ref>` | Omitted, so the whole in-scope work tree is scanned. | `--changed-since origin/master` | Limits the work tree to files changed since that git reference (section 6). |
 | `--evaluated-on <date>` | Section 3. | `--evaluated-on 2026-11-02` | Sets `evaluatedOn`. |
 
-There is no flag for the fingerprint key and no environment variable that carries it. The only input is the file `.ndpa-check/fingerprint.key`. Continuous integration writes the secret to that path before the scan and MUST NOT print the secret.
+There is no flag for the fingerprint key and no environment variable that carries it. The only input is the file `.gatekeeper/fingerprint.key`. Continuous integration writes the secret to that path before the scan and MUST NOT print the secret.
 
 ### 4.3 Example that sets every key
 
@@ -185,7 +185,7 @@ id = "pii.email"
 reason = "Fixture addresses are synthetic and are reviewed each quarter."
 
 [packs]
-local = [".ndpa-check/packs/acme-customer-id.json"]
+local = [".gatekeeper/packs/acme-customer-id.json"]
 ```
 
 Rule identifiers used as `severity.overrides` keys MUST be quoted. An unquoted `pii.phone` is a nested TOML table, not a rule identifier.
@@ -196,7 +196,7 @@ Rule identifiers used as `severity.overrides` keys MUST be quoted. An unquoted `
 schemaVersion = 1
 ```
 
-`init` writes this file when `ndpa-check.toml` is absent. It does not overwrite an existing file.
+`init` writes this file when `gatekeeper.toml` is absent. It does not overwrite an existing file.
 
 ---
 
@@ -241,7 +241,7 @@ These exclusions always apply. `scan.exclude` adds globs; it cannot remove a bui
 
 A path is excluded when any segment equals one of these names under ordinal ignore-case comparison:
 
-`.git`, `node_modules`, `bin`, `obj`, `dist`, `build`, `vendor`, `.ndpa-check`
+`.git`, `node_modules`, `bin`, `obj`, `dist`, `build`, `vendor`, `.gatekeeper`
 
 A path is excluded when its file name equals one of these lock-file names under ordinal ignore-case comparison:
 
@@ -294,7 +294,7 @@ Every override and every disabled rule is recorded in the evidence JSON (P0-04 c
 
 ## 9. Local packs
 
-`packs.local` is a list of paths to unsigned local rule packs. Paths are relative to the repository root, use `/`, and MUST NOT contain `..`, a leading `/` or `\`. A path that fails those rules, or that does not exist, is a tool error. There is no command-line flag to add a pack: adding a path is a configuration change. The pack loader opens these paths itself. The enumerator skips `.ndpa-check/`, and that skip does not stop the loader from reading a local pack stored there.
+`packs.local` is a list of paths to unsigned local rule packs. Paths are relative to the repository root, use `/`, and MUST NOT contain `..`, a leading `/` or `\`. A path that fails those rules, or that does not exist, is a tool error. There is no command-line flag to add a pack: adding a path is a configuration change. The pack loader opens these paths itself. The enumerator skips `.gatekeeper/`, and that skip does not stop the loader from reading a local pack stored there.
 
 A local pack uses the rule-pack format with `provenance` of `local`. Every rule identifier MUST start with `local.`. A local rule identifier that equals any other loaded rule identifier is a load error, the same outcome as two packs defining one identifier. A local pack cannot replace an Invenio rule. Outputs that name the pack mark its provenance as `local`.
 
@@ -327,7 +327,7 @@ Examples:
 
 ## 11. Exceptions
 
-`exceptions.toml` is a TOML document with `schemaVersion = 1` and zero or more `[[exception]]` tables. A parser error, a duplicate key, an unknown key, or a `schemaVersion` other than 1 is a tool error. Unknown keys are rejected here, unlike in `ndpa-check.toml`, because a misspelled field would otherwise look like an accepted exception.
+`exceptions.toml` is a TOML document with `schemaVersion = 1` and zero or more `[[exception]]` tables. A parser error, a duplicate key, an unknown key, or a `schemaVersion` other than 1 is a tool error. Unknown keys are rejected here, unlike in `gatekeeper.toml`, because a misspelled field would otherwise look like an accepted exception.
 
 ### 11.1 Fields
 
@@ -466,7 +466,7 @@ When the key is missing, the baseline is not applied, even if the file is presen
 
 ### 13.1 Key file
 
-`.ndpa-check/fingerprint.key` contains a cryptographic random 32-byte key, written as 64 lowercase hexadecimal characters followed by a single LF. `init` creates it when the file is absent. `baseline` creates it when the file is absent and `init` has not been run. Neither command overwrites an existing key.
+`.gatekeeper/fingerprint.key` contains a cryptographic random 32-byte key, written as 64 lowercase hexadecimal characters followed by a single LF. `init` creates it when the file is absent. `baseline` creates it when the file is absent and `init` has not been run. Neither command overwrites an existing key.
 
 Where the file system can express it, the file is readable and writable only by the user who created it. The key bytes MUST NOT appear in SARIF, evidence JSON, standard output, standard error, logs, a support bundle, or any other output.
 
@@ -513,11 +513,11 @@ When a baseline file is also present, the warning continues:
 
 ### 13.5 Git and continuous integration
 
-`init` writes `.ndpa-check/.gitignore` if needed. The file is UTF-8, LF, and contains the line `fingerprint.key`. If the file already exists, `init` leaves every other line alone and appends `fingerprint.key` only when no existing line is exactly that text.
+`init` writes `.gatekeeper/.gitignore` if needed. The file is UTF-8, LF, and contains the line `fingerprint.key`. If the file already exists, `init` leaves every other line alone and appends `fingerprint.key` only when no existing line is exactly that text.
 
-`doctor` warns when git tracks `.ndpa-check/fingerprint.key`. The warning does not by itself fail a scan. The warning text is:
+`doctor` warns when git tracks `.gatekeeper/fingerprint.key`. The warning does not by itself fail a scan. The warning text is:
 
-"Git is tracking .ndpa-check/fingerprint.key. Anyone who can read the repository can reverse a fingerprint of a short identifier. Stop tracking the file, remove it from history, and replace the key."
+"Git is tracking .gatekeeper/fingerprint.key. Anyone who can read the repository can reverse a fingerprint of a short identifier. Stop tracking the file, remove it from history, and replace the key."
 
 Continuous integration supplies the same file as a secret file. The binary does not fetch it.
 
@@ -525,7 +525,7 @@ Continuous integration supplies the same file as a secret file. The binary does 
 
 ## 14. `init` and `doctor`
 
-`gatekeeper-ndpa-check init` creates `.ndpa-check/` when it is absent, writes the key when it is absent, ensures `.gitignore` contains `fingerprint.key`, and writes the minimal `ndpa-check.toml` from section 4.4 when that file is absent. It does not write `exceptions.toml` or `baseline.json`. It does not print the key. It tells the user that continuous integration must receive the key as a secret file.
+`gatekeeper init` creates `.gatekeeper/` when it is absent, writes the key when it is absent, ensures `.gitignore` contains `fingerprint.key`, and writes the minimal `gatekeeper.toml` from section 4.4 when that file is absent. It does not write `exceptions.toml` or `baseline.json`. It does not print the key. It tells the user that continuous integration must receive the key as a secret file.
 
 `doctor` performs the tracked-key check in section 13.5. The rest of `doctor` is P1-13. This specification adds the tracked-key warning to that command; it does not define `doctor`'s other checks.
 

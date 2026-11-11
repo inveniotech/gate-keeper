@@ -1,7 +1,7 @@
 {
   "name": "gate-keeper-glossary",
-  "version": "1.0.0",
-  "source": "The Gate-Keeper product glossary (Doc 15) and the name-form convention decided by the owner on 28 October 2026.",
+  "version": "1.1.0",
+  "source": "The Gate-Keeper product glossary (Doc 15) and the name-form convention decided by the owner on 28 October 2026, amended by the owner on 11 November 2026 to remove the jurisdiction from the binary, folder and file names.",
   "terms": [
     {
       "term": "rule pack",
@@ -52,15 +52,9 @@
     },
     {
       "form": "gatekeeper",
-      "usedFor": "Domains, the command-line binary, the licence product claim, and environment variables (written in upper case).",
+      "usedFor": "Domains, the command-line binary, the configuration folder and file, the licence product claim, and environment variables (written in upper case). The names carry no jurisdiction, because jurisdictions are rule packs.",
       "appliesTo": "identifiers",
-      "examples": [ "gatekeeper.africa", "gatekeeper-ndpa-check", "product: gatekeeper", "GATEKEEPER_LICENCE" ]
-    },
-    {
-      "form": "ndpa-check",
-      "usedFor": "The configuration folder and file.",
-      "appliesTo": "identifiers",
-      "examples": [ ".ndpa-check/", "ndpa-check.toml" ]
+      "examples": [ "gatekeeper.africa", "gatekeeper scan", "product: gatekeeper", "GATEKEEPER_LICENCE", ".gatekeeper/", "gatekeeper.toml" ]
     }
   ],
   "bannedVariants": [

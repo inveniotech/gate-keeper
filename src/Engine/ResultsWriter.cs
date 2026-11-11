@@ -128,7 +128,7 @@ public static class ResultsWriter
             Version = "2.1.0",
             Runs = [new SarifRun
             {
-                Tool = new Tool { Driver = new ToolComponent { Name = "gatekeeper-ndpa-check", Version = EngineProduct.EngineVersion, InformationUri = "https://gatekeeper.africa/", Rules = descriptors } },
+                Tool = new Tool { Driver = new ToolComponent { Name = "gatekeeper", Version = EngineProduct.EngineVersion, InformationUri = "https://gatekeeper.africa/", Rules = descriptors } },
                 Invocations = [new Invocation { ExecutionSuccessful = true, ExitCode = (int)input.Outcome,
                     ToolExecutionNotifications = warnings.Length == 0 ? null : warnings.Select(w => new Notification { Level = FailureLevel.Warning, Message = new Message { Text = w.Message } }).ToArray() }],
                 Results = results,

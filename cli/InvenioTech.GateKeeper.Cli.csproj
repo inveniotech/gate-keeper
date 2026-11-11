@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>InvenioTech.GateKeeper.Cli</RootNamespace>
-    <AssemblyName>gatekeeper-ndpa-check</AssemblyName>
+    <AssemblyName>gatekeeper</AssemblyName>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
