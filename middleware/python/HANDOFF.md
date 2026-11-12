@@ -54,8 +54,10 @@ promotes unsigned authored packs or development keys into production trust.
 Supply independently signed release media before claiming a distributable free
 or paid installation. No production signing keys are needed for further work.
 
-Hosted CI on all five Python interpreters must be observed before review is
-complete. No full local Python 3.12 or 3.14 run is claimed. The independent check
+Hosted CI passed on all five Python interpreters on commit 7961938, including
+framework samples, strict types and package validation. The initial Python 3.15
+build-tool failure was fixed by updating the existing build pin to 1.6.1.
+No full local Python 3.12 or 3.14 run is claimed. The independent check
 phase required by AGENTS.md rule 37 still needs its own fresh session. This is
 why the pull request is a draft and references, rather than closes, issue #42.
 The linked website guide and production publication are outside this change.
@@ -67,3 +69,21 @@ gate, including the unchanged zero-egress proof, and resolve any findings.
 Complete release-media integration and linked website documentation before
 closing #42. No merge, tag, release or package publication is authorised here.
 Unrelated Node and JVM changes in the original working directory were excluded.
+
+## SDK restore follow-up
+
+The owner requested the SDK/lock-file mismatch fix after the Python jobs passed.
+Broad SDK roll-forward selected 10.0.404 even though CI installed 10.0.403. The
+newer SDK implicitly required linker tools 10.0.15 while the committed lock files
+required 10.0.14, causing NU1004 during locked restore. Exact SDK 10.0.403 selection
+is restored with roll-forward disabled. The build guide explains that future
+SDK, CI version and generated lock-file updates must be made together.
+
+The mismatch was reproduced with SDK 10.0.404 before the change. With the exact
+10.0.403 SDK in the official Linux container, locked restore passed without
+changing any committed lock file, and the solution built with zero warnings or
+errors. All 1,684 .NET tests passed; one existing symbolic-link corpus test was
+skipped on the mounted filesystem. The middleware probe also published with
+NativeAOT and trimming warnings treated as errors and passed when executed.
+The first container restore hit a dependency download timeout; the successful
+run used the existing local NuGet cache mounted read-only.

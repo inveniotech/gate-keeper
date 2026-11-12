@@ -22,11 +22,16 @@ The scan command now runs configured local rule packs and prints a console summa
 
 ## Build and test
 
-.NET 10 is pinned in `global.json`. From the repository root:
+Install .NET SDK 10.0.403, the exact version pinned in `global.json` and installed
+by CI. SDK roll-forward is disabled because SDK updates can change implicit
+linker and ahead-of-time compiler dependencies, invalidating locked restores.
+When upgrading the SDK, update the CI versions and regenerate the affected
+lock files together. From the repository root:
 
 ```powershell
-dotnet build
-dotnet test
+dotnet restore --locked-mode
+dotnet build --no-restore
+dotnet test --no-restore
 ```
 
 NuGet versions are pinned in `packages.lock.json`. Restore with `dotnet restore --locked-mode`.
