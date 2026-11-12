@@ -23,7 +23,13 @@ export interface Finding { readonly ruleId: string; readonly category: string; r
 export interface Context { readonly surface: 'log' | 'response' | 'value'; readonly fieldName?: string }
 export interface PackVersion { readonly id: string; readonly version: string; readonly contentDigest: string }
 export class InputLimitError extends Error { constructor() { super('Middleware input or result exceeds 65,536 Unicode scalars. Split the value.'); this.name = 'InputLimitError'; } }
-export class PackLoadError extends Error { constructor() { super('Middleware rule data is invalid. Load a verified compatible signed pack.'); this.name = 'PackLoadError'; } }
+/** Pack verification failure. Incompatible replacements require an adapter upgrade rather than fallback. */
+export class PackLoadError extends Error {
+  readonly incompatible: boolean;
+  constructor(message = 'Middleware rule data is invalid. Load a verified compatible signed pack.', incompatible = false) {
+    super(message); this.name = 'PackLoadError'; this.incompatible = incompatible;
+  }
+}
 
 const fold = (value: string): string => value.replace(/[A-Z]/g, (c) => c.toLowerCase());
 const printable = (value: string): boolean => value.length > 0 && !/[^\x20-\x7e]/.test(value);
