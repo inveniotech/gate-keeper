@@ -6,10 +6,10 @@ The exact help text of this build follows, captured from the command line itself
 
 ```text
 Description:
-  Scans a repository for personal data that the Nigeria Data Protection Act 2023 protects. The detection rules ship as data in rule packs. Running the binary with no arguments runs the scan.
+  Scans a repository for personal data that its rule packs describe. The bundled rule packs cover the Nigeria Data Protection Act 2023. The detection rules ship as data in rule packs. Running the binary with no arguments runs the scan.
 
 Usage:
-  gatekeeper-ndpa-check [command] [options]
+  gatekeeper [command] [options]
 
 Options:
   --version                      Prints the product version and the bundled pack version
@@ -19,8 +19,8 @@ Options:
 
 Commands:
   scan            Scans a repository and writes a console summary or evidence JSON
-  init            Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build
-  baseline        Writes current work-tree findings to .ndpa-check/baseline.json
+  init            Creates .gatekeeper/ with a starter configuration and the fingerprint key; not implemented in this build
+  baseline        Writes current work-tree findings to .gatekeeper/baseline.json
   doctor          Checks configuration, rule packs, Git and output access without scanning source
   support-bundle  Writes a local ZIP of masked configuration, versions and finding counts
   version         Prints the product version and the bundled pack version

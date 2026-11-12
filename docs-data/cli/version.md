@@ -9,7 +9,7 @@ Description:
   Prints the product version and the bundled pack version
 
 Usage:
-  gatekeeper-ndpa-check version [options]
+  gatekeeper version [options]
 
 Options:
   -?, -h, --help  Show help and usage information

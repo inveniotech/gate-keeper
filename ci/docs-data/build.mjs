@@ -194,10 +194,11 @@ export async function docsDataFiles(run) {
   return files;
 }
 
-function binaryCandidates() {
+/** Returns the default Release apphost paths for the requested operating system. */
+export function binaryCandidates(platform = process.platform) {
   const folder = fileURLToPath(new URL('../../cli/bin/Release/net10.0/', import.meta.url));
-  return process.platform === 'win32' ? [`${folder}gatekeeper-ndpa-check.exe`, `${folder}gatekeeper-ndpa-check`]
-    : [`${folder}gatekeeper-ndpa-check`];
+  return platform === 'win32' ? [`${folder}gatekeeper.exe`, `${folder}gatekeeper`]
+    : [`${folder}gatekeeper`];
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

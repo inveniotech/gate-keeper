@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>InvenioTech.GateKeeper.Serilog</RootNamespace>
+    <AssemblyName>InvenioTech.GateKeeper.Serilog</AssemblyName>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../version.txt').Trim())</Version>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../InvenioTech.GateKeeper.Middleware.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Approved under AGENTS.md rule 8 on 10 November 2026 for card P3-02; supplies the enricher and destructuring-policy interfaces. -->
+    <PackageReference Include="Serilog" />
+  </ItemGroup>
+</Project>
