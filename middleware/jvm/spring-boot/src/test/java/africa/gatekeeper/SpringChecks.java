@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.http.server.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.env.MapPropertySource;
 import java.nio.file.*;
 import java.util.*;
@@ -21,6 +22,9 @@ public final class SpringChecks {
         });
         check(response.getContentAsString().contains("[REDACTED:pii.synthetic]"));
         if (json.contains("é")) check(response.getContentAsString().contains("é"));
+    }
+    private static MethodParameter returnType() throws NoSuchMethodException {
+        return new MethodParameter(SpringChecks.class.getDeclaredMethod("main", String[].class), -1);
     }
     private static byte[] hex(String value) {
         byte[] bytes = new byte[value.length() / 2];
@@ -76,12 +80,12 @@ public final class SpringChecks {
         }
         GateKeeperResponseAdvice advice = new GateKeeperResponseAdvice(matcher, List.of("/value"), new ObjectMapper());
         MockHttpServletRequest request = new MockHttpServletRequest(); MockHttpServletResponse response = new MockHttpServletResponse();
-        Object result = advice.beforeBodyWrite(Map.of("value", "synthetic"), null, MediaType.APPLICATION_JSON,
+        Object result = advice.beforeBodyWrite(Map.of("value", "synthetic"), returnType(), MediaType.APPLICATION_JSON,
             MappingJackson2HttpMessageConverter.class, new ServletServerHttpRequest(request), new ServletServerHttpResponse(response));
         check(((Map<?, ?>) result).get("value").equals("[REDACTED:pii.synthetic]"));
         check(Boolean.TRUE.equals(request.getAttribute(GateKeeperResponseAdvice.FILTERED_ATTRIBUTE)));
         Map<String, Object> nullable = new HashMap<>(); nullable.put("value", null);
-        try { advice.beforeBodyWrite(nullable, null, MediaType.APPLICATION_JSON, MappingJackson2HttpMessageConverter.class,
+        try { advice.beforeBodyWrite(nullable, returnType(), MediaType.APPLICATION_JSON, MappingJackson2HttpMessageConverter.class,
             new ServletServerHttpRequest(new MockHttpServletRequest()), new ServletServerHttpResponse(new MockHttpServletResponse())); throw new AssertionError("Null leaf must fail."); }
         catch (ResponseFilter.ResponseFilterException expected) { }
     }
