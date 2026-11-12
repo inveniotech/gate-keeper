@@ -1,0 +1,28 @@
+name: Publish Node middleware with provenance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          registry-url: https://registry.npmjs.org
+      - name: Validate the release package
+        working-directory: middleware/node
+        run: |
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          npm run test:package
+          npm pack --dry-run
+      - name: Publish through npm trusted publishing
+        working-directory: middleware/node
+        run: |
+          npm pkg delete private
+          npm publish --provenance --access public
