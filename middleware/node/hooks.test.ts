@@ -159,7 +159,7 @@ test('Express should preserve native methods without configured paths', () => {
   assert.equal(res.write, write); assert.equal(res.end, end); res.write(source); res.end(source);
   assert.deepEqual(res.written, [source, source]);
 });
-test('Express should reject reentrant JSON during trusted delegation', () => {
+test('Express should reject re-entrant JSON during trusted delegation', () => {
   const res = nativeResponse(); const errors: unknown[] = [];
   res.json = function () { this.json({ value: source }); return this.end(source); };
   createExpressMiddleware(runtime, ['/value'], 4096)({}, res, (error) => { if (error) errors.push(error); });
@@ -185,7 +185,7 @@ test('Express should preserve native callback arguments and return values during
   assert.equal(res.json({ value: source }), res);
   assert.deepEqual(observed, [[JSON.stringify({ value: safe }), 'utf8', callback], [callback]]);
 });
-test('Express should latch rejection before invoking a reentrant error handler', () => {
+test('Express should latch rejection before invoking a re-entrant error handler', () => {
   const res = nativeResponse(); let errors = 0;
   createExpressMiddleware(runtime, ['/value'], 4096)({}, res, (error) => {
     if (error) { errors++; res.json({ value: source }); res.end(source); }
