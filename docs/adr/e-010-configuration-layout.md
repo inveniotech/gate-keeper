@@ -1,4 +1,4 @@
-# E-010: Configuration, exceptions and baseline layout
+# E-010: CLI binary and configuration naming
 
 ## Context
 
@@ -7,6 +7,11 @@ baseline state. Reviewers must be able to identify configuration changes and
 understand which settings produced the evidence.
 
 ## Decision
+
+Use `gatekeeper` as the command-line interface (CLI) binary and `.gatekeeper/`
+as its configuration directory, with `gatekeeper.toml` inside that directory.
+These are the current names in the [CLI contract](../../cli/README.md) and
+configuration specification. Historic jurisdiction-specific names are superseded.
 
 Use the [configuration specification](../specs/config-v1.md) as the single
 source of truth for discovery, file names, profiles, exceptions and baselines.
@@ -36,6 +41,7 @@ create competing contracts. These are draft rationale for owner review.
 
 - P0-02, [issue #1](https://github.com/inveniotech/gate-keeper/issues/1).
 - R-6, amended by IQ-02 and IQ-92.
+- Engineering Plan Draft 6, sections 4.13 and 7, E-010.
 - P0-05, [issue #4](https://github.com/inveniotech/gate-keeper/issues/4).
 - [Configuration decision table](../specs/config-v1.md#01-decision-status).
 - Rules 6, 10 and 24 of [AGENTS.md](../../AGENTS.md).

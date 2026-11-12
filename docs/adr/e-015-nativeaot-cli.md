@@ -20,10 +20,11 @@ The spike is feasibility evidence, not a new permanent binary-size budget.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** The source decision is described
-as decided by P0-02, but its original R-number cannot be verified from the
-available public sources. That trace must be supplied before this record can
-satisfy acceptance. No approval of this record is implied by existing code.
+**Draft — awaiting owner review and approval.** Engineering Plan Draft 6,
+section 7, cites the owner decision of 24 October 2026 for E-015, rather than a
+dedicated R-number. It identifies the supersession of proposed product decision
+D-017. Owner confirmation of this source-trace exception remains pending;
+neither the source nor the existing code approves this ADR.
 
 ## Consequences
 
@@ -45,4 +46,5 @@ These alternatives are draft rationale for owner review.
 - P0-16, [NativeAOT report](../../spikes/aot/report.md).
 - [Engine module](../../src/Engine/README.md).
 - Rules 7 and 30 of [AGENTS.md](../../AGENTS.md).
-- Original R-number: pending source verification.
+- Engineering Plan Draft 6, section 7: owner decision of 24 October 2026,
+  superseding proposed D-017. No dedicated R-number is assigned in that table.
