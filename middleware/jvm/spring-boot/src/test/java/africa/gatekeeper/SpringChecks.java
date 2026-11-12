@@ -13,7 +13,7 @@ import java.util.*;
 public final class SpringChecks {
     private static void check(boolean value) { if (!value) throw new AssertionError("Protected response contract differs."); }
     private static void root(RuntimeMatcher matcher, String pointer, String json) throws Exception {
-        GatekeeperFilter filter = new GatekeeperFilter(matcher, List.of(pointer), new ObjectMapper());
+        GateKeeperFilter filter = new GateKeeperFilter(matcher, List.of(pointer), new ObjectMapper());
         MockHttpServletResponse response = new MockHttpServletResponse();
         byte[] original = json.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         filter.doFilter(new MockHttpServletRequest(), response, (req, res) -> {
@@ -38,11 +38,11 @@ public final class SpringChecks {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
             context.getEnvironment().getPropertySources().addFirst(new MapPropertySource("synthetic", properties));
             if (matcher != null) context.registerBean(RuntimeMatcher.class, () -> matcher);
-            context.register(GatekeeperAutoConfiguration.class);
+            context.register(GateKeeperAutoConfiguration.class);
             try { context.refresh(); } catch (RuntimeException expected) { failed = true; }
             if (!failed) {
-                check((context.getBeanNamesForType(GatekeeperFilter.class).length == 1) == expectedBeans);
-                check((context.getBeanNamesForType(GatekeeperResponseAdvice.class).length == 1) == expectedBeans);
+                check((context.getBeanNamesForType(GateKeeperFilter.class).length == 1) == expectedBeans);
+                check((context.getBeanNamesForType(GateKeeperResponseAdvice.class).length == 1) == expectedBeans);
             }
         }
         check(failed == expectedFailure);
@@ -58,7 +58,7 @@ public final class SpringChecks {
         configuration(Map.of("gatekeeper.paths[0]", "/value"), verified, true, false);
         configuration(Map.of("gatekeeper.paths[0]", "/value"), null, false, true);
         configuration(Map.of("gatekeeper.paths", "/value"), matcher, false, true);
-        GatekeeperFilter filter = new GatekeeperFilter(matcher, List.of("/value"), new ObjectMapper());
+        GateKeeperFilter filter = new GateKeeperFilter(matcher, List.of("/value"), new ObjectMapper());
         for (String scenario : List.of("object", "null", "non-json", "unknown", "large", "committed")) {
             MockHttpServletRequest request = new MockHttpServletRequest(); MockHttpServletResponse response = new MockHttpServletResponse();
             if (scenario.equals("committed")) response.setCommitted(true);
@@ -74,12 +74,12 @@ public final class SpringChecks {
             if (scenario.equals("object")) check(response.getContentAsString().contains("[REDACTED:pii.synthetic]"));
             else { check(failed); check(response.getContentAsByteArray().length == 0); }
         }
-        GatekeeperResponseAdvice advice = new GatekeeperResponseAdvice(matcher, List.of("/value"), new ObjectMapper());
+        GateKeeperResponseAdvice advice = new GateKeeperResponseAdvice(matcher, List.of("/value"), new ObjectMapper());
         MockHttpServletRequest request = new MockHttpServletRequest(); MockHttpServletResponse response = new MockHttpServletResponse();
         Object result = advice.beforeBodyWrite(Map.of("value", "synthetic"), null, MediaType.APPLICATION_JSON,
             MappingJackson2HttpMessageConverter.class, new ServletServerHttpRequest(request), new ServletServerHttpResponse(response));
         check(((Map<?, ?>) result).get("value").equals("[REDACTED:pii.synthetic]"));
-        check(Boolean.TRUE.equals(request.getAttribute(GatekeeperResponseAdvice.FILTERED_ATTRIBUTE)));
+        check(Boolean.TRUE.equals(request.getAttribute(GateKeeperResponseAdvice.FILTERED_ATTRIBUTE)));
         Map<String, Object> nullable = new HashMap<>(); nullable.put("value", null);
         try { advice.beforeBodyWrite(nullable, null, MediaType.APPLICATION_JSON, MappingJackson2HttpMessageConverter.class,
             new ServletServerHttpRequest(new MockHttpServletRequest()), new ServletServerHttpResponse(new MockHttpServletResponse())); throw new AssertionError("Null leaf must fail."); }

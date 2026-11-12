@@ -9,8 +9,8 @@ integration runs on Java 17, 21 and 25. No `javax` module exists.
 | --- | --- | --- |
 | `africa.gatekeeper:gate-keeper-core` | `Installation`, `SignedPackVerifier`, `RuntimeMatcher`, `ConsentCheck`, `ResponseFilter` | JDK only |
 | `africa.gatekeeper:gate-keeper-logback` | `RedactingConverter` | Kotlin standard library; application supplies Logback |
-| `africa.gatekeeper:gate-keeper-log4j2` | `GatekeeperLog4j`, `GatekeeperRewritePolicy` | Kotlin standard library; application supplies Log4j2 |
-| `africa.gatekeeper:gate-keeper-spring-boot` | `GatekeeperFilter`, `GatekeeperResponseAdvice`, `GatekeeperAutoConfiguration` | Kotlin standard library; application supplies Spring, Jackson 2 and Jakarta Servlet |
+| `africa.gatekeeper:gate-keeper-log4j2` | `GateKeeperLog4j`, `GateKeeperRewritePolicy` | Kotlin standard library; application supplies Log4j2 |
+| `africa.gatekeeper:gate-keeper-spring-boot` | `GateKeeperFilter`, `GateKeeperResponseAdvice`, `GateKeeperAutoConfiguration` | Kotlin standard library; application supplies Spring, Jackson 2 and Jakarta Servlet |
 
 Production pack bytes and Maven Central publication remain human release steps.
 No production trust key, embedded production pack or release publication is
@@ -74,12 +74,12 @@ context.putObject(RedactingConverter.MATCHER_KEY, runtime);
 <!-- Use %gkmsg in the application's encoder pattern for its message. -->
 ```
 
-For Log4j2, call `GatekeeperLog4j.install(runtime)` once before logging, then
+For Log4j2, call `GateKeeperLog4j.install(runtime)` once before logging, then
 route the application's output through a Rewrite appender:
 
 ```xml
 <Rewrite name="Protected">
-  <GatekeeperRewritePolicy/>
+  <GateKeeperRewritePolicy/>
   <AppenderRef ref="Destination"/>
 </Rewrite>
 ```

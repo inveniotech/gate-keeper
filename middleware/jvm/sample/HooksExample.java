@@ -5,8 +5,8 @@ import java.util.List;
 /** Compiles against the public Kotlin hooks without Kotlin source. */
 public final class HooksExample {
     public static void use(RuntimeMatcher matcher) {
-        new RedactingConverter(); GatekeeperLog4j.install(matcher); GatekeeperRewritePolicy.createPolicy();
-        new GatekeeperFilter(matcher, List.of("/value"), new ObjectMapper());
-        new GatekeeperResponseAdvice(matcher, List.of("/value"), new ObjectMapper());
+        new RedactingConverter(); GateKeeperLog4j.install(matcher); GateKeeperRewritePolicy.createPolicy();
+        new GateKeeperFilter(matcher, List.of("/value"), new ObjectMapper());
+        new GateKeeperResponseAdvice(matcher, List.of("/value"), new ObjectMapper());
     }
 }

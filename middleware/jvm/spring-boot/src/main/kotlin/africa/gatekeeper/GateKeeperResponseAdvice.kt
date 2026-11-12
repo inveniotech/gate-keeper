@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 /** Transforms controller bodies atomically before JSON conversion. */
 @ControllerAdvice
-public class GatekeeperResponseAdvice(
+public class GateKeeperResponseAdvice(
     matcher: RuntimeMatcher,
     paths: List<String>,
     private val mapper: ObjectMapper,
@@ -40,7 +40,7 @@ public class GatekeeperResponseAdvice(
             if (servletResponse.isCommitted) { servletResponse.outputStream.close(); throw ResponseFilter.ResponseFilterException(true) }
             val tree = mapper.convertValue(body, Any::class.java)
             val result = filter.transform(tree, true, false, selectedContentType.toString())
-            if (mapper.writeValueAsBytes(result).size > GatekeeperFilter.MAXIMUM_BODY_BYTES) throw ResponseFilter.ResponseFilterException(false)
+            if (mapper.writeValueAsBytes(result).size > GateKeeperFilter.MAXIMUM_BODY_BYTES) throw ResponseFilter.ResponseFilterException(false)
             servletRequest.setAttribute(FILTERED_ATTRIBUTE, true)
             return result
         } catch (error: RuntimeException) {

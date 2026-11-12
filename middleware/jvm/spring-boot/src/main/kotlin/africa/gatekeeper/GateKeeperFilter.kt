@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 import java.util.Locale
 
 /** Buffers protected servlet JSON responses within a fixed host bound before committing bytes. */
-public class GatekeeperFilter(
+public class GateKeeperFilter(
     matcher: RuntimeMatcher,
     paths: List<String>,
     private val mapper: ObjectMapper,
@@ -33,7 +33,7 @@ public class GatekeeperFilter(
             buffered.finish()
             if (http.isCommitted) throw ResponseFilter.ResponseFilterException(true)
             val input = buffered.bytes.toByteArray()
-            val advised = request.getAttribute(GatekeeperResponseAdvice.FILTERED_ATTRIBUTE) == true
+            val advised = request.getAttribute(GateKeeperResponseAdvice.FILTERED_ATTRIBUTE) == true
             val output = if (advised) input else {
                 val media = buffered.contentType
                 val length = buffered.declaredLength

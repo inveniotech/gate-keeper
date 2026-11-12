@@ -1,7 +1,7 @@
 # Log4j2 artefact
 
-`gate-keeper-log4j2` supplies the generated `GatekeeperRewritePolicy` plugin at
-Java 15 bytecode. Call `GatekeeperLog4j.install` once before logging and route
+`gate-keeper-log4j2` supplies the generated `GateKeeperRewritePolicy` plugin at
+Java 15 bytecode. Call `GateKeeperLog4j.install` once before logging and route
 messages through a Rewrite appender. The policy copies events and replaces the
 formatted message; failures use a fixed safe sentence.
 
