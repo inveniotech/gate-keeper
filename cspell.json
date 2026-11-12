@@ -29,6 +29,12 @@
     "tests/conformance/vectors.json"
   ],
   "words": [
+    "ASGI",
+    "fastapi",
+    "httpx",
+    "mypy",
+    "pyproject",
+    "setuptools",
     "javac",
     "HMACSHA",
     "Awaiter",
