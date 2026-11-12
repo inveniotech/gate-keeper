@@ -36,6 +36,7 @@ tasks.register<JavaCompile>("compileCoreSample") {
     source("sample/CoreExample.java")
     classpath = project(":core").extensions.getByType<SourceSetContainer>()["main"].output
     destinationDirectory.set(layout.buildDirectory.dir("sample/core")); options.release.set(15)
+    sourceCompatibility = "15"; targetCompatibility = "15"
 }
 tasks.register<JavaCompile>("compileJavaSamples") {
     dependsOn("compileCoreSample", ":logback:classes", ":log4j2:classes", ":spring-boot:classes")
@@ -44,4 +45,5 @@ tasks.register<JavaCompile>("compileJavaSamples") {
         project(":spring-boot").configurations.getByName("compileClasspath") +
         project(":logback").configurations.getByName("compileClasspath") + project(":log4j2").configurations.getByName("compileClasspath")
     destinationDirectory.set(layout.buildDirectory.dir("sample/hooks")); options.release.set(17)
+    sourceCompatibility = "17"; targetCompatibility = "17"
 }
