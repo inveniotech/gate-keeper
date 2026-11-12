@@ -22,7 +22,7 @@ node --test ci/docs-data/*.test.mjs   # unit tests for the builders
 ./ci/docs-data/Test-DocsData.ps1      # verifies the packed manifest and determinism
 ```
 
-Pass `--cli=<path>` when the binary is not at `cli/bin/Release/net10.0/gatekeeper-ndpa-check`.
+Pass `--cli=<path>` when the binary is not at `cli/bin/Release/net10.0/gatekeeper` (`gatekeeper.exe` on Windows).
 
 ## Artefact
 

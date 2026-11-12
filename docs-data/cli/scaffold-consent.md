@@ -9,7 +9,7 @@ Description:
   Scaffolds the consent helper into an application; built in a Phase 3 release
 
 Usage:
-  gatekeeper-ndpa-check scaffold consent [options]
+  gatekeeper scaffold consent [options]
 
 Options:
   -?, -h, --help  Show help and usage information

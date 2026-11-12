@@ -6,10 +6,10 @@ The exact help text of this build follows, captured from the command line itself
 
 ```text
 Description:
-  Creates .ndpa-check/ with a starter configuration and the fingerprint key; not implemented in this build
+  Creates .gatekeeper/ with a starter configuration and the fingerprint key; not implemented in this build
 
 Usage:
-  gatekeeper-ndpa-check init [options]
+  gatekeeper init [options]
 
 Options:
   -?, -h, --help  Show help and usage information

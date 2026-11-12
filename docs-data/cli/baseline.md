@@ -6,10 +6,10 @@ The exact help text of this build follows, captured from the command line itself
 
 ```text
 Description:
-  Writes current work-tree findings to .ndpa-check/baseline.json
+  Writes current work-tree findings to .gatekeeper/baseline.json
 
 Usage:
-  gatekeeper-ndpa-check baseline [options]
+  gatekeeper baseline [options]
 
 Options:
   --evaluated-on <evaluated-on>  The evaluation date in YYYY-MM-DD form
