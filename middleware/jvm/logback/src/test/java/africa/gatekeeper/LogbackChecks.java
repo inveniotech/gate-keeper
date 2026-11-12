@@ -13,7 +13,7 @@ public final class LogbackChecks {
         if (!converter.convert(event).equals("[REDACTED:pii.synthetic]")) throw new AssertionError("Message must be redacted.");
         LoggingEvent oversized = new LoggingEvent(); oversized.setMessage("x".repeat(65537));
         if (!converter.convert(oversized).equals(RedactingConverter.FAILURE_MESSAGE)) throw new AssertionError("Oversized input must fail safely.");
-        converter.setContext(new LoggerContext());
-        if (!converter.convert(event).equals(RedactingConverter.FAILURE_MESSAGE)) throw new AssertionError("Missing matcher must fail safely.");
+        RedactingConverter withoutMatcher = new RedactingConverter(); withoutMatcher.setContext(new LoggerContext());
+        if (!withoutMatcher.convert(event).equals(RedactingConverter.FAILURE_MESSAGE)) throw new AssertionError("Missing matcher must fail safely.");
     }
 }
