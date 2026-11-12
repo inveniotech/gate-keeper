@@ -29,7 +29,7 @@ public class GatekeeperResponseAdvice(
     /** Applies to all converter types so a protected non-JSON body fails closed. */
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean = hasProtectedPaths
     /** Converts objects to a private JSON tree and refuses unsupported or already committed responses. */
-    override fun beforeBodyWrite(body: Any?, returnType: MethodParameter?, selectedContentType: MediaType,
+    override fun beforeBodyWrite(body: Any?, returnType: MethodParameter, selectedContentType: MediaType,
         selectedConverterType: Class<out HttpMessageConverter<*>>, request: ServerHttpRequest, response: ServerHttpResponse): Any? {
         if (!hasProtectedPaths) return body
         val servletRequest = (request as? ServletServerHttpRequest)?.servletRequest
