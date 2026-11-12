@@ -9,7 +9,7 @@ Description:
   Scaffolds a helper into an application. This build carries the 'consent' subcommand; the scaffolds for the other helpers arrive in Phase 3.
 
 Usage:
-  gatekeeper-ndpa-check scaffold [command] [options]
+  gatekeeper scaffold [command] [options]
 
 Options:
   -?, -h, --help  Show help and usage information

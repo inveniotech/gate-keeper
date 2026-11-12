@@ -9,7 +9,7 @@ Description:
   Scans a repository and writes a console summary or evidence JSON
 
 Usage:
-  gatekeeper-ndpa-check scan [options]
+  gatekeeper scan [options]
 
 Options:
   --json                         Writes Gate-Keeper evidence JSON to standard output

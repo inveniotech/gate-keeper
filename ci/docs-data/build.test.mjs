@@ -2,8 +2,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ruleEntries, relatedNearMisses, listedCommands, captureCommands, cliReferencePages, docsDataFiles, authoredSources } from './build.mjs';
+import { fileURLToPath } from 'node:url';
+import { ruleEntries, relatedNearMisses, listedCommands, captureCommands, cliReferencePages, docsDataFiles, authoredSources, binaryCandidates } from './build.mjs';
 import { packVersion } from '../rule-packs/detection-authoring.mjs';
+
+test('the default CLI candidates use the current assembly name on Windows and Unix', () => {
+  const project = readFileSync(new URL('../../cli/InvenioTech.GateKeeper.Cli.csproj', import.meta.url), 'utf8');
+  const assembly = project.match(/<AssemblyName>([^<]+)<\/AssemblyName>/)[1];
+  const folder = new URL('../../cli/bin/Release/net10.0/', import.meta.url);
+  assert.deepEqual(binaryCandidates('linux'), [fileURLToPath(new URL(assembly, folder))]);
+  assert.deepEqual(binaryCandidates('win32'), [
+    fileURLToPath(new URL(`${assembly}.exe`, folder)),
+    fileURLToPath(new URL(assembly, folder)),
+  ]);
+});
 
 const register = {
   status: 'approved-in-principle',

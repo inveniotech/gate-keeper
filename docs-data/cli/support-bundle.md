@@ -9,11 +9,11 @@ Description:
   Writes a local ZIP of masked configuration, versions and finding counts
 
 Usage:
-  gatekeeper-ndpa-check support-bundle [options]
+  gatekeeper support-bundle [options]
 
 Options:
   --evaluated-on <evaluated-on>  The evaluation date in YYYY-MM-DD form
-  --output <output>              The repository-relative ZIP filename [default: .ndpa-check/support-bundle.zip]
+  --output <output>              The repository-relative ZIP filename [default: .gatekeeper/support-bundle.zip]
   -?, -h, --help                 Show help and usage information
 
 ```

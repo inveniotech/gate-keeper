@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/middleware/">
     <Project Path="middleware/dotnet/InvenioTech.GateKeeper.Middleware.csproj" />
+    <Project Path="middleware/dotnet/AspNetCore/InvenioTech.GateKeeper.AspNetCore.csproj" />
+    <Project Path="middleware/dotnet/Compliance/InvenioTech.GateKeeper.Compliance.Redaction.csproj" />
+    <Project Path="middleware/dotnet/Serilog/InvenioTech.GateKeeper.Serilog.csproj" />
   </Folder>
   <Folder Name="/cli/">
     <Project Path="cli/InvenioTech.GateKeeper.Cli.csproj" />
@@ -11,10 +14,14 @@
   <Folder Name="/src/Signing/">
     <Project Path="src/Signing/InvenioTech.GateKeeper.Signing.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/aspnetcore/InvenioTech.GateKeeper.Sample.AspNetCore.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/conformance/NativeProbe/MiddlewareNativeProbe.csproj" />
     <Project Path="tests/InvenioTech.GateKeeper.Tests/InvenioTech.GateKeeper.Tests.csproj" />
     <Project Path="tests/Engine.Tests/InvenioTech.GateKeeper.Engine.Tests.csproj" />
+    <Project Path="tests/Middleware.Tests/InvenioTech.GateKeeper.Middleware.Tests.csproj" />
     <Project Path="tests/Signing.Tests/InvenioTech.GateKeeper.Signing.Tests.csproj" />
     <Project Path="tests/Cli.Tests/InvenioTech.GateKeeper.Cli.Tests.csproj" />
     <Project Path="tests/Corpus.Tests/InvenioTech.GateKeeper.Corpus.Tests.csproj" />
