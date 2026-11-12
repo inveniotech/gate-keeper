@@ -39,6 +39,14 @@ jobs:
         run: node tests/conformance/check-patterns.mjs
       - name: Verify native matcher, validators, redaction, consent and wildcard responses
         run: node tests/conformance/check-runtime.mjs
+      - name: Verify signed packs, installation and framework hooks
+        run: node --test middleware/node/*.test.ts
+      - name: Verify ESM, CommonJS and declarations
+        working-directory: middleware/node
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          npm run test:package
   jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 5

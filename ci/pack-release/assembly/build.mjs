@@ -25,7 +25,9 @@ export function sorted(value) {
 function validateContent(bytes) {
   if (bytes.length > 16 * 1024 * 1024) throw new Error('A content pack exceeds 16 MiB.');
   const script = fileURLToPath(new URL('./Validate-Content.ps1', import.meta.url));
-  const result = spawnSync('pwsh', ['-NoProfile', '-File', script], { input: bytes, timeout: 10000, maxBuffer: 1024 * 1024 });
+  // Each document starts a new PowerShell process. A cold start on a hosted runner can exceed 10 seconds and was reported as a schema failure.
+  const result = spawnSync('pwsh', ['-NoProfile', '-File', script], { input: bytes, timeout: 30000, maxBuffer: 1024 * 1024 });
+  if (result.error?.code === 'ETIMEDOUT') throw new Error('Schema validation timed out before PowerShell returned a result.');
   if (result.error || result.status !== 0) throw new Error('Content does not validate against the rule-pack schema, or the schema tool is unavailable.');
 }
 

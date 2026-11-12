@@ -1,7 +1,29 @@
 {
-  "name": "@inveniotech/gate-keeper-runtime",
+  "name": "@inveniotech/gate-keeper",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.18.0" }
+  "engines": { "node": ">=22.18.0" },
+  "description": "Offline verified rule-pack loading, redaction and framework hooks for Gate-Keeper.",
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "https://github.com/inveniotech/gate-keeper.git", "directory": "middleware/node" },
+  "files": ["dist", "README.md", "LICENSE"],
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": { "import": { "types": "./dist/esm/index.d.ts", "default": "./dist/esm/index.js" }, "require": { "types": "./dist/cjs/index.d.ts", "default": "./dist/cjs/index.js" } },
+    "./express": { "import": { "types": "./dist/esm/express.d.ts", "default": "./dist/esm/express.js" }, "require": { "types": "./dist/cjs/express.d.ts", "default": "./dist/cjs/express.js" } },
+    "./nest": { "import": { "types": "./dist/esm/nest.d.ts", "default": "./dist/esm/nest.js" }, "require": { "types": "./dist/cjs/nest.d.ts", "default": "./dist/cjs/nest.js" } },
+    "./pino": { "import": { "types": "./dist/esm/pino.d.ts", "default": "./dist/esm/pino.js" }, "require": { "types": "./dist/cjs/pino.d.ts", "default": "./dist/cjs/pino.js" } },
+    "./winston": { "import": { "types": "./dist/esm/winston.d.ts", "default": "./dist/esm/winston.js" }, "require": { "types": "./dist/cjs/winston.d.ts", "default": "./dist/cjs/winston.js" } }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test *.test.ts",
+    "test:package": "node package-smoke.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": { "typescript": "5.9.3" }
 }
