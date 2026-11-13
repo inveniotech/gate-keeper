@@ -18,32 +18,41 @@ outside this format record. No key is generated or changed here.
 
 ## Status
 
-**Accepted in part — recorded on 13 November 2026.** IQ-07/35/37/38/39 are
-recorded owner decisions in the [licence-token decision table](../specs/licence-token-v1.md#01-decision-status).
-They settle exact signed bytes, the payload limit, date claims, source precedence
-and entity identification. The owner's confirmation recognises those decisions as
-approved. [The signing module](../../src/Signing/README.md) implements the shared
-exact-byte Ed25519 primitive; production token discovery, claim validation and
-rotation are not established by that primitive alone.
+**Accepted — owner decision, 13 November 2026.** This record accepts the format
+and discovery details in section 0.4 of the [licence-token specification](../specs/licence-token-v1.md):
+the readable line-based armour, restricted key identifier syntax, exact claim
+names and bytes, ordered licence sources, fail-closed handling of an explicitly
+requested missing file, and rejection of an `updatesUntil` date before
+`purchasedOn`. The licence remains portable and offline; it does not call home,
+fingerprint a machine, or merge claims from multiple tokens.
 
-**Awaiting owner review and acceptance:** the additional format and discovery
-details in section 0.4 of the token specification that are neither implemented in
-production nor separately accepted, including armour, identifier character rules,
-source strings, missing-file handling and claim-date validation. The
+The product decision to identify the licensed legal entity with its CAC
+registration number is accepted, but the field MUST NOT be used to issue a
+production token until a lawyer confirms it may be carried there (IQ-39). The
 [licence vector helper](../../tests/InvenioTech.GateKeeper.Tests/LicenceVectorSupport.cs)
-explicitly identifies itself as test-only, so it is not evidence of a production
-verifier. The lawyer confirmation recorded by IQ-39 also remains outstanding.
-Production key custody and issuance remain outside this record.
+is explicitly test-only and is not evidence of a production verifier.
+Production token discovery, claim validation, issuance, key custody and key
+rotation remain implementation and operations work; they do not reopen this
+format decision. The [signing module](../../src/Signing/README.md) implements the
+shared exact-byte Ed25519 primitive, not those production capabilities.
 
 ## Consequences
 
 Token bytes remain portable. Parsing cannot promote unverified claims to trusted
-data. Format approval does not change entitlement policy or production trust roots.
+data. Source precedence is deterministic, and an explicitly selected missing
+file cannot silently select another organisation's token. Format approval does
+not change entitlement policy or production trust roots. CAC field use remains
+blocked on legal confirmation.
 
 ## Alternatives considered
 
-Online activation would conflict with offline verification. Re-serialisation
-would verify a different byte sequence. Neither is introduced as a fallback.
+Online activation and machine fingerprinting would conflict with offline,
+portable licensing. A binary token envelope or a general-purpose JSON signature
+format would add complexity without helping manual licence installation or
+cross-stack verification. Re-serialisation would verify a different byte
+sequence. Searching past an explicitly selected missing file could use the
+wrong organisation's token, and allowing an updates end date before purchase
+would create contradictory claims. None is introduced as a fallback.
 
 ## Traces
 

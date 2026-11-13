@@ -23,7 +23,7 @@ Use [TEMPLATE.md](TEMPLATE.md) for new records.
 | [E-004](e-004-results-format.md) | SARIF and evidence JSON | Accepted |
 | [E-005](e-005-exceptions-lifecycle.md) | Exceptions format and lifecycle | Accepted |
 | [E-007](e-007-evidence-transport.md) | Evidence transport and completion | Partially accepted; additional unimplemented details await review |
-| [E-008](e-008-licence-token.md) | Offline licence tokens and key rotation | Partially accepted; additional unimplemented details await review |
+| [E-008](e-008-licence-token.md) | Offline licence tokens and key rotation | Accepted; CAC registration number use awaits legal confirmation |
 | [E-010](e-010-configuration-layout.md) | CLI binary and configuration naming | Accepted |
 | [E-011](e-011-stack-sequencing.md) | Middleware stacks and roadmap | Accepted |
 | [E-015](e-015-nativeaot-cli.md) | C# and .NET NativeAOT CLI | Accepted |
@@ -35,5 +35,6 @@ Source decisions with R-numbers cite them. E-001 and E-015 use the source's
 actual D-006 and dated-owner-decision references, with source-trace questions retained
 for issue #1. Those questions do not reopen the accepted decisions. Later specifications and recorded naming and scope
 amendments take precedence over older plan examples. Issue #1 stays open until
-its full register and traceability acceptance criteria are met. E-007 and E-008
-identify the remaining details awaiting owner acceptance.
+its full register and traceability acceptance criteria are met. E-007 identifies
+the remaining details awaiting owner acceptance. E-008 is accepted; production
+use of the CAC registration number still awaits legal confirmation.
