@@ -84,6 +84,19 @@ watermark behaviour; this kit does not pretend its test-fixture JSON reader is
 a production JVM pack loader. Python joins with P3-05. Production keys, releases
 and framework dependencies are not introduced here.
 
+## Python adapter checks
+
+P3-05 consumes the same generated expectations without rewriting them. Run
+`check_patterns.py`, `check_runtime.py`, `check_python_behaviour.py`,
+`check_python_packs.py` and `check_python_hooks.py` with Python from this directory
+or the repository root. The first two verify regex spans and native matching;
+the remaining suites verify consent, atomic responses, signed packs and host
+hooks. `python_fixture.py` supplies source-tree imports only to these checks.
+The installed wheel is checked separately with
+`python -I tests/conformance/check_python_distribution.py` after installation.
+See the [Python module guide](../../middleware/python/README.md) for framework
+samples, strict types, formatting and package build commands.
+
 ## Observing runtime cost
 
 Run `node tests/conformance/benchmark-runtime.mjs` for the real authored rules

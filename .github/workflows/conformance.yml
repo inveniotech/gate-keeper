@@ -47,6 +47,42 @@ jobs:
           npm ci --ignore-scripts
           npm run build
           npm run test:package
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13', '3.14', '3.15']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install development tools and sample hosts
+        run: python -m pip install -r middleware/python/requirements-dev.txt
+      - name: Verify native conformance, consent, packs and framework hooks
+        run: |
+          python tests/conformance/check_patterns.py
+          python tests/conformance/check_runtime.py
+          python tests/conformance/check_python_behaviour.py
+          python tests/conformance/check_python_packs.py
+          python tests/conformance/check_python_hooks.py
+          python samples/django/app.py
+          python samples/fastapi/app.py
+      - name: Check strict types and formatting
+        working-directory: middleware/python
+        run: |
+          python -m mypy
+          python -m ruff check src
+          python -m ruff format --check src
+      - name: Build and check the source distribution and wheel
+        working-directory: middleware/python
+        run: |
+          python -m build
+          python -m twine check --strict dist/*
+          python -m pip install --no-deps dist/*.whl
+          python -I ../../tests/conformance/check_python_distribution.py
   jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 5
