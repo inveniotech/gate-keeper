@@ -23,7 +23,7 @@ of applied settings and exceptions. This record does not introduce extra keys.
 
 **Accepted — recorded on 13 November 2026.** The owner's confirmation covers
 the implemented naming and configuration decision. The
-[CLI project](../../cli/InvenioTech.GateKeeper.Cli.csproj) names the binary
+[CLI project](../../cli/) names the binary
 `gatekeeper`; [ConfigurationLoader](../../src/Engine/ConfigurationLoader.cs)
 reads `.gatekeeper/gatekeeper.toml`, and [PolicyStore](../../src/Engine/PolicyStore.cs)
 uses that directory for exceptions, baselines and the fingerprint key.

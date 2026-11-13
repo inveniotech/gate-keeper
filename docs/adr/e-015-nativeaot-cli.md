@@ -22,7 +22,7 @@ The spike is feasibility evidence, not a new permanent binary-size budget.
 
 **Accepted — recorded on 13 November 2026.** The owner's confirmation covers
 the implemented C#/.NET 10 and NativeAOT decision. The
-[CLI project](../../cli/InvenioTech.GateKeeper.Cli.csproj) references the shared engine;
+[CLI project](../../cli/) references the shared engine;
 the [native release workflow](../../.github/workflows/native-release.yml) publishes
 trimmed NativeAOT binaries and treats trim and AOT warnings as errors.
 Engineering Plan Draft 6 records the owner decision of 24 October 2026,

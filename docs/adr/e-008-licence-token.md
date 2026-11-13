@@ -29,7 +29,7 @@ fingerprint a machine, or merge claims from multiple tokens.
 The product decision to identify the licensed legal entity with its CAC
 registration number is accepted, but the field MUST NOT be used to issue a
 production token until a lawyer confirms it may be carried there (IQ-39). The
-[licence vector helper](../../tests/InvenioTech.GateKeeper.Tests/LicenceVectorSupport.cs)
+[licence vector helper in the test suite](../../tests/)
 is explicitly test-only and is not evidence of a production verifier.
 Production token discovery, claim validation, issuance, key custody and key
 rotation remain implementation and operations work; they do not reopen this
