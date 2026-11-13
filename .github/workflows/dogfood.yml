@@ -1,0 +1,74 @@
+name: Repository dogfood
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      scanner-ref:
+        description: Commit or review branch containing the scanner and dogfood harness
+        required: true
+        type: string
+      evaluated-on:
+        description: Explicit date, otherwise the target commit date
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  dogfood:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: target
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: inveniotech/gate-keeper
+          ref: ${{ inputs.scanner-ref || github.sha }}
+          path: scanner
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: scanner/global.json
+      - name: Verify authored detection inputs and target pack
+        run: |
+          cd scanner
+          node ci/rule-packs/build-detection.mjs --check
+          node ci/dogfood/build-pack.mjs --check ../target/.gatekeeper/dogfood.pack.json
+          node --test ci/dogfood/scan.test.mjs ci/dogfood/build-pack.test.mjs
+      - name: Build the pinned source CLI
+        working-directory: scanner
+        run: dotnet build cli -c Release -p:RestoreLockedMode=true
+      - name: Exercise the real scanner
+        env:
+          GATEKEEPER_TEST_BINARY: scanner/cli/bin/Release/net10.0/gatekeeper.dll
+        run: node --test scanner/ci/dogfood/scan.integration.test.mjs
+      - name: Run repeatable detection scan
+        id: scan
+        shell: bash
+        env:
+          DATE_INPUT: ${{ inputs.evaluated-on }}
+        run: |
+          evaluated_on="$DATE_INPUT"
+          if [[ -z "$evaluated_on" ]]; then evaluated_on=$(git -C target show -s --format=%cs HEAD); fi
+          node scanner/ci/dogfood/scan.mjs scanner/cli/bin/Release/net10.0/gatekeeper.dll target "$evaluated_on" dogfood-output
+      - name: Validate evidence
+        id: evidence
+        if: ${{ !cancelled() && steps.scan.outcome != 'skipped' && hashFiles('dogfood-output/evidence.json') != '' }}
+        shell: pwsh
+        run: |
+          $valid = Get-Content dogfood-output/evidence.json -Raw | Test-Json -SchemaFile scanner/schemas/gk-results.schema.json
+          if (-not $valid) { throw 'Dogfood evidence is invalid.' }
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        with:
+          name: dogfood-evidence
+          path: dogfood-output/evidence.json
+          if-no-files-found: error
+          retention-days: 7
