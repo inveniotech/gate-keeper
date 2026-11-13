@@ -18,9 +18,22 @@ outside this format record. No key is generated or changed here.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** E-008 maps to the token
-specification. IQ-07/35/37/38/39 and that specification take precedence over
-Draft 6's older claim examples.
+**Accepted in part — recorded on 13 November 2026.** IQ-07/35/37/38/39 are
+recorded owner decisions in the [licence-token decision table](../specs/licence-token-v1.md#01-decision-status).
+They settle exact signed bytes, the payload limit, date claims, source precedence
+and entity identification. The owner's confirmation recognises those decisions as
+approved. [The signing module](../../src/Signing/README.md) implements the shared
+exact-byte Ed25519 primitive; production token discovery, claim validation and
+rotation are not established by that primitive alone.
+
+**Awaiting owner review and acceptance:** the additional format and discovery
+details in section 0.4 of the token specification that are neither implemented in
+production nor separately accepted, including armour, identifier character rules,
+source strings, missing-file handling and claim-date validation. The
+[licence vector helper](../../tests/InvenioTech.GateKeeper.Tests/LicenceVectorSupport.cs)
+explicitly identifies itself as test-only, so it is not evidence of a production
+verifier. The lawyer confirmation recorded by IQ-39 also remains outstanding.
+Production key custody and issuance remain outside this record.
 
 ## Consequences
 

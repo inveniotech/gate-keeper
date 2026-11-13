@@ -18,9 +18,19 @@ or credential protocol.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** R-5 is the historical source;
-IQ-27/28/29/46/85 and the current specification refine it. Older permission
-for network code in the CLI is not restored.
+**Accepted in part — recorded on 13 November 2026.** The owner confirmed that
+implemented decisions and decisions accepted elsewhere are approved. IQ-27/28/29/46/85
+are recorded owner decisions in the [evidence-sink decision table](../specs/evidence-sink-v1.md#01-decision-status):
+local offline output, pipeline copies, destination paths, digest logging and a matching
+sidecar as the completion witness. [ScanCli](../../cli/ScanCli.cs) writes local results;
+the [zero-egress harness](../../ci/zero-egress/README.md) checks the offline boundary.
+These decisions no longer await acceptance even though the upload step is later work.
+
+**Awaiting owner review and acceptance:** section 0.4 of the evidence-sink
+specification adds details beyond those recorded decisions, including exact witness
+bytes, `norev` naming, path validation and the three-attempt failure procedure.
+The P4-04 pipeline implementation is still pending; examples alone are not an
+implementation. This record does not accept those additional unimplemented details.
 
 ## Consequences
 

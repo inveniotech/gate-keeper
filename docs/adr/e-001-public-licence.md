@@ -12,9 +12,11 @@ This records the existing licence; it does not change its terms.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** The source register cites
-product decision D-006, not a dedicated R-number. Owner confirmation of this
-trace exception remains pending; no R-number has been invented.
+**Accepted — recorded on 13 November 2026.** The existing [LICENSE](../../LICENSE)
+and [README](../../README.md#licence) already establish Apache-2.0. The owner
+confirmed that implemented decisions and decisions accepted elsewhere are approved.
+The D-006 source reference is retained; whether it satisfies issue #1's R-number
+criterion is a traceability question, not pending licence approval.
 
 ## Consequences
 

@@ -19,9 +19,14 @@ examples and validation cases remain alongside the specification and schema.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** Approval of individual decisions
-recorded by the specification is not approval of this record or the whole
-specification. No approval is granted by this draft.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+this implemented format decision. [PackLoader](../../src/Engine/PackLoader.cs)
+verifies signed manifest bytes and content digests before parsing and merging;
+[MatcherEngine](../../src/Engine/MatcherEngine.cs) executes structured rules.
+[Pack-loader tests](../../tests/Engine.Tests/PackLoaderTests.cs) and
+[matcher tests](../../tests/Engine.Tests/MatcherEngineTests.cs) cover these contracts.
+IQ-14 and IQ-36 also carry explicit owner acceptance in the linked specification.
+This status records the implemented decision; it does not accept future format changes.
 
 ## Consequences
 
@@ -37,8 +42,7 @@ cases; a rule author cannot introduce arbitrary executable matching code.
 - Detection rules embedded in engine code would require engine releases for data
   changes and conflict with NFR-027.
 
-These are draft rationale, not a claim that a separate alternatives decision has
-already been approved.
+These alternatives explain the implemented format decision.
 
 ## Traces
 

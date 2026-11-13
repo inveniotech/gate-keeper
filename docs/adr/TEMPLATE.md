@@ -12,8 +12,12 @@ Do not duplicate a format contract here.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** Cite evidence of an existing
-decision separately from approval of this record. Only the owner may approve it.
+**Draft — awaiting owner review and approval.** Only the owner may approve a decision.
+When the owner authorises recognising implemented or previously accepted decisions,
+record that authority, the date and links to the implementation or prior acceptance.
+For partial acceptance, list the accepted decisions and the specific details still
+awaiting review separately. Do not treat pending implementation as pending approval
+when an owner decision is already recorded.
 
 ## Consequences
 

@@ -18,8 +18,12 @@ stamps follow the current specification.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** This record does not approve the
-whole results specification or change its amendments' individual status.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+the implemented results decision. [ResultsWriter](../../src/Engine/ResultsWriter.cs)
+produces both outputs from one completed scan, with deterministic ordering,
+version stamps and no matched values. [Writer tests](../../tests/InvenioTech.GateKeeper.Tests/ResultsWriterTests.cs)
+and [consistency tests](../../tests/InvenioTech.GateKeeper.Tests/ResultsConsistencyTests.cs)
+cover the contract. This acceptance applies to the current implemented profile.
 
 ## Consequences
 

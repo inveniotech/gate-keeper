@@ -21,9 +21,14 @@ of applied settings and exceptions. This record does not introduce extra keys.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** R-6 is the historical layout
-revision; IQ-02 and IQ-92 amend its naming. The specification remains at its own
-recorded status. This draft does not accept either specification.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+the implemented naming and configuration decision. The
+[CLI project](../../cli/InvenioTech.GateKeeper.Cli.csproj) names the binary
+`gatekeeper`; [ConfigurationLoader](../../src/Engine/ConfigurationLoader.cs)
+reads `.gatekeeper/gatekeeper.toml`, and [PolicyStore](../../src/Engine/PolicyStore.cs)
+uses that directory for exceptions, baselines and the fingerprint key.
+[Configuration tests](../../tests/Engine.Tests/ConfigurationLoaderTests.cs) cover
+discovery and validation. R-6 is historical; IQ-02 and IQ-92 supply the amendments.
 
 ## Consequences
 
@@ -35,7 +40,7 @@ keys stay out of version control. Public path names remain jurisdiction-neutral.
 
 Scattering exceptions and settings across unrelated locations makes discovery
 and review harder. Maintaining both historic and current path conventions would
-create competing contracts. These are draft rationale for owner review.
+create competing contracts. These alternatives explain the implemented layout decision.
 
 ## Traces
 

@@ -16,9 +16,11 @@ specific owner instructions apply within their authorised scope.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** R-12 directs written agent
-rules. This record documents the requirement without approving, amending or
-waiving a rule.
+**Accepted — recorded on 13 November 2026.** [AGENTS.md](../../AGENTS.md)
+explicitly records owner approval on 27 October 2026 and later owner amendments.
+The owner's confirmation recognises this existing acceptance. R-12 supplies the
+engineering-plan trace. This record documents the governing policy without
+amending or waiving it.
 
 ## Consequences
 

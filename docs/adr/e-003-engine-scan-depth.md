@@ -19,9 +19,14 @@ without repository scanning or request gating.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** Engineering Plan Draft 6,
-sections 4.4 and 7, establishes E-003. R-1 constrains middleware. Current
-specifications take precedence over older examples in the plan.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+the implemented scan-depth decision. [MatcherEngine](../../src/Engine/MatcherEngine.cs)
+implements shapes, validators, context, location constraints and list matching;
+[ConfigurationLoader](../../src/Engine/ConfigurationLoader.cs) resolves profiles
+and history scope. [Matcher tests](../../tests/Engine.Tests/MatcherEngineTests.cs)
+and [history tests](../../tests/Engine.Tests/FileEnumeratorHistoryTests.cs) cover
+the behaviour. The accepted middleware contract separately excludes repository
+scanning and request gating. Future analysis capabilities still need their own decisions.
 
 ## Consequences
 

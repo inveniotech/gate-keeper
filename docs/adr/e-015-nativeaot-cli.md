@@ -9,7 +9,7 @@ signature verification and matching under native ahead-of-time compilation.
 
 ## Decision
 
-Draft the CLI and engine baseline as C# on .NET 10, with the CLI published as a
+Use the CLI and engine baseline as C# on .NET 10, with the CLI published as a
 trimmed NativeAOT executable. Reuse the engine as a library rather than invoking
 the CLI from middleware. Keep the signature implementation behind its existing
 internal interface and use source-generated serialisation.
@@ -20,11 +20,14 @@ The spike is feasibility evidence, not a new permanent binary-size budget.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** Engineering Plan Draft 6,
-section 7, cites the owner decision of 24 October 2026 for E-015, rather than a
-dedicated R-number. It identifies the supersession of proposed product decision
-D-017. Owner confirmation of this source-trace exception remains pending;
-neither the source nor the existing code approves this ADR.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+the implemented C#/.NET 10 and NativeAOT decision. The
+[CLI project](../../cli/InvenioTech.GateKeeper.Cli.csproj) references the shared engine;
+the [native release workflow](../../.github/workflows/native-release.yml) publishes
+trimmed NativeAOT binaries and treats trim and AOT warnings as errors.
+Engineering Plan Draft 6 records the owner decision of 24 October 2026,
+superseding proposed D-017. Its lack of a dedicated R-number remains a source-trace
+question for issue #1, not a reason to leave this implemented decision unapproved.
 
 ## Consequences
 
@@ -38,7 +41,7 @@ must be verified on supported operating systems and architectures.
 A managed-only CLI would depend on a runtime installation or a larger bundled
 runtime. A separate engine implementation would duplicate matching behaviour.
 The spike records dependency-size trade-offs without deciding a size budget.
-These alternatives are draft rationale for owner review.
+These alternatives explain the implemented architecture decision.
 
 ## Traces
 

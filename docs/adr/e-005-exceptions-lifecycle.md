@@ -15,8 +15,12 @@ a finding. This record adds no fields or workflow service.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** The source register maps E-005
-to this contract. The referenced specifications retain their own approval status.
+**Accepted — recorded on 13 November 2026.** The owner's confirmation covers
+the implemented exception lifecycle. [PolicyStore](../../src/Engine/PolicyStore.cs)
+validates exception files; [FindingPolicy](../../src/Engine/FindingPolicy.cs)
+applies scope, expiry, suppression, severity and baseline policy using the explicit
+evaluation date. [Policy tests](../../tests/Engine.Tests/FindingPolicyTests.cs)
+cover expiry, precedence and entry hashes. Baselines remain distinct from exceptions.
 
 ## Consequences
 

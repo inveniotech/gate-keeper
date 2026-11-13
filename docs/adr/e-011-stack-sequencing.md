@@ -17,9 +17,14 @@ adapter availability.
 
 ## Status
 
-**Draft — awaiting owner review and approval.** R-2 is the original source.
-IQ-79 and IQ-89 amend its runtime and launch sequencing. The accepted middleware
-contract records the current scope; the old four-stack launch list is not restored.
+**Accepted — recorded on 13 November 2026.** The middleware contract was
+accepted by the owner on 9 November 2026 in [pull request #123](https://github.com/inveniotech/gate-keeper/pull/123).
+It establishes the current first-release stacks and defers Python. Implementations
+exist for [.NET](../../middleware/dotnet/README.md),
+[Node/TypeScript](../../middleware/node/README.md) and
+[Kotlin/JVM](../../middleware/jvm/README.md). The owner's confirmation recognises
+both that prior acceptance and the implemented scope. Future stacks remain future
+work, not decisions awaiting acceptance of the current sequencing.
 
 ## Consequences
 
