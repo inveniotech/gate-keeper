@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "middleware/python/src"))
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from inveniotech.gatekeeper import ConsentCheck, RuntimeMatcher
+from inveniotech.gatekeeper import ConsentCheck, ConsentState, RuntimeMatcher
 from inveniotech.gatekeeper.fastapi import FastAPIMiddleware
 from inveniotech.gatekeeper.logging import RedactingFilter
 
@@ -21,10 +21,11 @@ def main() -> None:
     app = FastAPI()
     app.add_middleware(FastAPIMiddleware, runtime=runtime, paths=["/protected"])
 
-    async def provider(subject: str, purpose: str) -> str:
-        return "denied"
+    class Provider:
+        async def get_state(self, subject_id: str, purpose: str) -> ConsentState:
+            return "denied"
 
-    consent = ConsentCheck(None, provider, lambda event: None)
+    consent = ConsentCheck(None, Provider(), lambda event: None)
 
     @app.get("/")
     async def endpoint() -> dict[str, object]:

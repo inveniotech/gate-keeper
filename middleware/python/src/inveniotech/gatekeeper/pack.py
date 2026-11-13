@@ -6,6 +6,8 @@ from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date, datetime
 from hashlib import sha256, sha512
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import cast
 
@@ -340,6 +342,29 @@ class Installation:
         self._runtime = self._build(packs)
         self._packs = packs
 
+    @classmethod
+    def from_package(
+        cls,
+        keys: Mapping[str, bytes],
+        watermark_keys: Mapping[str, bytes] | None = None,
+    ) -> "Installation":
+        """Load bounded signed media staged under embedded/ in this installed package.
+
+        Public trust keys are supplied separately; missing or invalid media raises PackLoadError.
+        """
+        try:
+            embedded = files("inveniotech.gatekeeper").joinpath("embedded")
+            names = sorted(item.name for item in embedded.iterdir() if item.name.endswith(".json"))
+            return cls(
+                [_read_signed_pack(embedded, name) for name in names],
+                keys,
+                watermark_keys,
+            )
+        except (OSError, ValueError):
+            raise PackLoadError(
+                "Cannot read embedded signed packs. Reinstall complete trusted release media."
+            ) from None
+
     @staticmethod
     def _build(packs: tuple[VerifiedPack, ...]) -> RuntimeMatcher:
         return RuntimeMatcher(
@@ -369,30 +394,36 @@ class Installation:
 
     def replace_from_path(self, path: Path) -> None:
         """Read explicit content and adjacent manifest/signature files; unreadable media fails atomically."""
-
-        def bounded_read(file: Path, maximum: int) -> bytes:
-            with file.open("rb") as stream:
-                data = stream.read(maximum + 1)
-            _require(len(data) <= maximum)
-            return data
-
         try:
-            watermark = path.with_suffix(".watermark.manifest.armour")
-            watermark_signature = path.with_suffix(".watermark.signature.hex")
-            _require(watermark.exists() == watermark_signature.exists())
-            candidate = SignedPack(
-                bounded_read(path, 16 * 1024 * 1024),
-                bounded_read(path.with_suffix(".manifest.armour"), 8192).decode("utf-8"),
-                bytes.fromhex(
-                    bounded_read(path.with_suffix(".signature.hex"), 256).decode("ascii")
-                ),
-                bounded_read(watermark, 8192).decode("utf-8") if watermark.exists() else None,
-                bytes.fromhex(bounded_read(watermark_signature, 256).decode("ascii"))
-                if watermark_signature.exists()
-                else None,
-            )
+            candidate = _read_signed_pack(path.parent, path.name)
         except (OSError, ValueError):
             raise PackLoadError(
                 "Cannot read signed replacement. Supply readable trusted release media."
             ) from None
         self.replace(candidate)
+
+
+def _read_signed_pack(directory: Traversable, filename: str) -> SignedPack:
+    """Read one JSON document and adjacent bounded sidecars without accepting partial media."""
+    _require(filename.endswith(".json") and len(filename) > 5)
+    stem = filename[:-5]
+
+    def bounded_read(name: str, maximum: int) -> bytes:
+        with directory.joinpath(name).open("rb") as stream:
+            data = stream.read(maximum + 1)
+        _require(len(data) <= maximum)
+        return data
+
+    watermark = f"{stem}.watermark.manifest.armour"
+    watermark_signature = f"{stem}.watermark.signature.hex"
+    has_watermark = directory.joinpath(watermark).is_file()
+    _require(has_watermark == directory.joinpath(watermark_signature).is_file())
+    return SignedPack(
+        bounded_read(filename, 16 * 1024 * 1024),
+        bounded_read(f"{stem}.manifest.armour", 8192).decode("utf-8"),
+        bytes.fromhex(bounded_read(f"{stem}.signature.hex", 256).decode("ascii")),
+        bounded_read(watermark, 8192).decode("utf-8") if has_watermark else None,
+        bytes.fromhex(bounded_read(watermark_signature, 256).decode("ascii"))
+        if has_watermark
+        else None,
+    )

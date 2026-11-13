@@ -1,6 +1,12 @@
 """Gate-Keeper middleware with no required runtime dependencies."""
 
-from .consent import ConsentCheck, ConsentDiagnostic, ConsentState
+from .consent import (
+    AsyncConsentProvider,
+    ConsentCheck,
+    ConsentDiagnostic,
+    ConsentProvider,
+    ConsentState,
+)
 from .pack import Installation, SignedPack, VerifiedPack, verify_signed_pack
 from .response import ResponseFilter, ResponseFilterError
 from .runtime import Context, Finding, InputLimitError, PackLoadError, RuntimeMatcher
@@ -8,6 +14,8 @@ from .runtime import Context, Finding, InputLimitError, PackLoadError, RuntimeMa
 __all__ = [
     "ConsentCheck",
     "ConsentDiagnostic",
+    "ConsentProvider",
+    "AsyncConsentProvider",
     "ConsentState",
     "Context",
     "Finding",

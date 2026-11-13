@@ -19,6 +19,31 @@ complete release installation media. A release host supplies its embedded
 use development fixture keys as production trust. Private signing keys are
 neither accepted nor needed by this API.
 
+For an offline distribution build, stage each independently signed content
+document and its adjacent sidecars in
+`src/inveniotech/gatekeeper/embedded/` in a temporary copy of this package.
+Use a common stem, such as `free.json`, `free.manifest.armour` and
+`free.signature.hex`. A paid pack may also have
+`free.watermark.manifest.armour` and `free.watermark.signature.hex`; supply
+both watermark files or neither. The staged directory is ignored by Git and
+must never contain development fixtures in a release build. Build the source
+distribution and wheel from that temporary copy, then verify the installed
+wheel with trust anchors obtained independently of those candidate media.
+No private signing key belongs in the package or application.
+
+```python
+from inveniotech.gatekeeper import Installation
+
+# Obtain these public keys from an independently trusted release channel.
+installation = Installation.from_package(trusted_public_keys)
+runtime = installation.runtime
+```
+
+`from_package` uses bounded reads and the same signature, digest, schema and
+version verifier as `Installation`. An absent pack, incomplete sidecars,
+untrusted signer or tampered document raises `PackLoadError` before a runtime
+is exposed. This does not make the source checkout a production installation.
+
 Each `SignedPack` carries exact content bytes, the armoured manifest and detached
 signature bytes. Optional watermark armour and signature must be supplied
 together. `Installation` verifies all embedded packs before exposing `runtime`.
@@ -88,8 +113,11 @@ using the synthetic conformance corpus, without a network server.
 ## Consent
 
 `ConsentCheck(provider, async_provider, diagnostic)` takes independent synchronous
-and asynchronous providers. Use `check` / `is_granted` for the synchronous
-provider and `acheck` / `ais_granted` for the asynchronous provider. Providers
+and asynchronous providers. Implement `ConsentProvider.get_state` and
+`AsyncConsentProvider.get_state` respectively. Existing callable providers
+remain supported; an object's `get_state` takes precedence over `__call__`.
+Use `check` / `is_granted` for the synchronous provider and `acheck` /
+`ais_granted` for the asynchronous provider. Providers
 must be safe for concurrent calls. No consent state is cached. Missing providers,
 invalid states and provider failures return `unknown`; only `granted` returns
 true. Invalid arguments raise `ValueError` before calling the provider.

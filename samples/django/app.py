@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "middleware/python/src"))
 from django.conf import settings
 from django.http import JsonResponse
 from django.test import RequestFactory
-from inveniotech.gatekeeper import ConsentCheck, RuntimeMatcher
+from inveniotech.gatekeeper import ConsentCheck, ConsentState, RuntimeMatcher
 from inveniotech.gatekeeper.django import DjangoMiddleware
 from inveniotech.gatekeeper.logging import RedactingFilter
 
@@ -27,7 +27,11 @@ def main() -> None:
     middleware = DjangoMiddleware(lambda request: JsonResponse({"protected": sample["text"]}), runtime, ["/protected"])
     response = middleware(RequestFactory().get("/"))
     assert json.loads(response.content)["protected"] == sample["redacted"]
-    consent = ConsentCheck(lambda subject, purpose: "denied", None, lambda event: None)
+    class Provider:
+        def get_state(self, subject_id: str, purpose: str) -> ConsentState:
+            return "denied"
+
+    consent = ConsentCheck(Provider(), None, lambda event: None)
     assert not consent.is_granted("synthetic-subject", "acme.marketing-sms")
 
 

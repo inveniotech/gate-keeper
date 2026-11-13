@@ -5,3 +5,4 @@ __pycache__/
 .ruff_cache/
 build/
 dist/
+src/inveniotech/gatekeeper/embedded/

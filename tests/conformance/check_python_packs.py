@@ -4,6 +4,8 @@ import json
 import re
 import unittest
 import tempfile
+from pathlib import Path
+from unittest.mock import patch
 from copy import deepcopy
 from importlib import import_module
 
@@ -19,6 +21,39 @@ from python_fixture import (
 
 class PackTests(unittest.TestCase):
     """Verify exact signed bytes, never reserialised content."""
+
+    def test_packaged_installation_should_require_complete_trusted_media(self) -> None:
+        fixture = ROOT / "tests/vectors/pack"
+        keys = {
+            item["keyId"]: bytes.fromhex(item["publicKeyHex"])
+            for item in json.loads((fixture / "development-public-key.json").read_text())["keys"]
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            package = Path(temporary)
+            embedded = package / "embedded"
+            embedded.mkdir()
+            with patch("inveniotech.gatekeeper.pack.files", return_value=package):
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package(keys)
+                for suffix, source in (
+                    ("json", "pack.pack.json"),
+                    ("manifest.armour", "pack.manifest.armour"),
+                    ("signature.hex", "pack.signature.hex"),
+                ):
+                    (embedded / f"pack.{suffix}").write_bytes((fixture / source).read_bytes())
+                installation = Installation.from_package(keys)
+                self.assertEqual(installation.runtime.versions()["packs"][0]["id"], "invenio.ng.example.p1")
+                (embedded / "pack.signature.hex").unlink()
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package(keys)
+                (embedded / "pack.signature.hex").write_bytes(
+                    (fixture / "pack.signature.hex").read_bytes()
+                )
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package({})
+                (embedded / "pack.json").write_bytes(b"tampered")
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package(keys)
 
     def test_path_loader_should_bound_media_and_reject_present_invalid_watermark(
         self,

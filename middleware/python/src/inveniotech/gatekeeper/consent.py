@@ -2,13 +2,33 @@
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Literal, TypedDict
+from typing import Literal, Protocol, TypedDict, runtime_checkable
 
 from .runtime import scalars
 
 ConsentState = Literal["granted", "denied", "unknown"]
-SyncProvider = Callable[[str, str], str]
-AsyncProvider = Callable[[str, str], Awaitable[str]]
+
+
+@runtime_checkable
+class ConsentProvider(Protocol):
+    """Application-owned synchronous consent state lookup; never cached by the adapter."""
+
+    def get_state(self, subject_id: str, purpose: str) -> ConsentState:
+        """Return granted, denied or unknown for the supplied subject and purpose."""
+        ...
+
+
+@runtime_checkable
+class AsyncConsentProvider(Protocol):
+    """Application-owned asynchronous consent state lookup; never cached by the adapter."""
+
+    async def get_state(self, subject_id: str, purpose: str) -> ConsentState:
+        """Return granted, denied or unknown without blocking the event loop."""
+        ...
+
+
+SyncProvider = ConsentProvider | Callable[[str, str], str]
+AsyncProvider = AsyncConsentProvider | Callable[[str, str], Awaitable[str]]
 
 
 class ConsentDiagnostic(TypedDict):
@@ -73,7 +93,12 @@ class ConsentCheck:
         if self._provider is None:
             return "unknown"
         try:
-            answer = self._provider(subject_id, purpose)
+            lookup = (
+                self._provider.get_state
+                if isinstance(self._provider, ConsentProvider)
+                else self._provider
+            )
+            answer = lookup(subject_id, purpose)
             if caller_cancelled():
                 raise asyncio.CancelledError()
             return state(answer)
@@ -101,7 +126,12 @@ class ConsentCheck:
         if self._async_provider is None:
             return "unknown"
         try:
-            answer = await self._async_provider(subject_id, purpose)
+            lookup = (
+                self._async_provider.get_state
+                if isinstance(self._async_provider, AsyncConsentProvider)
+                else self._async_provider
+            )
+            answer = await lookup(subject_id, purpose)
             if task is not None and task.cancelling():
                 raise asyncio.CancelledError()
             return state(answer)

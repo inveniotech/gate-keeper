@@ -17,6 +17,34 @@ from python_fixture import (
 class BehaviourTests(unittest.IsolatedAsyncioTestCase):
     """Exercise host semantics in addition to unchanged engine fixtures."""
 
+    async def test_consent_should_prefer_get_state_on_sync_and_async_objects(self) -> None:
+        calls = []
+
+        class SyncProvider:
+            def get_state(self, subject_id: str, purpose: str) -> str:
+                calls.append("sync.get_state")
+                return "denied"
+
+            def __call__(self, subject_id: str, purpose: str) -> str:
+                calls.append("sync.call")
+                return "granted"
+
+        class AsyncProvider:
+            async def get_state(self, subject_id: str, purpose: str) -> str:
+                calls.append("async.get_state")
+                return "granted"
+
+            async def __call__(self, subject_id: str, purpose: str) -> str:
+                calls.append("async.call")
+                return "denied"
+
+        check = ConsentCheck(SyncProvider(), AsyncProvider(), lambda event: None)
+        self.assertEqual(check.check("synthetic-subject", "a.b"), "denied")
+        self.assertFalse(check.is_granted("synthetic-subject", "a.b"))
+        self.assertEqual(await check.acheck("synthetic-subject", "a.b"), "granted")
+        self.assertTrue(await check.ais_granted("synthetic-subject", "a.b"))
+        self.assertEqual(calls, ["sync.get_state"] * 2 + ["async.get_state"] * 2)
+
     async def test_consent_should_preserve_cancellation_when_provider_cleanup_throws(
         self,
     ) -> None:
