@@ -33,6 +33,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 | Version | Date | Change |
 |---|---|---|
 | 1 (draft) | 2 November 2026 | First draft. |
+| 1 (draft) | 13 November 2026 | Local file storage is part of the free scanner. Every remote evidence sink is a paid Feature Pack feature. |
 
 ### 0.4 Details this draft fixes
 
@@ -69,6 +70,8 @@ The default of not uploading. The path of an evidence file and its sidecar in a 
 The binary writes the evidence file on the machine that ran the scan. It does not open a connection in order to scan, and it does not contain upload code. A repository that runs only the scan therefore sends nothing.
 
 The default pipeline publishes the evidence file as an artefact of that pipeline and stops there. No sink is contacted.
+
+Local file storage is part of the free scanner. That is the evidence file written on the machine that ran the scan, including a copy to a folder the job can already write. Every remote evidence sink is a paid Feature Pack feature. That includes an S3-compatible bucket, an Azure Blob container, and any other destination that is not a local file. This specification describes the path those destinations share. It does not describe how the Feature Pack is licensed.
 
 A sink exists only when the customer adds a later step and names the destination. The destination is one of:
 
@@ -185,6 +188,8 @@ A job that wants the evidence stored therefore fails when the copy fails, and th
 ## 8. Worked examples
 
 The three examples use the same local file, `results.gk.json`, the same identity, branch, date and revision as section 4, and the same witness line. They are GitHub Actions steps because that is the first wrapper. The commands are what any other pipeline runs. Names such as `acme-evidence` are synthetic. Section 7 is what repeats a failed copy. The examples show the copy itself, once.
+
+Section 8.1 is local file storage and is part of the free scanner. Sections 8.2 and 8.3 are remote evidence sinks. Every remote evidence sink is a paid Feature Pack feature.
 
 Each example runs only when the scan step succeeded. `scan` below is that step's id. The digest commands print the witness line for `results.gk.json` and write it to `results.gk.json.sha256`. The stored file name is the layout name, not `results.gk.json`.
 
