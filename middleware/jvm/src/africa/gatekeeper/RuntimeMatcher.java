@@ -12,6 +12,7 @@ public final class RuntimeMatcher {
     private static final Pattern MASK = Pattern.compile("\\[REDACTED:[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)*\\]");
     private final List<Rule> rules;
     private final List<Map<String, Object>> packs;
+    private final boolean verifiedInstallation;
 
     /** A scalar-limit failure without source content. */
     public static final class InputLimitException extends RuntimeException {
@@ -19,7 +20,11 @@ public final class RuntimeMatcher {
     }
     /** An incompatible or invalid already loaded rule model. */
     public static final class PackLoadException extends RuntimeException {
-        public PackLoadException() { super("Invalid middleware rule data. Load a verified compatible signed pack."); }
+        final boolean requiresUpgrade;
+        /** Constructs a content-free failure with a recovery instruction. */
+        public PackLoadException(String message) { this(message, false); }
+        PackLoadException(String message, boolean requiresUpgrade) { super(message); this.requiresUpgrade = requiresUpgrade; }
+        public PackLoadException() { this("Invalid middleware rule data. Load a verified compatible signed pack."); }
     }
     /** Content-free emitted span, in Unicode scalar coordinates. */
     public static final class Finding {
@@ -43,6 +48,10 @@ public final class RuntimeMatcher {
         this(input, disabled, diagnostic, List.of());
     }
     public RuntimeMatcher(List<Map<String, Object>> input, Set<String> disabled, Consumer<String> diagnostic, List<Map<String, Object>> metadata) {
+        this(input, disabled, diagnostic, metadata, false);
+    }
+    RuntimeMatcher(List<Map<String, Object>> input, Set<String> disabled, Consumer<String> diagnostic, List<Map<String, Object>> metadata, boolean verifiedInstallation) {
+        this.verifiedInstallation = verifiedInstallation;
         if (input == null || input.isEmpty()) throw new PackLoadException();
         Set<String> off = disabled == null ? Set.of() : Set.copyOf(disabled);
         List<Rule> prepared = new ArrayList<>(); Set<String> ids = new HashSet<>();
@@ -63,6 +72,8 @@ public final class RuntimeMatcher {
 
     /** Version reporting contains only code and loaded-pack identities. */
     public Map<String, Object> versions() { return Map.of("adapterVersion", BuildVersion.VALUE, "packs", packs); }
+    /** True only when Installation created this runtime after signature verification. */
+    public boolean isVerifiedInstallation() { return verifiedInstallation; }
 
     /** All runtime matches; context and repository paths never select runtime rules. */
     public List<Finding> matches(String text) {
