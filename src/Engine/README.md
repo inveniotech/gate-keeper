@@ -103,3 +103,5 @@ Only builds with BenchmarkInstrumentation=true include anonymous per-file matchi
 ## Installation Git checks (P1-13)
 
 RepositoryGitState reuses the local Git runner to check executable availability, work-tree membership and whether the index tracks the fingerprint key. It never reads key contents or contacts a remote. Tests exercise an indexed synthetic key and a plain directory.
+
+Processor output amendment (P2-12, #64): schema artefact 2.1.0 adds optional processor metadata after each evidence finding citation, including history, and to SARIF rule properties. The object contains dataCategories in authored order with later duplicates removed, followed by the verbatim usualRegion. Ordinary rules omit the object. Evidence schema version 1, SARIF 2.1.0 and gatekeeper/v1 fingerprints remain unchanged. Console details request confirmation of actual data categories, service region and transfer basis.

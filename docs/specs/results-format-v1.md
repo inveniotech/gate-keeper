@@ -38,6 +38,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 | 1 (draft) | 2 November 2026 | First draft. |
 | 1 (additive amendment) | 5 November 2026 | The owner approved pack-version stamps in SARIF as well as evidence. Schema artefact 1.2.0 adds the optional run property `packs`; new producers always emit it. The SARIF standard version remains 2.1.0 and the evidence schema version remains 1. This approval covers the amendment, not acceptance of the whole specification. |
 | 1 (breaking amendment before the first release) | 11 November 2026 | The owner decided that product names carry no jurisdiction (IQ-92). The SARIF driver name becomes `gatekeeper` and the fingerprint key moves to `.gatekeeper/fingerprint.key`. No release had been published, so the evidence schema version remains 1, and schema artefact 2.0.0 records the incompatible change to the SARIF profile. This approval covers the amendment, not acceptance of the whole specification. |
+| 1 (additive amendment) | 13 November 2026 | The owner approved the processor metadata mapping and console sentence under P2-12 (#64), following the additive version-policy approval on 9 November 2026. Schema artefact 2.1.0 adds optional metadata on evidence findings and SARIF rule entries. The evidence schema version, SARIF standard version and fingerprint name remain unchanged. This approval covers the amendment, not acceptance of the whole specification. |
 
 ### 0.4 Details this draft fixes
 
@@ -146,13 +147,13 @@ Result keys, in order: `ruleId`, `ruleIndex`, `level`, `message`, `locations`, `
 
 ### 4.3 Rules and citations
 
-Rule keys, in order: `id`, `shortDescription`, and `properties` when the citation has an NDPA or GAID string.
+Rule keys, in order: `id`, `shortDescription`, and `properties` when the citation has an NDPA or GAID string or the effective rule carries processor metadata.
 
 `shortDescription.text` is `citation.title`.
 
 `helpUri` MUST NOT be set. Version 1 has no per-rule page to point at.
 
-When `citation.ndpa` is present, `properties.ndpa` carries that string. When `citation.gaid` is present, `properties.gaid` carries that string. Those two keys are alphabetical. A citation with only a title omits `properties`. The strings are the pack's citation text. This specification does not invent a section number; examples use a placeholder title.
+When `citation.ndpa` is present, `properties.ndpa` carries that string. When `citation.gaid` is present, `properties.gaid` carries that string. When the effective rule has a processor block, `properties.processor` carries the object defined in section 5.3. Keys are alphabetical: `gaid`, `ndpa`, `processor`. A citation with only a title omits `properties` unless the rule has processor metadata. The citation strings are the pack's text. This specification does not invent a section number; examples use a placeholder title. Processor metadata occurs once per reported rule, never on SARIF results; history remains outside SARIF.
 
 ### 4.4 Fingerprints
 
@@ -222,6 +223,14 @@ Sort: `path`, `line`, `column`, `ruleId`, using ordinal comparison for strings a
 | `fingerprint` | when a key was available | The `gatekeeper/v1` fingerprint. Omitted for every finding when the key is missing. |
 | `baselineState` | yes | `unchanged` or `new`. |
 | `citation` | yes | `title`, then `ndpa` when present, then `gaid` when present. |
+| `processor` | when the effective rule has a processor block | `dataCategories`, then `usualRegion`; omitted otherwise, never null. |
+
+The optional `processor` object copies metadata from the effective rule selected
+by pack loading. `dataCategories` is a non-empty array of strings in authored
+order, dropping later repeats by ordinal comparison. `usualRegion` is copied
+verbatim. No matched input contributes to either field. Reordering categories
+on the winning rule reorders the output; metadata never changes fingerprint
+inputs. Baselines retain metadata, while suppressed findings remain absent.
 
 ### 5.4 History
 
@@ -294,3 +303,24 @@ P1-11 writes the section. Later audit reporting reads it.
 ## 7. What a clean scan still records
 
 A scan with no findings still writes both files. The evidence file has empty `findings`, `history` (when history did not run), `exceptions`, `inventory` and, when nothing warned, `warnings`. `baseline.matchedCount` is 0 and `oldestAgeDays` is 0. `exitCode` is 0. The SARIF log has empty `rules` and empty `results`. Packs that loaded are still listed, so the evidence file shows which rule content ran.
+
+## 8. Processor output amendment (P2-12, #64)
+
+The owner approved the additive v1 policy on 9 November 2026 and the mapping and
+console sentence on 13 November 2026. Schema artefact 2.1.0 adds the optional
+objects in sections 4.3 and 5.3, including history. Earlier documents that omit
+the object remain valid; validators pinned to older closed schema artefacts
+reject it. Evidence schema version 1, SARIF 2.1.0, the v1 profile identifier
+and the `gatekeeper/v1` fingerprint key remain unchanged. There is no new CLI flag.
+
+Console work-tree and history findings with processor metadata show the authored
+categories with later repeats removed, the verbatim region caveat and this
+owner-approved sentence:
+
+> Integration reference detected. Confirm the categories of data actually sent,
+> the service region and the applicable transfer basis for your deployment.
+
+These details describe the catalogue snapshot. They do not establish actual
+processing, an organisation's data inventory or a transfer. Matched values and
+source lines remain omitted. The linked website guide is a release follow-up
+(IQ-65).

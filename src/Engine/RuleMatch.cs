@@ -31,4 +31,10 @@ public sealed record RuleMatch(
     Citation Citation,
     IReadOnlyList<string> SuppressionHints,
     int SpanStart,
-    int SpanLength);
+    int SpanLength)
+{
+    /// <summary>Gets the effective rule catalogue metadata, without matched content.</summary>
+    [System.Text.Json.Serialization.JsonPropertyName("processor"), System.Text.Json.Serialization.JsonPropertyOrder(10)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProcessorInfo? Processor { get; init; }
+}

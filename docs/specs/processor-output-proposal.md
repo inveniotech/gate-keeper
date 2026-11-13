@@ -1,19 +1,19 @@
 # Processor catalogue output proposal
 
-**Status: version policy approved by the owner on 9 November 2026; remaining
-proposal is draft.** P2-12 (#64), IQ-82; NFR-004, NFR-009, NFR-020, NFR-027
+**Status: version policy approved by the owner on 9 November 2026; mapping and
+console sentence approved by the owner on 13 November 2026.** P2-12 (#64), IQ-82; NFR-004, NFR-009, NFR-020, NFR-027
 and NFR-031. The owner selected the additive amendment path in pull request
-#124. This records that decision; it does not claim approval of the remaining
-data mapping or legal-adjacent console wording. The current writers and schemas
-are unchanged (rules 1, 15 and 24 of [AGENTS.md](../../AGENTS.md)).
+#124. The approval recorded below covers the output mapping and legal-adjacent
+console wording. Schema artefact 2.1.0 and the writers implement that amendment
+(rules 1, 15 and 24 of [AGENTS.md](../../AGENTS.md)).
 
 ## Problem and completed work
 
 The authored catalogue and verified public NIBSS integrations are complete in
 #114/#119 and #121/#122. Pack loading retains `processor.dataCategories` and
-`processor.usualRegion`, but `Finding` and the results writers do not expose
-them. The existing [results format](results-format-v1.md) fixes message text to
-rule identifier plus citation title, and both JSON Schemas close unknown fields.
+`processor.usualRegion`; the output amendment now exposes them through findings
+and results writers. The [results format](results-format-v1.md) keeps result
+message text fixed to rule identifier plus citation title, and both JSON Schemas close unknown fields.
 A document that adds a field fails a validator pinned to the schema files that
 predate that field.
 
@@ -50,7 +50,7 @@ There is no new CLI flag and no product major. Existing v1 fixtures that omit
 proposal's successor text in the results format, and the artefact version in
 the same pull request.
 
-## Proposed data mapping
+## Approved data mapping
 
 Processor metadata describes the rule, not one occurrence. The two documents
 already carry citations in different places, and this proposal follows that
@@ -71,7 +71,7 @@ the citation has an NDPA or GAID string or the rule has a processor block.
 Key order stays alphabetical: `gaid`, `ndpa`, then `processor`. A result keeps
 its current keys and gains no `properties` field.
 
-| Destination | Proposed value | Source and omission rule |
+| Destination | Value | Source and omission rule |
 |---|---|---|
 | Evidence finding `processor.dataCategories` | Array of category strings | Copy from the effective loaded rule, in authored order, dropping a later repeat of an earlier value |
 | Evidence finding `processor.usualRegion` | Region caveat string | Copy verbatim from the effective loaded rule |
@@ -100,7 +100,7 @@ file name does not rename the key.
 
 The object below is copied from the authored rule `transfer.processor.aws`. It
 shows the metadata object only. It is not a complete evidence document, and the
-current schema artefact does not accept it:
+schema artefact 2.1.0 accepts it at the positions defined above:
 
 ```json
 {
@@ -111,7 +111,7 @@ current schema artefact does not accept it:
 }
 ```
 
-Console wording is proposed legal-adjacent text for owner review:
+Console wording approved by the owner on 13 November 2026:
 
 > Integration reference detected. Confirm the categories of data actually sent,
 > the service region and the applicable transfer basis for your deployment.
@@ -154,14 +154,15 @@ describe the catalogue snapshot, not a verified inventory of the customer's data
 
 ## Implementation handoff
 
-The additive version policy is approved. After the owner accepts or amends the
-remaining mapping and console sentence, split implementation into a public results-contract and
-writer card plus a linked website guide card. Extend the existing writer and
-source-generated serialisation; do not add a second result pipeline. Publish
-schema artefact 2.1.0 and add deterministic schema tests in the writer PR. Reuse the
-existing processor corpus and combined synthetic report.
+The additive version policy, mapping and console sentence have owner approval.
+The public results-contract and writer amendment uses the existing writers and
+source-generated serialisation, with deterministic schema tests and schema
+artefact 2.1.0. The processor corpus and combined synthetic report are reused.
+The linked website guide remains a release follow-up (IQ-65).
 
-Do not close #64 on this proposal. Owner acceptance of the remaining mapping and
-console sentence, the writer and schema work, and the linked website guide
-remain pending. Production signing, catalogue publication and actual customer
+This proposal alone does not close #64. The public writer and schema work now
+implements the accepted mapping; the linked website guide remains pending
+before release. Production signing, catalogue publication and actual customer
 transfer analysis remain outside this card.
+
+Owner approval, 13 November 2026: the defined processor output mapping and console sentence are accepted for implementation. The public writer and schema amendment is implemented under P2-12 (#64). The linked website guide remains a release follow-up.

@@ -13,6 +13,16 @@ The `gatekeeper` command line. Work package P1-01 (issue #11) built the command 
 - `init` and `scaffold consent` exit 2 with a message saying they are not in this build yet. The command line never pretends a scan ran.
 - Results go to the output writer, diagnostics to the error-writer (rule 31).
 
+Processor findings (P2-12, #64) also show the effective rule's categories in
+authored order with later repeats removed, its verbatim region caveat and the
+owner-approved request to confirm the data actually sent, service region and
+applicable transfer basis. Both work-tree and history console findings include
+these details. JSON evidence carries the optional `processor` object after the
+citation, including history; ordinary rules omit it. The catalogue describes an
+integration reference and does not establish actual processing or a transfer.
+Matched values and source lines remain omitted. Default note severity does not
+fail the default error threshold.
+
 ## Dependencies
 
 - `System.CommandLine` 2.0.14 (MIT), pinned in `Directory.Packages.props` and registered in `ci/guardrails/allowed-dependencies.json`. The P0-16 spike did not measure it, so the owner approved it under rule 8 for this repository on 3 November 2026, conditional on the library being ahead-of-time safe and offering a real advantage; both were verified in this pull request: the native publish carries zero trim and ahead-of-time warnings under the repository's analysers, and the library provides the standard grammar, the standard help rendering and shell-completion integration that the hand-written parser could not grow without a second bespoke component.

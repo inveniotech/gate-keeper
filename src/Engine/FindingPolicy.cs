@@ -121,7 +121,8 @@ public static class FindingPolicy
                 }
             }
             findings.Add(new Finding(adjusted.RuleId, adjusted.Severity, adjusted.Category, adjusted.Path, adjusted.Line, adjusted.Column,
-                adjusted.LocationKind, fingerprint, baseline, adjusted.Citation));
+                adjusted.LocationKind, fingerprint, baseline, adjusted.Citation)
+            { Processor = adjusted.Processor });
         }
         foreach (var item in scan.History)
         {

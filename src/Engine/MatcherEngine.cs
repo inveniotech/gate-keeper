@@ -578,7 +578,8 @@ public sealed class MatcherEngine
             rule.Citation,
             rule.SuppressionHints ?? [],
             spanStart,
-            spanLength);
+            spanLength)
+        { Processor = rule.Processor };
     }
 
     private static int CompareMatches(RuleMatch left, RuleMatch right)

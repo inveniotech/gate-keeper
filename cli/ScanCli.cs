@@ -103,13 +103,25 @@ internal static class ScanCli
                 if (finding.Citation.NdpaSection is { } ndpa) text.Append(" NDPA ").Append(ndpa);
                 if (finding.Citation.GaidSection is { } gaid) text.Append(" GAID ").Append(gaid);
                 text.Append('\n');
+                AppendProcessorDetail(text, finding.Processor);
             }
         }
         foreach (var finding in input.Policy.History)
+        {
             text.Append(CultureInfo.InvariantCulture, $"History {finding.CommitId} {finding.Match.Path}:{finding.Match.Line}:{finding.Match.Column} {finding.Match.Severity.ToString().ToLowerInvariant()} {finding.Match.RuleId}: {finding.Match.Citation.Title}\n");
+            AppendProcessorDetail(text, finding.Match.Processor);
+        }
         text.Append(CultureInfo.InvariantCulture, $"Findings: {input.Policy.Findings.Count} work tree, {input.Policy.History.Count} history. Exit code: {(int)input.Outcome}.\n");
         if (!input.HistoryScanned) text.Append("A clean result does not mean git history was scanned.\n");
         await output.WriteAsync(text.ToString()).ConfigureAwait(false);
+    }
+
+    private static void AppendProcessorDetail(StringBuilder text, ProcessorInfo? processor)
+    {
+        if (processor is null) return;
+        text.Append("    Data categories: ").AppendJoin(", ", processor.DataCategories.Distinct(StringComparer.Ordinal)).Append('\n');
+        text.Append("    ").Append(processor.UsualRegion).Append('\n');
+        text.Append("    Integration reference detected. Confirm the categories of data actually sent, the service region and the applicable transfer basis for your deployment.\n");
     }
 
     private sealed class NoEmbeddedKeys : IPackKeyCatalogue
