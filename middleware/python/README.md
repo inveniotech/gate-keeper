@@ -31,16 +31,28 @@ distribution and wheel from that temporary copy, then verify the installed
 wheel with trust anchors obtained independently of those candidate media.
 No private signing key belongs in the package or application.
 
+Install the already pinned build tools from an approved offline wheelhouse
+before building: `build==1.6.1` (from `requirements-dev.txt`),
+`setuptools==80.9.0` and `wheel==0.45.1` (from `pyproject.toml`). Then run:
+
+```sh
+python -m build --no-isolation
+python -m pip install --no-index --no-deps dist/inveniotech_gate_keeper-0.1.0-py3-none-any.whl
+```
+
 ```python
 from inveniotech.gatekeeper import Installation
 
-# Obtain these public keys from an independently trusted release channel.
-installation = Installation.from_package(trusted_public_keys)
+# Both mappings use key identifiers and raw public-key bytes from independently
+# trusted release settings. Omit watermark keys only when no watermark is staged.
+installation = Installation.from_package(
+    trusted_pack_public_keys, trusted_watermark_public_keys
+)
 runtime = installation.runtime
 ```
 
 `from_package` uses bounded reads and the same signature, digest, schema and
-version verifier as `Installation`. An absent pack, incomplete sidecars,
+version verifier as `Installation`. An absent pack, incomplete or orphan sidecars,
 untrusted signer or tampered document raises `PackLoadError` before a runtime
 is exposed. This does not make the source checkout a production installation.
 
@@ -64,8 +76,8 @@ or download is performed.
 ```python
 from inveniotech.gatekeeper import Installation
 
-# The application supplies signed embedded media and trusted public keys.
-installation = Installation(embedded_packs, trusted_public_keys)
+# The application supplies signed embedded media and independent public keys.
+installation = Installation(embedded_packs, trusted_pack_public_keys, trusted_watermark_public_keys)
 runtime = installation.runtime
 safe_text = runtime.redact(application_text)
 finding = runtime.classify(application_text, {"surface": "value"})

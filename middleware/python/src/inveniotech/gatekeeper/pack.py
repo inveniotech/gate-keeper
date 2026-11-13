@@ -354,7 +354,23 @@ class Installation:
         """
         try:
             embedded = files("inveniotech.gatekeeper").joinpath("embedded")
-            names = sorted(item.name for item in embedded.iterdir() if item.name.endswith(".json"))
+            present = {item.name for item in embedded.iterdir()}
+            suffixes = (
+                ".watermark.manifest.armour",
+                ".watermark.signature.hex",
+                ".manifest.armour",
+                ".signature.hex",
+            )
+            for name in present:
+                if any(name.endswith(suffix) for suffix in suffixes):
+                    _require(
+                        any(
+                            f"{name[: -len(suffix)]}.json" in present
+                            for suffix in suffixes
+                            if name.endswith(suffix)
+                        )
+                    )
+            names = sorted(name for name in present if name.endswith(".json"))
             return cls(
                 [_read_signed_pack(embedded, name) for name in names],
                 keys,
@@ -416,8 +432,9 @@ def _read_signed_pack(directory: Traversable, filename: str) -> SignedPack:
 
     watermark = f"{stem}.watermark.manifest.armour"
     watermark_signature = f"{stem}.watermark.signature.hex"
-    has_watermark = directory.joinpath(watermark).is_file()
-    _require(has_watermark == directory.joinpath(watermark_signature).is_file())
+    present = {item.name for item in directory.iterdir()}
+    has_watermark = watermark in present
+    _require(has_watermark == (watermark_signature in present))
     return SignedPack(
         bounded_read(filename, 16 * 1024 * 1024),
         bounded_read(f"{stem}.manifest.armour", 8192).decode("utf-8"),

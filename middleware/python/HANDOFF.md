@@ -111,21 +111,17 @@ existing development-only signed vectors in a temporary package copy, builds
 the source distribution and wheel offline, checks both archives and strict
 metadata, installs the wheel outside the checkout, and verifies identity and
 redaction. The existing pack tests cover absent media, incomplete sidecars,
-tampering and an untrusted signer. This source validation cannot establish
-production release-media availability. A linked website draft at
-`docs/pages/python-middleware.html` documents version `0.1.0` as unreleased
-and outside the first release. Its generator test passes.
+orphan recognised sidecars beside a valid pack, directory-shaped watermark
+sidecars, a valid content stem ending in `.watermark`, tampering and an
+untrusted signer. The package data includes only
+recognised media suffixes; the installation check proves an unrelated staged
+file is excluded. This source validation cannot establish
+production release-media availability. Companion documentation is tracked in
+the linked website draft.
 
 Local Python 3.12 validation passed all five conformance scripts, both real
 framework samples, strict mypy, Ruff lint and format, and the staged-media
-package installation check. The website guide generator tests passed 14 of 14,
-with valid links and self-hosted scripts. The initial website build attempts
-failed under sandbox restrictions: one could not resolve `github.com`, and
-two local-data Angular attempts aborted inside esbuild. The parent session
-then reran `npm run build` with the bundled Node 24, one Angular worker and
-approved host permissions. The pinned docs-data asset returned HTTP 404, so
-the generator used its documented fallback; all 20 pages had valid internal
-links, and the Angular production build passed. The parent also observed a
-passing locked .NET restore and 1,684 passing tests, with one existing symbolic
-link test skipped. A fresh independent rule-37 check and pull request
-review remain for the next phase. No release or publication is claimed.
+package installation check. The parent also observed a passing locked .NET
+restore and 1,684 passing tests, with one existing symbolic link test skipped.
+A fresh independent rule-37 check and pull request review remain for the next
+phase. No release or publication is claimed.

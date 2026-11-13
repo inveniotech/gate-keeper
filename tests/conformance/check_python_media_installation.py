@@ -29,6 +29,7 @@ with tempfile.TemporaryDirectory(prefix="gatekeeper-python-stage-") as scratch:
         ("free.signature.hex", "pack.signature.hex"),
     ]:
         shutil.copyfile(fixture / original, embedded / target)
+    (embedded / "unrelated.txt").write_text("not signed media")
     build = subprocess.run(
         [sys.executable, "-m", "build", "--no-isolation", "--sdist", "--wheel"],
         cwd=stage,
@@ -44,12 +45,14 @@ with tempfile.TemporaryDirectory(prefix="gatekeeper-python-stage-") as scratch:
     names = ["free.json", "free.manifest.armour", "free.signature.hex"]
     with zipfile.ZipFile(wheel) as archive:
         included = archive.namelist()
+        assert not any(name.endswith("/embedded/unrelated.txt") for name in included)
         assert all(
             any(name.endswith("/embedded/" + part) for name in included)
             for part in names
         )
     with tarfile.open(sdist) as archive:
         included = archive.getnames()
+        assert not any(name.endswith("/embedded/unrelated.txt") for name in included)
         assert all(
             any(name.endswith("/embedded/" + part) for name in included)
             for part in names
@@ -104,5 +107,5 @@ assert version('inveniotech-gate-keeper')=='0.1.0'
     if run.returncode:
         raise RuntimeError(run.stdout)
     print(
-        "Staged sdist and wheel include three signed files; strict metadata, isolated import, identity and redaction passed."
+        "Staged sdist and wheel include signed media, exclude unrelated files, and pass strict metadata, isolated identity and redaction checks."
     )

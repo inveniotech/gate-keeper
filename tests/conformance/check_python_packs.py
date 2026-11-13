@@ -22,11 +22,43 @@ from python_fixture import (
 class PackTests(unittest.TestCase):
     """Verify exact signed bytes, never reserialised content."""
 
-    def test_packaged_installation_should_require_complete_trusted_media(self) -> None:
+    def test_packaged_installation_should_accept_content_stem_ending_in_watermark(self) -> None:
         fixture = ROOT / "tests/vectors/pack"
         keys = {
             item["keyId"]: bytes.fromhex(item["publicKeyHex"])
             for item in json.loads((fixture / "development-public-key.json").read_text())["keys"]
+            if item["purpose"] == "pack-signing"
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            package = Path(temporary)
+            embedded = package / "embedded"
+            embedded.mkdir()
+            for suffix, source in (
+                ("json", "pack.pack.json"),
+                ("manifest.armour", "pack.manifest.armour"),
+                ("signature.hex", "pack.signature.hex"),
+            ):
+                (embedded / f"free.watermark.{suffix}").write_bytes((fixture / source).read_bytes())
+            with patch("inveniotech.gatekeeper.pack.files", return_value=package):
+                self.assertEqual(
+                    Installation.from_package(keys).runtime.versions()["packs"][0]["id"],
+                    "invenio.ng.example.p1",
+                )
+
+    def test_packaged_installation_should_require_complete_trusted_media(self) -> None:
+        fixture = ROOT / "tests/vectors/pack"
+        public_keys = json.loads((fixture / "development-public-key.json").read_text())[
+            "keys"
+        ]
+        keys = {
+            item["keyId"]: bytes.fromhex(item["publicKeyHex"])
+            for item in public_keys
+            if item["purpose"] == "pack-signing"
+        }
+        watermark_keys = {
+            item["keyId"]: bytes.fromhex(item["publicKeyHex"])
+            for item in public_keys
+            if item["purpose"] == "pack-watermark"
         }
         with tempfile.TemporaryDirectory() as temporary:
             package = Path(temporary)
@@ -43,6 +75,34 @@ class PackTests(unittest.TestCase):
                     (embedded / f"pack.{suffix}").write_bytes((fixture / source).read_bytes())
                 installation = Installation.from_package(keys)
                 self.assertEqual(installation.runtime.versions()["packs"][0]["id"], "invenio.ng.example.p1")
+                for suffix, source in (
+                    ("watermark.manifest.armour", "watermark.manifest.armour"),
+                    ("watermark.signature.hex", "watermark.signature.hex"),
+                ):
+                    (embedded / f"pack.{suffix}").write_bytes((fixture / source).read_bytes())
+                self.assertEqual(
+                    Installation.from_package(keys, watermark_keys).runtime.versions()["packs"][0]["id"],
+                    "invenio.ng.example.p1",
+                )
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package(keys)
+                for suffix in ("watermark.manifest.armour", "watermark.signature.hex"):
+                    (embedded / f"pack.{suffix}").unlink()
+                for orphan in (
+                    "other.manifest.armour",
+                    "other.signature.hex",
+                    "other.watermark.manifest.armour",
+                    "other.watermark.signature.hex",
+                ):
+                    with self.subTest(orphan=orphan):
+                        (embedded / orphan).write_text("orphan")
+                        with self.assertRaises(PackLoadError):
+                            Installation.from_package(keys)
+                        (embedded / orphan).unlink()
+                (embedded / "pack.watermark.manifest.armour").mkdir()
+                with self.assertRaises(PackLoadError):
+                    Installation.from_package(keys)
+                (embedded / "pack.watermark.manifest.armour").rmdir()
                 (embedded / "pack.signature.hex").unlink()
                 with self.assertRaises(PackLoadError):
                     Installation.from_package(keys)

@@ -22,7 +22,12 @@ where = ["src"]
 namespaces = true
 
 [tool.setuptools.package-data]
-"inveniotech.gatekeeper" = ["py.typed", "embedded/*"]
+"inveniotech.gatekeeper" = [
+    "py.typed",
+    "embedded/*.json",
+    "embedded/*.manifest.armour",
+    "embedded/*.signature.hex",
+]
 
 [tool.mypy]
 python_version = "3.11"
