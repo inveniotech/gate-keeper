@@ -57,17 +57,17 @@ or paid installation. No production signing keys are needed for further work.
 Hosted CI passed on all five Python interpreters on commit 7961938, including
 framework samples, strict types and package validation. The initial Python 3.15
 build-tool failure was fixed by updating the existing build pin to 1.6.1.
-No full local Python 3.12 or 3.14 run is claimed. The independent check
-phase required by AGENTS.md rule 37 still needs its own fresh session. This is
-why the pull request is a draft and references, rather than closes, issue #42.
-The linked website guide and production publication are outside this change.
+No full local Python 3.14 run is claimed. The independent check required by
+AGENTS.md rule 37 has since completed; its outcome is recorded below. This
+pull request remains a draft and references, rather than closes, issue #42.
+Companion documentation is tracked in linked website PR #42. Production
+publication remains an owner step.
 
 ## Continuation
 
-Review the draft pull request in a fresh check session. Confirm every hosted
-gate, including the unchanged zero-egress proof, and resolve any findings.
-Complete release-media integration and linked website documentation before
-closing #42. No merge, tag, release or package publication is authorised here.
+Complete production release-media integration and merge linked website PR #42
+before a release. No merge, tag, release or package publication is authorised
+here.
 Unrelated Node and JVM changes in the original working directory were excluded.
 
 ## SDK restore follow-up
@@ -117,11 +117,19 @@ untrusted signer. The package data includes only
 recognised media suffixes; the installation check proves an unrelated staged
 file is excluded. This source validation cannot establish
 production release-media availability. Companion documentation is tracked in
-the linked website draft.
+linked website PR #42.
+
+Replacement reads use direct bounded opens of the known JSON and sidecar
+paths. Only a missing optional watermark file counts as absent; permission
+errors and directory-shaped sidecars fail. A deterministic test blocks
+directory listing while leaving the known files readable and verifies that
+replacement still activates the newer signed pack.
 
 Local Python 3.12 validation passed all five conformance scripts, both real
 framework samples, strict mypy, Ruff lint and format, and the staged-media
 package installation check. The parent also observed a passing locked .NET
 restore and 1,684 passing tests, with one existing symbolic link test skipped.
-A fresh independent rule-37 check and pull request review remain for the next
-phase. No release or publication is claimed.
+The fresh independent rule-37 check found no remaining actionable findings.
+It verified the no-list directory replacement, directory-shaped watermark
+rejection and all 15 pack tests. Production-signed media and publication remain
+owner steps; no release or publication is claimed.

@@ -430,17 +430,23 @@ def _read_signed_pack(directory: Traversable, filename: str) -> SignedPack:
         _require(len(data) <= maximum)
         return data
 
+    def optional_read(name: str, maximum: int) -> bytes | None:
+        try:
+            return bounded_read(name, maximum)
+        except FileNotFoundError:
+            return None
+
     watermark = f"{stem}.watermark.manifest.armour"
     watermark_signature = f"{stem}.watermark.signature.hex"
-    present = {item.name for item in directory.iterdir()}
-    has_watermark = watermark in present
-    _require(has_watermark == (watermark_signature in present))
+    watermark_bytes = optional_read(watermark, 8192)
+    watermark_signature_bytes = optional_read(watermark_signature, 256)
+    _require((watermark_bytes is None) == (watermark_signature_bytes is None))
     return SignedPack(
         bounded_read(filename, 16 * 1024 * 1024),
         bounded_read(f"{stem}.manifest.armour", 8192).decode("utf-8"),
         bytes.fromhex(bounded_read(f"{stem}.signature.hex", 256).decode("ascii")),
-        bounded_read(watermark, 8192).decode("utf-8") if has_watermark else None,
-        bytes.fromhex(bounded_read(watermark_signature, 256).decode("ascii"))
-        if has_watermark
+        watermark_bytes.decode("utf-8") if watermark_bytes is not None else None,
+        bytes.fromhex(watermark_signature_bytes.decode("ascii"))
+        if watermark_signature_bytes is not None
         else None,
     )

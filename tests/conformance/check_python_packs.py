@@ -162,6 +162,37 @@ class PackTests(unittest.TestCase):
                 active.replace_from_path(path)
             self.assertIs(active.runtime, initial)
 
+    def test_path_loader_should_read_known_files_without_listing_directory(self) -> None:
+        fixture = ROOT / "tests/vectors/pack"
+        keys = {
+            item["keyId"]: bytes.fromhex(item["publicKeyHex"])
+            for item in json.loads((fixture / "development-public-key.json").read_text())["keys"]
+            if item["purpose"] == "pack-signing"
+        }
+        active = Installation(
+            [
+                SignedPack(
+                    (fixture / "pack.pack.json").read_bytes(),
+                    (fixture / "pack.manifest.armour").read_text(),
+                    bytes.fromhex((fixture / "pack.signature.hex").read_text()),
+                )
+            ],
+            keys,
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "replacement.json"
+            for suffix, source in (
+                ("json", "next-line.pack.json"),
+                ("manifest.armour", "next-line.manifest.armour"),
+                ("signature.hex", "next-line.signature.hex"),
+            ):
+                (Path(temporary) / f"replacement.{suffix}").write_bytes(
+                    (fixture / source).read_bytes()
+                )
+            with patch.object(Path, "iterdir", side_effect=PermissionError("listing forbidden")):
+                active.replace_from_path(path)
+            self.assertEqual(active.runtime.versions()["packs"][0]["version"], "2027.2.0")
+
     def test_pack_schema_should_reject_invalid_optional_policy_and_nested_metadata(
         self,
     ) -> None:
