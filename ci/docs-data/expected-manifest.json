@@ -2,7 +2,7 @@
   "name": "gate-keeper-docs-data",
   "version": "0.2.0",
   "packVersion": "2026.11.0",
-  "schemasVersion": "2.0.0",
+  "schemasVersion": "2.1.0",
   "files": [
     {
       "path": "citations.json",
@@ -46,7 +46,7 @@
     },
     {
       "path": "rules.json",
-      "sha256": "a5e9fb5aa171fef6ccf7f460f69bbeca9527d4e69f704a2851bc8de841f19581"
+      "sha256": "d2c9e2658f981cec609e12974ef851d36d21c599a2bc15a792a4d38738648bcc"
     },
     {
       "path": "rules/bvn.md",
@@ -70,15 +70,15 @@
     },
     {
       "path": "rules/processors.md",
-      "sha256": "427da608ce78f102ed4deed226c1bae8d6087dc695ce7e21c28ec7ce9c313830"
+      "sha256": "d6644e7c0824494f02876b842a862699714f0e5a8ad1988ba733015648fede0d"
     },
     {
       "path": "schemas/VERSION",
-      "sha256": "c28fcca53637bc88e124af1725df13cb98c69dedefd62fb3cdbe1cdb6b760624"
+      "sha256": "c89b87c262e9d5ffd20e73aac74a1772adcc9f5a21682cc33adcf5086e5fef5c"
     },
     {
       "path": "schemas/gk-results.schema.json",
-      "sha256": "31385943e1585be93038f16df3a83aa86854966c51dab20e7f9d36b760e532f1"
+      "sha256": "86236c4afd5f77d789ab5971fd85afcb5e2f053357092f496bb9e973d012664b"
     },
     {
       "path": "schemas/rulepack.schema.json",
@@ -86,7 +86,7 @@
     },
     {
       "path": "schemas/sarif-profile.schema.json",
-      "sha256": "fbadd8f652f591f29b0047c6f67adc3653d00bae4403dd0964b78761db601594"
+      "sha256": "572df8a383d9aa03a5520dd43caaa2a1e79632956683ae7baa7828744eac298f"
     }
   ]
 }

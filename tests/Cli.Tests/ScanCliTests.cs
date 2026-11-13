@@ -28,7 +28,11 @@ internal sealed class CliRepository : IDisposable
         return (code, output.ToString(), errors.ToString());
     }
 
-    public void Dispose() => Directory.Delete(Root, true);
+    public void Dispose()
+    {
+        foreach (var file in Directory.EnumerateFiles(Root, "*", SearchOption.AllDirectories)) File.SetAttributes(file, FileAttributes.Normal);
+        Directory.Delete(Root, true);
+    }
 }
 
 public sealed class ScanCliTests

@@ -58,7 +58,7 @@ public static class ResultsWriter
         foreach (var entry in input.Settings.DisabledRules.OrderBy(p => p.Id, StringComparer.Ordinal))
         { writer.WriteStartObject(); writer.WriteString("id", entry.Id); writer.WriteString("reason", entry.Reason); writer.WriteEndObject(); }
         writer.WriteEndArray(); writer.WriteEndObject(); writer.WriteStartArray("findings");
-        foreach (var finding in findings) JsonSerializer.Serialize(writer, finding, EngineJsonSerializerContext.Default.Finding);
+        foreach (var finding in findings) JsonSerializer.Serialize(writer, finding with { Processor = OutputProcessor(finding.Processor) }, EngineJsonSerializerContext.Default.Finding);
         writer.WriteEndArray(); writer.WriteStartArray("history");
         foreach (var entry in input.Policy.History.OrderBy(h => h.CommitId, StringComparer.Ordinal).ThenBy(h => h.Match.Path, StringComparer.Ordinal).ThenBy(h => h.Match.Line).ThenBy(h => h.Match.RuleId, StringComparer.Ordinal).ThenBy(h => h.Match.Column))
         {
@@ -66,7 +66,9 @@ public static class ResultsWriter
             writer.WriteStartObject(); writer.WriteString("commitId", entry.CommitId); writer.WriteString("ruleId", match.RuleId);
             writer.WriteString("severity", Word(match.Severity)); writer.WriteString("category", match.Category); writer.WriteString("path", match.Path);
             writer.WriteNumber("line", match.Line); writer.WriteNumber("column", match.Column); writer.WriteString("locationKind", Kind(match.LocationKind));
-            writer.WritePropertyName("citation"); JsonSerializer.Serialize(writer, match.Citation, EngineJsonSerializerContext.Default.Citation); writer.WriteEndObject();
+            writer.WritePropertyName("citation"); JsonSerializer.Serialize(writer, match.Citation, EngineJsonSerializerContext.Default.Citation);
+            if (OutputProcessor(match.Processor) is { } processor) { writer.WritePropertyName("processor"); JsonSerializer.Serialize(writer, processor, EngineJsonSerializerContext.Default.ProcessorInfo); }
+            writer.WriteEndObject();
         }
         writer.WriteEndArray(); writer.WriteStartArray("exceptions");
         foreach (var entry in input.Policy.Exceptions.OrderBy(e => e.Id, StringComparer.Ordinal).ThenBy(e => e.Path, StringComparer.Ordinal).ThenBy(e => e.Line).ThenBy(e => e.Column).ThenBy(e => e.RuleId, StringComparer.Ordinal))
@@ -108,6 +110,7 @@ public static class ResultsWriter
             var properties = new SortedDictionary<string, JsonElement>(StringComparer.Ordinal);
             if (citation.GaidSection is not null) properties.Add("gaid", Text(citation.GaidSection));
             if (citation.NdpaSection is not null) properties.Add("ndpa", Text(citation.NdpaSection));
+            if (OutputProcessor(g.First().Processor) is { } processor) properties.Add("processor", JsonSerializer.SerializeToElement(processor, EngineJsonSerializerContext.Default.ProcessorInfo));
             return new ReportingDescriptor { Id = g.Key, ShortDescription = new MultiformatMessageString { Text = citation.Title }, Properties = properties.Count > 0 ? properties : null };
         }).ToArray();
         var indexes = descriptors.Select((d, index) => (d.Id, index)).ToDictionary(p => p.Id!, p => p.index, StringComparer.Ordinal);
@@ -181,6 +184,8 @@ public static class ResultsWriter
         stream.WriteByte((byte)'\n');
         return stream.ToArray();
     }
+    private static ProcessorInfo? OutputProcessor(ProcessorInfo? processor) => processor is null ? null
+        : processor with { DataCategories = processor.DataCategories.Distinct(StringComparer.Ordinal).ToArray() };
     private static JsonElement Text(string text) => JsonSerializer.SerializeToElement(text, EngineJsonSerializerContext.Default.String);
     private static string Day(DateOnly day) => day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     private static string Profile(ScanSettings settings) => settings.Profile == ScanProfile.Deep ? "deep" : "default";

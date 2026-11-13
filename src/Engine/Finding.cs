@@ -39,4 +39,10 @@ public sealed record Finding(
     [property: JsonPropertyName("baselineState"), JsonPropertyOrder(8)]
     BaselineState BaselineState,
     [property: JsonPropertyName("citation"), JsonPropertyOrder(9)]
-    Citation Citation);
+    Citation Citation)
+{
+    /// <summary>Gets the effective rule catalogue metadata, without matched content.</summary>
+    [System.Text.Json.Serialization.JsonPropertyName("processor"), System.Text.Json.Serialization.JsonPropertyOrder(10)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProcessorInfo? Processor { get; init; }
+}
