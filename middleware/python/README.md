@@ -37,7 +37,7 @@ before building: `build==1.6.1` (from `requirements-dev.txt`),
 
 ```sh
 python -m build --no-isolation
-python -m pip install --no-index --no-deps dist/inveniotech_gate_keeper-0.1.0-py3-none-any.whl
+python -m pip install --no-index --no-deps dist/*.whl
 ```
 
 ```python
