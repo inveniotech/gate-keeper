@@ -9,11 +9,11 @@ Description:
   Checks configuration, rule packs, Git and output access without scanning source
 
 Usage:
-  gatekeeper-ndpa-check doctor [options]
+  gatekeeper doctor [options]
 
 Options:
   --evaluated-on <evaluated-on>  The evaluation date in YYYY-MM-DD form
-  --output <output>              The repository-relative output directory to check [default: .ndpa-check]
+  --output <output>              The repository-relative output directory to check [default: .gatekeeper]
   -?, -h, --help                 Show help and usage information
 
 ```

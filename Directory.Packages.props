@@ -7,6 +7,15 @@
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <!-- Test-only JSON Schema validator, approved under rule 8 on 1 November 2026 (P0-03). It is not referenced by cli/ or src/Engine. -->
     <PackageVersion Include="JsonSchema.Net" Version="9.6.0" />
+    <!--
+      Rule-8 approval, dated 10 November 2026, for the P3-02 .NET adapter only: these two
+      packages and no others. Microsoft.Extensions.Compliance.Redaction (MIT) supplies the
+      Redactor base type the middleware redactor subclasses; Serilog (Apache-2.0) supplies
+      the enricher and destructuring-policy interfaces. Both are pinned stable versions that
+      declare IsAotCompatible, and any trim or NativeAOT warning stops the card.
+    -->
+    <PackageVersion Include="Microsoft.Extensions.Compliance.Redaction" Version="10.11.0" />
+    <PackageVersion Include="Serilog" Version="4.4.0" />
   </ItemGroup>
 
   <!--
