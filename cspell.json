@@ -188,6 +188,8 @@
     "varchar",
     "aspnetcore",
     "destructures",
-    "unconfigured"
+    "unconfigured",
+    "javax",
+    "gkmsg"
   ]
 }
