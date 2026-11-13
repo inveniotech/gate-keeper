@@ -1,6 +1,6 @@
 # Licence token, version 1
 
-**Status: draft — not accepted.** This specification is an AI draft for the owner to review and approve (rule 15 of `AGENTS.md`). It records the public token format. Nothing in this document is final, accepted or approved until the owner says so.
+**Status: accepted by the owner on 13 November 2026, with a legal-use condition.** The owner accepts the version 1 token format and discovery rules below. The `cacRegistrationNumber` claim MUST NOT be used in a production token until a lawyer confirms that it may be included (IQ-39). This acceptance does not claim that a production verifier or issuer is implemented.
 
 This document is the written contract for work package P0-06 ([issue #5](https://github.com/inveniotech/gate-keeper/issues/5)). It does not implement the verifier or the `licence install` command; those are later work. The vectors in [`tests/vectors/licence/`](../../tests/vectors/licence/) are the public cases, produced by [`New-LicenceVectors.mjs`](../../tests/vectors/licence/New-LicenceVectors.mjs) from the development key in section 6.
 
@@ -12,7 +12,7 @@ This draft does not add a JSON Schema file. The signed line is JSON, but a verif
 
 ### 0.1 Decision status
 
-Normative text in this specification comes from the recorded decisions listed here. The specification itself stays a draft, because rule 15 reserves final approval of specifications to the owner.
+Normative text in this specification comes from the recorded decisions listed here. The owner accepts this version 1 contract on 13 November 2026. The CAC registration number claim remains subject to the legal-use condition in section 0.4 item 4; this condition does not make the accepted format ambiguous.
 
 | Identifier | Status | What it settles |
 |---|---|---|
@@ -32,16 +32,17 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 | Version | Date | Change |
 |---|---|---|
-| 1 (draft) | 2 November 2026 | First draft. |
+| 1 | 2 November 2026 | First draft. |
+| 1 | 13 November 2026 | Owner accepted the format and discovery details; production use of the CAC registration number remains subject to legal confirmation. |
 
-### 0.4 Details this draft fixes
+### 0.4 Accepted format and discovery details
 
-The decisions name the signed bytes, the two date claims, and the kinds of place a token is read from. They do not spell the armour, the other claim names, or the flag and path strings. This draft fixes the following so that an issuer and a verifier agree. Each item is part of the draft for the owner to accept or amend.
+The recorded decisions name the signed bytes, the two date claims, and the kinds of place a token is read from. They do not spell the armour, the other claim names, or the flag and path strings. The owner accepts the following details so that an issuer and a verifier agree. Item 4's product requirement is accepted, but production use of the CAC registration number remains subject to legal confirmation.
 
 1. **Armour and signed bytes.** Section 2 is the file layout. The signed bytes are the UTF-8 of the single payload line after one trailing CR has been removed. The line feed that ends the line in the file is not signed.
 2. **Claim names and the example order.** Section 4 names every claim. Verifiers MUST NOT require a particular key order and MUST NOT re-serialise the payload. The examples use the order in section 4 only so the vectors have one byte string.
 3. **`keyId` shape.** A key identifier is `gklic-` followed by 1 to 32 characters. The first of those characters is a letter or a digit. The rest are letters, digits or `-`. The development key is `gklic-dev-1`.
-4. **`orgId` and `cacRegistrationNumber`.** Section 4 gives their character rules. IQ-39 says to carry the registration number and records that a lawyer has not yet confirmed the field. The field is in this draft so the format has a place for it. The owner can remove it before acceptance.
+4. **`orgId` and `cacRegistrationNumber`.** Section 4 gives their character rules. IQ-39 says to carry the registration number, which lets an audit report identify the licensed entity exactly. A lawyer has not yet confirmed that the registration number may appear in the token; do not use this claim in a production token until that confirmation is received.
 5. **Source names.** The flag is `--licence <path>`. The token text is `GATEKEEPER_LICENCE`. The file path is `GATEKEEPER_LICENCE_FILE`. The configuration file is `licence.gklic` inside the configuration folder. The mounted file is `/var/lib/gatekeeper/licence.gklic`.
 6. **A requested file that is missing stops the search.** `--licence` or `GATEKEEPER_LICENCE_FILE`, when set, is the only source consulted. A missing file is reported as missing. Later sources are not used. An empty `GATEKEEPER_LICENCE` is unset, not a token.
 7. **`updatesUntil` is on or after `purchasedOn`.** When both dates are present, a verifier rejects the token if `updatesUntil` is earlier than `purchasedOn`. This is a check on the claims after the signature has verified. It does not say which packs or features a date allows.

@@ -43,9 +43,10 @@ The fixed entries are `configuration.json` (typed effective settings with all fr
 
 Run `dotnet test tests/Cli.Tests --filter FullyQualifiedName~SupportBundleCliTests` and `dotnet test tests/Corpus.Tests --filter FullyQualifiedName~CorpusSupportBundleTests` for command behaviour and the corpus-wide privacy acceptance test.
 
-The corpus privacy acceptance test supplies real matchers through an internal
-composition seam for both source scanning and final-document checks. Its shape
-cache has no elapsed-time deadline so that busy runners cannot turn a semantic
+The corpus privacy acceptance test and the CLI test for restricted-rule metadata
+masking supply real matchers through an internal
+composition seam for both source scanning and final-document checks. Their shape
+caches have no elapsed-time deadline so that busy runners cannot turn a semantic
 privacy assertion into a timing test. Public CLI entry points retain the
 100 millisecond production deadline; no flag or environment override is exposed.
 Deterministic fault-injection tests prove that a matcher failure in either stage

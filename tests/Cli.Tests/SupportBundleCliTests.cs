@@ -116,9 +116,20 @@ public sealed class SupportBundleCliTests
             """);
         Directory.CreateDirectory(Path.Combine(repo.Root, "src"));
         await File.WriteAllTextAsync(Path.Combine(repo.Root, "src", "sample.txt"), "context marker");
-        var result = await repo.Run("support-bundle", "--evaluated-on", "2026-11-01");
-        result.Code.Should().Be(0, result.Errors);
+        var errors = new StringWriter();
+        var matcherStages = 0;
+        var shapes = new ShapeRegexCache(Timeout.InfiniteTimeSpan);
+        // This test checks source restrictions and metadata masking, not runner scheduling.
+        // The production deadline and matcher-failure propagation have separate tests.
+        var result = await CliModule.RunWithMatcherFactoryAsync(["support-bundle", "--evaluated-on", "2026-11-01"],
+            new StringWriter(), errors, repo.Root,
+            rules => { matcherStages++; return new MatcherEngine(rules, shapes: shapes); });
+        result.Should().Be(0, errors.ToString());
+        matcherStages.Should().Be(2, "the source scan and metadata privacy check must both use real matching");
         using var archive = ZipFile.OpenRead(Path.Combine(repo.Root, ".gatekeeper", "support-bundle.zip"));
+        using var findings = JsonDocument.Parse(await ReadEntry(archive, "findings.json"));
+        findings.RootElement.GetProperty("workTreeCount").GetInt32().Should().Be(1);
+        findings.RootElement.GetProperty("rules")[0].GetProperty("ruleId").GetString().Should().Be("local.context");
         using var versions = JsonDocument.Parse(await ReadEntry(archive, "versions.json"));
         versions.RootElement.GetProperty("packs")[0].GetProperty("packId").GetString().Should().Be("[masked]");
     }
