@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.nin",
+    "path": "src/logging.ts",
+    "line": 1,
+    "column": 28,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.nin.log",
+    "path": "src/logging.ts",
+    "line": 1,
+    "column": 28,
+    "triage": "true-positive"
+  }
+]

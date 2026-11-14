@@ -16,14 +16,14 @@ public sealed class DoctorCliTests
         result.Output.Should().Contain("configuration: valid").And.Contain("local.example: unsigned local pack; valid")
             .And.Contain("output: writable").And.Contain("licence: not checked");
         result.Output.Should().NotContain("source.txt").And.NotContain("local.token").And.NotContain("marker");
-        Directory.EnumerateFiles(Path.Combine(repo.Root, ".ndpa-check"), "*.tmp").Should().BeEmpty();
+        Directory.EnumerateFiles(Path.Combine(repo.Root, ".gatekeeper"), "*.tmp").Should().BeEmpty();
     }
 
     [Fact]
     public async Task Doctor_Should_ContinueIndependentChecks_When_ConfigurationIsInvalid()
     {
         using var repo = new CliRepository();
-        File.WriteAllText(Path.Combine(repo.Root, ".ndpa-check", "ndpa-check.toml"), "schemaVersion = 9\n");
+        File.WriteAllText(Path.Combine(repo.Root, ".gatekeeper", "gatekeeper.toml"), "schemaVersion = 9\n");
         var result = await repo.Run("doctor");
         result.Code.Should().Be(2);
         result.Output.Should().Contain("configuration: invalid").And.Contain("git:").And.Contain("output: writable");

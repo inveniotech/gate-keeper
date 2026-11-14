@@ -98,6 +98,57 @@ public sealed class MatcherEngineTests
     }
 
     [Fact]
+    public void MatcherEngine_Should_MatchAnAddressAtTheTextEdges_When_TheBoundaryIsEmail()
+    {
+        // The address is the whole text, so both ends of the text count as boundaries.
+        var text = "ada@ledgerops.ng";
+        var matches = Scan(text, EmailRule(MatchBoundary.Email));
+
+        matches.Should().ContainSingle();
+        matches[0].Column.Should().Be(1);
+    }
+
+    [Fact]
+    public void MatcherEngine_Should_AcceptASentenceDotTail_When_TheBoundaryIsEmail()
+    {
+        // The trailing neighbour set leaves out '.', so a sentence dot after the domain does not reject the match.
+        var text = "to ada@ledgerops.ng.";
+        var matches = Scan(text, EmailRule(MatchBoundary.Email));
+
+        matches.Should().ContainSingle();
+        matches[0].Column.Should().Be(4);
+    }
+
+    [Fact]
+    public void MatcherEngine_Should_MatchADottedLocalPart_When_TheBoundaryIsEmail()
+    {
+        var text = "to dipo.ada@ledgerops.ng";
+        var matches = Scan(text, DottedEmailRule(MatchBoundary.Email));
+
+        matches.Should().ContainSingle();
+        matches[0].Column.Should().Be(4);
+    }
+
+    [Fact]
+    public void MatcherEngine_Should_RejectAnInternalDotStart_When_TheBoundaryIsEmail()
+    {
+        // A longer local part lets the shape align after an internal dot; the
+        // leading neighbour set keeps '.', so that shortened alignment is rejected.
+        var matches = Scan("to dipo.ada.bola@ledgerops.ng", DottedEmailRule(MatchBoundary.Email));
+
+        matches.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MatcherEngine_Should_RejectATrailingLabelNeighbour_When_TheBoundaryIsEmail()
+    {
+        // The shape ends inside a longer label run, so the trailing neighbour '-' rejects the span.
+        var matches = Scan("to ada@ledgerops.ng-uk", EmailRule(MatchBoundary.Email));
+
+        matches.Should().BeEmpty();
+    }
+
+    [Fact]
     public void MatcherEngine_Should_ResumeOneScalarLater_When_TheFirstAlignmentIsExcluded()
     {
         // Eleven ones are excluded. The alignment one scalar later is a different span and stands.
@@ -418,7 +469,7 @@ public sealed class MatcherEngineTests
         return Pattern(shape, MatchBoundary.Digit, "local.nuban", validator: validator, excludePrefixes: excludePrefixes);
     }
 
-    private static Rule EmailRule()
+    private static Rule EmailRule(MatchBoundary boundary = MatchBoundary.Alnum)
     {
         var shape = new[]
         {
@@ -429,7 +480,23 @@ public sealed class MatcherEngineTests
             new RuleShapePart(2, 16, null, ShapeClass.Alnum, null, null),
         };
         var validator = new RuleValidator(RuleValidatorName.EmailNotExampleDomain, null, null);
-        return Pattern(shape, MatchBoundary.Alnum, "local.email", validator: validator);
+        return Pattern(shape, boundary, "local.email", validator: validator);
+    }
+
+    private static Rule DottedEmailRule(MatchBoundary boundary)
+    {
+        var shape = new[]
+        {
+            new RuleShapePart(1, 8, null, ShapeClass.Alnum, null, null),
+            new RuleShapePart(1, 1, ".", null, null, null),
+            new RuleShapePart(1, 8, null, ShapeClass.Alnum, null, null),
+            new RuleShapePart(1, 1, "@", null, null, null),
+            new RuleShapePart(2, 16, null, ShapeClass.Alnum, null, null),
+            new RuleShapePart(1, 1, ".", null, null, null),
+            new RuleShapePart(2, 8, null, ShapeClass.Alnum, null, null),
+        };
+        var validator = new RuleValidator(RuleValidatorName.EmailNotExampleDomain, null, null);
+        return Pattern(shape, boundary, "local.email", validator: validator);
     }
 
     private static Rule Phone()

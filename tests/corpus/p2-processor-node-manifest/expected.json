@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.flutterwave",
+    "path": "package.json",
+    "line": 1,
+    "column": 19,
+    "triage": "true-positive"
+  }
+]

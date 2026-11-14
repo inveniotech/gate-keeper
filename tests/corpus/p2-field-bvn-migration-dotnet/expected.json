@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.bvn.field.migration",
+    "path": "migrations/example.cs",
+    "line": 1,
+    "column": 43,
+    "triage": "true-positive"
+  }
+]

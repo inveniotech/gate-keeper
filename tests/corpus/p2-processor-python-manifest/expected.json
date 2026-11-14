@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.aws",
+    "path": "requirements.txt",
+    "line": 1,
+    "column": 1,
+    "triage": "true-positive"
+  }
+]

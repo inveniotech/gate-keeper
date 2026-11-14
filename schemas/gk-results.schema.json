@@ -60,6 +60,16 @@
   ],
   "additionalProperties": false,
   "$defs": {
+    "processor": {
+      "type": "object",
+      "properties": {
+        "dataCategories": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "usualRegion": { "type": "string", "minLength": 1 }
+      },
+      "required": ["dataCategories", "usualRegion"],
+      "additionalProperties": false
+    },
+
     "civilDate": {
       "type": "string",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
@@ -185,7 +195,8 @@
         "locationKind": { "$ref": "#/$defs/locationKind" },
         "fingerprint": { "$ref": "#/$defs/hex64" },
         "baselineState": { "enum": ["unchanged", "new"] },
-        "citation": { "$ref": "#/$defs/citation" }
+        "citation": { "$ref": "#/$defs/citation" },
+        "processor": { "$ref": "#/$defs/processor" }
       },
       "required": ["ruleId", "severity", "category", "path", "line", "column", "locationKind", "baselineState", "citation"],
       "additionalProperties": false
@@ -201,7 +212,8 @@
         "line": { "type": "integer", "minimum": 1 },
         "column": { "type": "integer", "minimum": 1 },
         "locationKind": { "$ref": "#/$defs/locationKind" },
-        "citation": { "$ref": "#/$defs/citation" }
+        "citation": { "$ref": "#/$defs/citation" },
+        "processor": { "$ref": "#/$defs/processor" }
       },
       "required": ["commitId", "ruleId", "severity", "category", "path", "line", "column", "locationKind", "citation"],
       "additionalProperties": false

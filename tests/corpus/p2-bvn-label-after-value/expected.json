@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.bvn",
+    "path": "src/context.ts",
+    "line": 1,
+    "column": 21,
+    "triage": "true-positive"
+  }
+]

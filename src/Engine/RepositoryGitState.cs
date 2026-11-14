@@ -16,7 +16,7 @@ public sealed record RepositoryGitState(bool Available, bool InsideWorkTree, boo
         if (version is not { ExitCode: 0 }) return new(false, false, false);
         var tree = await git.TryRunAsync(root, ["rev-parse", "--is-inside-work-tree"], cancellationToken).ConfigureAwait(false);
         if (tree is not { ExitCode: 0 } value || System.Text.Encoding.UTF8.GetString(value.StandardOutput).Trim() != "true") return new(true, false, false);
-        var tracked = await git.TryRunAsync(root, ["ls-files", "--error-unmatch", "--", ".ndpa-check/fingerprint.key"], cancellationToken).ConfigureAwait(false);
+        var tracked = await git.TryRunAsync(root, ["ls-files", "--error-unmatch", "--", ".gatekeeper/fingerprint.key"], cancellationToken).ConfigureAwait(false);
         return new(true, true, tracked is { ExitCode: 0 });
     }
 }

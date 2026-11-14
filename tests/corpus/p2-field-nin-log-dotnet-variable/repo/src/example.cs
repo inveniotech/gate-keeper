@@ -1,0 +1,1 @@
+Log.Information("{Nin}", nin);

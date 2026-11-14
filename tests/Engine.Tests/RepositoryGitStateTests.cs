@@ -12,8 +12,8 @@ public sealed class RepositoryGitStateTests
         var repo = GitTestRepository.Create();
         try
         {
-            repo.WriteFile(".ndpa-check/fingerprint.key", new string('a', 64) + "\n");
-            repo.Stage(".ndpa-check/fingerprint.key");
+            repo.WriteFile(".gatekeeper/fingerprint.key", new string('a', 64) + "\n");
+            repo.Stage(".gatekeeper/fingerprint.key");
             var state = await RepositoryGitState.ReadAsync(repo.RootPath);
             state.Available.Should().BeTrue();
             state.InsideWorkTree.Should().BeTrue();

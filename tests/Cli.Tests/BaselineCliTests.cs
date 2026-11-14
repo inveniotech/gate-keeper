@@ -19,7 +19,7 @@ public sealed class BaselineCliTests
             code.Should().Be(2);
             errors.ToString().Should().Contain("No rule pack").And.Contain("packs.local");
             output.ToString().Should().BeEmpty();
-            File.Exists(Path.Combine(root, ".ndpa-check", "baseline.json")).Should().BeFalse();
+            File.Exists(Path.Combine(root, ".gatekeeper", "baseline.json")).Should().BeFalse();
         }
         finally { Directory.Delete(root, true); }
     }
@@ -28,11 +28,11 @@ public sealed class BaselineCliTests
     public async Task Baseline_Should_WriteAKeyAndBaseline_When_ALocalPackIsConfigured()
     {
         var root = Path.Combine(Path.GetTempPath(), "gate-keeper-baseline-cli", Guid.NewGuid().ToString("N"));
-        var folder = Path.Combine(root, ".ndpa-check");
+        var folder = Path.Combine(root, ".gatekeeper");
         Directory.CreateDirectory(folder);
         try
         {
-            await File.WriteAllTextAsync(Path.Combine(folder, "ndpa-check.toml"), "schemaVersion = 1\n[packs]\nlocal = [\".ndpa-check/local.json\"]\n");
+            await File.WriteAllTextAsync(Path.Combine(folder, "gatekeeper.toml"), "schemaVersion = 1\n[packs]\nlocal = [\".gatekeeper/local.json\"]\n");
             await File.WriteAllTextAsync(Path.Combine(folder, "local.json"), """
                 {"schemaVersion":1,"id":"local.example","version":1,"minEngineVersion":"0.1.0","provenance":"local","rules":[
                 {"id":"local.marker","severity":"error","category":"synthetic","citation":{"title":"Synthetic test citation."},"sinceVersion":1,"matcher":{"list":{"package":["marker"]}}}]}

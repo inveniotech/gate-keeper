@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.email",
+    "path": "src/example.ts",
+    "line": 1,
+    "column": 16,
+    "triage": "true-positive"
+  }
+]

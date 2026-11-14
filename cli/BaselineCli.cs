@@ -9,7 +9,7 @@ internal static class BaselineCli
 {
     internal static Command Create(TextWriter output, TextWriter errors, string root)
     {
-        var command = new Command("baseline", "Writes current work-tree findings to .ndpa-check/baseline.json");
+        var command = new Command("baseline", "Writes current work-tree findings to .gatekeeper/baseline.json");
         var date = new Option<string?>("--evaluated-on") { Description = "The evaluation date in YYYY-MM-DD form" };
         command.Options.Add(date);
         command.SetAction(async (parse, token) =>
@@ -25,7 +25,7 @@ internal static class BaselineCli
                 var result = await BaselineCommand.RunAsync(root, merged.Rules.Select(r => r.Rule).ToArray(), TimeProvider.System,
                     parse.GetValue(date), Environment.GetEnvironmentVariable("SOURCE_DATE_EPOCH"), token).ConfigureAwait(false);
                 foreach (var warning in load.Warnings) await errors.WriteLineAsync(warning).ConfigureAwait(false);
-                await output.WriteLineAsync($"The baseline was written to .ndpa-check/baseline.json with {result.Findings.Count} findings. Supply fingerprint.key to continuous integration as a secret file.").ConfigureAwait(false);
+                await output.WriteLineAsync($"The baseline was written to .gatekeeper/baseline.json with {result.Findings.Count} findings. Supply fingerprint.key to continuous integration as a secret file.").ConfigureAwait(false);
                 return (int)ExitOutcome.Pass;
             }
             catch (EngineToolException exception)
@@ -35,7 +35,7 @@ internal static class BaselineCli
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                await errors.WriteLineAsync("The baseline could not read or write a repository file. Check .ndpa-check paths and access permissions, then run baseline again.").ConfigureAwait(false);
+                await errors.WriteLineAsync("The baseline could not read or write a repository file. Check .gatekeeper paths and access permissions, then run baseline again.").ConfigureAwait(false);
                 return (int)ExitOutcome.ToolError;
             }
         });

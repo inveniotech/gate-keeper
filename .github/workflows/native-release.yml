@@ -48,7 +48,7 @@ jobs:
         env:
           MUSL: ${{ matrix.musl }}
         run: |
-          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper-ndpa-check.exe' } else { 'artifacts/native/gatekeeper-ndpa-check' }
+          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper.exe' } else { 'artifacts/native/gatekeeper' }
           if ($env:MUSL -eq 'true') {
             ./ci/native-release/Test-PublishedCorpus.ps1 -Binary $binary -ContainerImage mcr.microsoft.com/dotnet/runtime-deps:10.0-alpine-extra
           } else {
@@ -59,7 +59,7 @@ jobs:
         env:
           RID: ${{ matrix.rid }}
         run: |
-          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper-ndpa-check.exe' } else { 'artifacts/native/gatekeeper-ndpa-check' }
+          $binary = if ($IsWindows) { 'artifacts/native/gatekeeper.exe' } else { 'artifacts/native/gatekeeper' }
           $version = [regex]::Match((Get-Content src/Engine/EngineProduct.cs -Raw), 'EngineVersion = "([^"]+)"').Groups[1].Value
           if (-not $version) { throw 'The product version could not be read.' }
           ./ci/native-release/Pack-Native.ps1 -Binary $binary -RuntimeIdentifier $env:RID -Destination artifacts/release -ProductVersion $version
@@ -91,6 +91,7 @@ jobs:
           pwsh -File candidate/ci/native-release/Test-PackNative.ps1
           dotnet test candidate/tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests --verbosity quiet
           pwsh -File candidate/ci/native-release/Enable-BaselineInstrumentation.ps1 -BaselineRoot baseline
+          pwsh -File candidate/ci/native-release/Rename-BaselineNames.ps1 -BaselineRoot baseline
       - name: Publish both comparison arms on the same runner
         run: |
           dotnet publish baseline/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
@@ -99,7 +100,7 @@ jobs:
         run: dotnet publish candidate/cli -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/release-size
       - name: Measure paired cold start, whole scan and added CI time
         shell: pwsh
-        run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper-ndpa-check -CandidateBinary artifacts/candidate/gatekeeper-ndpa-check -Destination artifacts/benchmarks -ReferencePack candidate/ci/native-release/reference.pack.json -ReleaseBinary artifacts/release-size/gatekeeper-ndpa-check
+        run: ./candidate/ci/native-release/Measure-Native.ps1 -BaselineBinary artifacts/baseline/gatekeeper -CandidateBinary artifacts/candidate/gatekeeper -Destination artifacts/benchmarks -ReferencePack candidate/ci/native-release/reference.pack.json -ReleaseBinary artifacts/release-size/gatekeeper
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -120,7 +121,7 @@ jobs:
           $checksums = Get-ChildItem artifacts -Recurse -Filter '*.sha256' | Sort-Object Name | ForEach-Object { [IO.File]::ReadAllText($_.FullName).TrimEnd() }
           [IO.File]::WriteAllText('artifacts/SHA256SUMS', ($checksums -join "`n") + "`n")
           $lines = @('# Native release candidate measurements', '', '| Runtime identifier | Binary bytes |', '|---|---:|')
-          foreach ($file in Get-ChildItem artifacts -Recurse -Filter 'gatekeeper-ndpa-check-*.json' | Sort-Object Name) {
+          foreach ($file in Get-ChildItem artifacts -Recurse -Filter 'gatekeeper-*.json' | Sort-Object Name) {
             $record = Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
             $lines += "| $($record.runtimeIdentifier) | $($record.binaryBytes) |"
           }

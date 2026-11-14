@@ -5,5 +5,12 @@
     "path": "config/dispatch.toml",
     "ruleId": "pii.email",
     "triage": "true-positive"
+  },
+  {
+    "column": 19,
+    "line": 4,
+    "path": "config/dispatch.toml",
+    "ruleId": "pii.email.configuration",
+    "triage": "true-positive"
   }
 ]

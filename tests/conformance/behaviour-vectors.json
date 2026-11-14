@@ -1,0 +1,604 @@
+{
+  "version": 1,
+  "consent": {
+    "cases": [
+      {
+        "provider": "granted",
+        "expected": "granted",
+        "isGranted": true,
+        "calls": 2,
+        "diagnostics": 0
+      },
+      {
+        "provider": "denied",
+        "expected": "denied",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 0
+      },
+      {
+        "provider": "unknown",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 0
+      },
+      {
+        "provider": "invalid",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 0
+      },
+      {
+        "provider": "absent",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 0,
+        "diagnostics": 1
+      },
+      {
+        "provider": "throws",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 2
+      },
+      {
+        "provider": "cancelled",
+        "expected": "cancelled",
+        "isGranted": null,
+        "calls": 0,
+        "diagnostics": 0
+      },
+      {
+        "provider": "provider-timeout",
+        "expected": "unknown",
+        "isGranted": false,
+        "calls": 2,
+        "diagnostics": 2
+      },
+      {
+        "provider": "caller-cancelled-during",
+        "expected": "cancelled",
+        "isGranted": null,
+        "calls": 1,
+        "diagnostics": 0
+      }
+    ],
+    "purposes": [
+      {
+        "value": "acme.marketing-sms",
+        "accepted": true
+      },
+      {
+        "value": "a.b",
+        "accepted": true
+      },
+      {
+        "value": "",
+        "accepted": false
+      },
+      {
+        "value": "single",
+        "accepted": false
+      },
+      {
+        "value": "Acme.marketing",
+        "accepted": false
+      },
+      {
+        "value": "acme..marketing",
+        "accepted": false
+      },
+      {
+        "value": "acme.marketing\n",
+        "accepted": false
+      },
+      {
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "accepted": true
+      },
+      {
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "accepted": false
+      }
+    ]
+  },
+  "response": {
+    "rules": [
+      {
+        "id": "local.marker",
+        "severity": "note",
+        "category": "synthetic",
+        "citation": {
+          "title": "Synthetic response conformance."
+        },
+        "sinceVersion": "2026.11.0",
+        "matcher": {
+          "list": {
+            "package": [
+              "marker"
+            ]
+          }
+        }
+      }
+    ],
+    "cases": [
+      {
+        "name": "all-array-elements",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": [
+            {
+              "phone": "[REDACTED:local.marker]"
+            },
+            {
+              "phone": "[REDACTED:local.marker]"
+            }
+          ],
+          "other": "unchanged"
+        }
+      },
+      {
+        "name": "exact-index-is-not-all-elements",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/0/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": [
+            {
+              "phone": "[REDACTED:local.marker]"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        }
+      },
+      {
+        "name": "duplicate-selection",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone",
+          "/customers/0/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json; charset=utf-8",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": [
+            {
+              "phone": "[REDACTED:local.marker]"
+            },
+            {
+              "phone": "[REDACTED:local.marker]"
+            }
+          ],
+          "other": "unchanged"
+        }
+      },
+      {
+        "name": "mixed-types-fail-atomically",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": 123
+            }
+          ]
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "nested-wildcards",
+        "body": {
+          "groups": [
+            [
+              {
+                "value": "marker"
+              },
+              {
+                "value": "marker"
+              }
+            ]
+          ]
+        },
+        "paths": [
+          "/groups/*/*/value"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/problem+json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "groups": [
+            [
+              {
+                "value": "[REDACTED:local.marker]"
+              },
+              {
+                "value": "[REDACTED:local.marker]"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "name": "escaped-keys",
+        "body": {
+          "a/b": {
+            "~": {
+              "*": "marker"
+            }
+          }
+        },
+        "paths": [
+          "/a~1b/~0/~2"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "a/b": {
+            "~": {
+              "*": "[REDACTED:local.marker]"
+            }
+          }
+        }
+      },
+      {
+        "name": "empty-array",
+        "body": {
+          "customers": []
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": []
+        }
+      },
+      {
+        "name": "missing-object-field",
+        "body": {
+          "customers": [
+            {}
+          ]
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": [
+            {}
+          ]
+        }
+      },
+      {
+        "name": "wildcard-needs-array",
+        "body": {
+          "customers": {}
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "selected-null-fails",
+        "body": {
+          "phone": null
+        },
+        "paths": [
+          "/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "null-parent-fails",
+        "body": {
+          "user": null
+        },
+        "paths": [
+          "/user/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "missing-parent-passes",
+        "body": {},
+        "paths": [
+          "/user/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {}
+      },
+      {
+        "name": "missing-content-type-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": null,
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "empty-content-type-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "streaming-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": false,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "committed-requires-abort",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": true,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": true,
+        "expected": null
+      },
+      {
+        "name": "wrong-content-type-fails",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [
+          "/customers/*/phone"
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "text/plain",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "unprotected-pass-through",
+        "body": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        },
+        "paths": [],
+        "lengthKnown": false,
+        "headersCommitted": true,
+        "contentType": "application/octet-stream",
+        "failed": false,
+        "abortRequired": false,
+        "expected": {
+          "customers": [
+            {
+              "phone": "marker"
+            },
+            {
+              "phone": "marker"
+            }
+          ],
+          "other": "unchanged"
+        }
+      },
+      {
+        "name": "root-string",
+        "body": "marker",
+        "paths": [
+          ""
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": false,
+        "abortRequired": false,
+        "expected": "[REDACTED:local.marker]"
+      },
+      {
+        "name": "null-root-protected",
+        "body": null,
+        "paths": [
+          ""
+        ],
+        "lengthKnown": true,
+        "headersCommitted": false,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": false,
+        "expected": null
+      },
+      {
+        "name": "null-root-committed",
+        "body": null,
+        "paths": [
+          ""
+        ],
+        "lengthKnown": true,
+        "headersCommitted": true,
+        "contentType": "application/json",
+        "failed": true,
+        "abortRequired": true,
+        "expected": null
+      },
+      {
+        "name": "null-root-unprotected",
+        "body": null,
+        "paths": [],
+        "lengthKnown": false,
+        "headersCommitted": true,
+        "contentType": "application/octet-stream",
+        "failed": false,
+        "abortRequired": false,
+        "expected": null
+      }
+    ]
+  }
+}

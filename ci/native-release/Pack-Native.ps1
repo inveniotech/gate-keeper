@@ -13,7 +13,7 @@ $size = (Get-Item -LiteralPath $path).Length
 if ($size -gt 10MB) { throw "The $RuntimeIdentifier binary is $size bytes, above the owner-approved 10 MiB budget (IQ-90)." }
 New-Item -ItemType Directory -Path $Destination -Force | Out-Null
 $destinationPath = (Resolve-Path -LiteralPath $Destination).Path
-$name = "gatekeeper-ndpa-check-$RuntimeIdentifier"
+$name = "gatekeeper-$RuntimeIdentifier"
 $windows = $RuntimeIdentifier.StartsWith('win-', [StringComparison]::Ordinal)
 $archive = Join-Path $destinationPath ($name + $(if ($windows) { '.zip' } else { '.tar.gz' }))
 $stream = [IO.File]::Open($archive, [IO.FileMode]::Create, [IO.FileAccess]::Write, [IO.FileShare]::None)

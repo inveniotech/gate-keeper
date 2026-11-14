@@ -1,0 +1,123 @@
+{
+  "contentIssuedAt": "2026-11-06",
+  "coverageDate": "2026-11-06",
+  "id": "invenio.email",
+  "minEngineVersion": "0.2.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "pii.email",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f), 39 and 65",
+        "title": "Review protection of identifying email addresses."
+      },
+      "id": "pii.email",
+      "matcher": {
+        "pattern": {
+          "boundary": "email",
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "%",
+                  "%"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2026.11.0"
+}

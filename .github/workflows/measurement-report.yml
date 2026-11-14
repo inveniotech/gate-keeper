@@ -1,0 +1,82 @@
+name: Measurement report
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      evaluation_date:
+        description: 'Optional UTC evaluation date in the yyyy-MM-dd form; defaults to the workflow run start date.'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  false-positive-report:
+    name: Weekly false-positive measurement
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Fix the evaluation date from the run metadata
+        id: date
+        shell: pwsh
+        env:
+          REQUESTED_DATE: ${{ inputs.evaluation_date }}
+          RUN_STARTED_AT: ${{ github.run_started_at }}
+        run: |
+          $requested = $env:REQUESTED_DATE
+          $started = $env:RUN_STARTED_AT
+          if ($requested) {
+            $parsed = [datetime]::MinValue
+            $valid = [datetime]::TryParseExact($requested, 'yyyy-MM-dd', [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::None, [ref]$parsed)
+            if (-not $valid) {
+              Write-Error "The requested evaluation date '$requested' is not a UTC date in the yyyy-MM-dd form. Dispatch again with a date such as 2026-11-16."
+              exit 2
+            }
+            $date = $requested
+          } elseif ($started -and $started.Length -ge 10) {
+            $date = $started.Substring(0, 10)
+          } else {
+            $date = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd', [System.Globalization.CultureInfo]::InvariantCulture)
+          }
+          Add-Content $env:GITHUB_OUTPUT "evaluation-date=$date"
+
+      - name: Run the harness and write the dated report
+        shell: pwsh
+        env:
+          EVALUATION_DATE: ${{ steps.date.outputs.evaluation-date }}
+          MEASUREMENT_REVISION: ${{ github.sha }}
+        run: ./ci/rule-packs/Measure-Detection.ps1 -EvaluationDate $env:EVALUATION_DATE -MeasurementRevision $env:MEASUREMENT_REVISION
+
+      - name: Upload this run's dated report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: false-positive-report-${{ steps.date.outputs.evaluation-date }}
+          path: docs/reports/false-positive-${{ steps.date.outputs.evaluation-date }}.md
+          if-no-files-found: error
+
+      - name: Publish this run's report as the job summary
+        if: always()
+        shell: pwsh
+        env:
+          EVALUATION_DATE: ${{ steps.date.outputs.evaluation-date }}
+        run: |
+          $path = 'docs/reports/false-positive-' + $env:EVALUATION_DATE + '.md'
+          if (-not (Test-Path $path)) {
+            Write-Error "The measurement run did not write $path, so there is nothing to summarise; the upload step reports the missing file."
+            exit 1
+          }
+          Add-Content $env:GITHUB_STEP_SUMMARY (Get-Content $path -Raw)

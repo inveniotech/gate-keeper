@@ -26,7 +26,7 @@ public sealed class CorpusScorerTests
             Citation: new Citation(Title: "synthetic test citation", NdpaSection: null, GaidSection: null));
 
     private static CorpusExpectedEntry Expected(string ruleId, string path, int line, int column) =>
-        new() { RuleId = ruleId, Path = path, Line = line, Column = column, Triage = "true-positive" };
+        new() { RuleId = ruleId, Path = path, Line = line, Column = column, Triage = CorpusTriage.TruePositive };
 
     [Fact]
     public void CorpusScorer_Should_Match_TheExpectedLocation_When_TheFindingCarriesTheSameKey()

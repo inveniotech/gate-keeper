@@ -1,0 +1,1 @@
+const nin = customer.nin;

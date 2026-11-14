@@ -54,7 +54,9 @@ These three assumptions are the part of the corpus the rule-pack work packages c
 
 ## The case inventory
 
-**Positives** — one finding each, in the storage contexts the card fixes from day one:
+The detection authoring modules add context positives and near-misses through `node ci/rule-packs/build-detection.mjs --write`; use `--check` to verify them. Their generated rule reference pages under `docs-data/rules/` list each case. All values come from the documented generator. The long-line BVN case includes an adjacent `bvn=` label so its expectation obeys IQ-12 while retaining a line longer than 100,000 characters.
+
+**Positives** — the base identifier expectations below now have additional location observations where P2-04 supplies a scope. Counts represent findings rather than unique identifiers. The storage contexts are:
 
 | Case | Rule | Context |
 |---|---|---|
@@ -141,3 +143,287 @@ The same generator also supports benchmark mode: pass --benchmark followed by a 
 ## Support-bundle privacy inventory (P1-13)
 
 Regenerate the synthetic-value inventory with: node tests/corpus/New-CorpusValues.mjs --values-json > tests/corpus/synthetic-values.json. The privacy-inventory workflow fails if this generated file differs from the documented generator. CorpusSupportBundleTests runs the real scan and bundle command for every case, opens every archive entry and rejects any generated identifier or fingerprint key. A mandatory synthetic finding prevents an empty scan from passing the test. This validates privacy independently of Phase 2 detection recall.
+
+<!-- generated-identifier-cases:start -->
+## Phase 2 identifier acceptance cases
+
+Regenerate with `node tests/corpus/New-IdentifierCases.mjs --write` and verify with `--check`. All personal identifiers come from the documented generator above. These inputs establish expectations before production rules; their existence does not claim measured recall or precision.
+
+| Case | Expected rule |
+|---|---|
+| `p2-bvn-dotnet-source` | `pii.bvn` |
+| `p2-bvn-jvm-source` | `pii.bvn` |
+| `p2-bvn-node-source` | `pii.bvn` |
+| `p2-bvn-shape-near-miss` | No finding |
+| `p2-bvn-validator-near-miss` | No finding |
+| `p2-email-dotnet-source` | `pii.email` |
+| `p2-email-jvm-source` | `pii.email` |
+| `p2-email-node-source` | `pii.email` |
+| `p2-email-shape-near-miss` | No finding |
+| `p2-email-validator-near-miss` | No finding |
+| `p2-nin-dotnet-source` | `pii.nin` |
+| `p2-nin-jvm-source` | `pii.nin` |
+| `p2-nin-node-source` | `pii.nin` |
+| `p2-nin-shape-near-miss` | No finding |
+| `p2-nin-validator-near-miss` | No finding |
+| `p2-nuban-dotnet-source` | `pii.nuban` |
+| `p2-nuban-jvm-source` | `pii.nuban` |
+| `p2-nuban-node-source` | `pii.nuban` |
+| `p2-nuban-shape-near-miss` | No finding |
+| `p2-nuban-validator-near-miss` | No finding |
+| `p2-phone-dotnet-source` | `pii.phone` |
+| `p2-phone-jvm-source` | `pii.phone` |
+| `p2-phone-node-source` | `pii.phone` |
+| `p2-phone-shape-near-miss` | No finding |
+| `p2-phone-validator-near-miss` | No finding |
+
+<!-- generated-identifier-cases:end -->
+
+<!-- generated-location-cases:start -->
+## Phase 2 location acceptance cases
+
+Regenerate with `node tests/corpus/New-LocationCases.mjs --write` and verify with `--check`. Literal identifiers reuse the documented generator. Field-handling cases contain no literal personal identifier. Base and location findings are intentional separate observations. Detection tests verify exact locations, severity and inventory kinds through the loaded source packs.
+
+| Case | Expected rule |
+|---|---|
+| `p2-field-bvn-api-dotnet` | `pii.bvn.field.api` |
+| `p2-field-bvn-api-jvm` | `pii.bvn.field.api` |
+| `p2-field-bvn-api-node` | `pii.bvn.field.api` |
+| `p2-field-bvn-different-statement` | No finding |
+| `p2-field-bvn-log-dotnet` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-dotnet-variable` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-jvm` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-jvm-variable` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-node` | `pii.bvn.field.log` |
+| `p2-field-bvn-log-node-variable` | `pii.bvn.field.log` |
+| `p2-field-bvn-masked` | No finding |
+| `p2-field-bvn-migration-dotnet` | `pii.bvn.field.migration` |
+| `p2-field-bvn-migration-jvm` | `pii.bvn.field.migration` |
+| `p2-field-bvn-migration-node` | `pii.bvn.field.migration` |
+| `p2-field-bvn-ordinary-source` | No finding |
+| `p2-field-bvn-protected-column` | No finding |
+| `p2-field-bvn-unrelated-field` | No finding |
+| `p2-field-bvn-unrelated-response` | No finding |
+| `p2-field-nin-api-dotnet` | `pii.nin.field.api` |
+| `p2-field-nin-api-jvm` | `pii.nin.field.api` |
+| `p2-field-nin-api-node` | `pii.nin.field.api` |
+| `p2-field-nin-different-statement` | No finding |
+| `p2-field-nin-log-dotnet` | `pii.nin.field.log` |
+| `p2-field-nin-log-dotnet-variable` | `pii.nin.field.log` |
+| `p2-field-nin-log-jvm` | `pii.nin.field.log` |
+| `p2-field-nin-log-jvm-variable` | `pii.nin.field.log` |
+| `p2-field-nin-log-node` | `pii.nin.field.log` |
+| `p2-field-nin-log-node-variable` | `pii.nin.field.log` |
+| `p2-field-nin-masked` | No finding |
+| `p2-field-nin-migration-dotnet` | `pii.nin.field.migration` |
+| `p2-field-nin-migration-jvm` | `pii.nin.field.migration` |
+| `p2-field-nin-migration-node` | `pii.nin.field.migration` |
+| `p2-field-nin-ordinary-source` | No finding |
+| `p2-field-nin-protected-column` | No finding |
+| `p2-field-nin-unrelated-field` | No finding |
+| `p2-field-nin-unrelated-response` | No finding |
+| `p2-international-phone-api-model-international` | `pii.phone.international`, `pii.phone.international.api` |
+| `p2-international-phone-api-model-international-plus` | `pii.phone.international`, `pii.phone.international.api` |
+| `p2-international-phone-api-model-overlong` | No finding |
+| `p2-international-phone-configuration-international` | `pii.phone.international`, `pii.phone.international.configuration` |
+| `p2-international-phone-configuration-international-plus` | `pii.phone.international`, `pii.phone.international.configuration` |
+| `p2-international-phone-configuration-overlong` | No finding |
+| `p2-international-phone-fixture-international` | `pii.phone.international`, `pii.phone.international.fixture` |
+| `p2-international-phone-fixture-international-plus` | `pii.phone.international`, `pii.phone.international.fixture` |
+| `p2-international-phone-fixture-overlong` | No finding |
+| `p2-international-phone-log-international` | `pii.phone.international`, `pii.phone.international.log` |
+| `p2-international-phone-log-international-plus` | `pii.phone.international`, `pii.phone.international.log` |
+| `p2-international-phone-log-overlong` | No finding |
+| `p2-international-phone-migration-international` | `pii.phone.international`, `pii.phone.international.migration` |
+| `p2-international-phone-migration-international-plus` | `pii.phone.international`, `pii.phone.international.migration` |
+| `p2-international-phone-migration-overlong` | No finding |
+| `p2-location-bvn-api-model` | `pii.bvn`, `pii.bvn.api` |
+| `p2-location-bvn-api-model-shape-near-miss` | No finding |
+| `p2-location-bvn-api-model-validator-near-miss` | No finding |
+| `p2-location-bvn-configuration` | `pii.bvn`, `pii.bvn.configuration` |
+| `p2-location-bvn-configuration-shape-near-miss` | No finding |
+| `p2-location-bvn-configuration-validator-near-miss` | No finding |
+| `p2-location-bvn-fixture` | `pii.bvn`, `pii.bvn.fixture` |
+| `p2-location-bvn-fixture-shape-near-miss` | No finding |
+| `p2-location-bvn-fixture-validator-near-miss` | No finding |
+| `p2-location-bvn-log` | `pii.bvn`, `pii.bvn.log` |
+| `p2-location-bvn-log-shape-near-miss` | No finding |
+| `p2-location-bvn-log-validator-near-miss` | No finding |
+| `p2-location-bvn-migration` | `pii.bvn`, `pii.bvn.migration` |
+| `p2-location-bvn-migration-shape-near-miss` | No finding |
+| `p2-location-bvn-migration-validator-near-miss` | No finding |
+| `p2-location-email-api-model` | `pii.email`, `pii.email.api` |
+| `p2-location-email-api-model-shape-near-miss` | No finding |
+| `p2-location-email-api-model-validator-near-miss` | No finding |
+| `p2-location-email-configuration` | `pii.email`, `pii.email.configuration` |
+| `p2-location-email-configuration-shape-near-miss` | No finding |
+| `p2-location-email-configuration-validator-near-miss` | No finding |
+| `p2-location-email-fixture` | `pii.email`, `pii.email.fixture` |
+| `p2-location-email-fixture-shape-near-miss` | No finding |
+| `p2-location-email-fixture-validator-near-miss` | No finding |
+| `p2-location-email-log` | `pii.email`, `pii.email.log` |
+| `p2-location-email-log-shape-near-miss` | No finding |
+| `p2-location-email-log-validator-near-miss` | No finding |
+| `p2-location-email-migration` | `pii.email`, `pii.email.migration` |
+| `p2-location-email-migration-shape-near-miss` | No finding |
+| `p2-location-email-migration-validator-near-miss` | No finding |
+| `p2-location-nin-api-model` | `pii.nin`, `pii.nin.api` |
+| `p2-location-nin-api-model-shape-near-miss` | No finding |
+| `p2-location-nin-api-model-validator-near-miss` | No finding |
+| `p2-location-nin-configuration` | `pii.nin`, `pii.nin.configuration` |
+| `p2-location-nin-configuration-shape-near-miss` | No finding |
+| `p2-location-nin-configuration-validator-near-miss` | No finding |
+| `p2-location-nin-fixture` | `pii.nin`, `pii.nin.fixture` |
+| `p2-location-nin-fixture-shape-near-miss` | No finding |
+| `p2-location-nin-fixture-validator-near-miss` | No finding |
+| `p2-location-nin-log` | `pii.nin`, `pii.nin.log` |
+| `p2-location-nin-log-shape-near-miss` | No finding |
+| `p2-location-nin-log-validator-near-miss` | No finding |
+| `p2-location-nin-migration` | `pii.nin`, `pii.nin.migration` |
+| `p2-location-nin-migration-shape-near-miss` | No finding |
+| `p2-location-nin-migration-validator-near-miss` | No finding |
+| `p2-location-nuban-api-model` | `pii.nuban`, `pii.nuban.api` |
+| `p2-location-nuban-api-model-shape-near-miss` | No finding |
+| `p2-location-nuban-api-model-validator-near-miss` | No finding |
+| `p2-location-nuban-configuration` | `pii.nuban`, `pii.nuban.configuration` |
+| `p2-location-nuban-configuration-shape-near-miss` | No finding |
+| `p2-location-nuban-configuration-validator-near-miss` | No finding |
+| `p2-location-nuban-fixture` | `pii.nuban`, `pii.nuban.fixture` |
+| `p2-location-nuban-fixture-shape-near-miss` | No finding |
+| `p2-location-nuban-fixture-validator-near-miss` | No finding |
+| `p2-location-nuban-log` | `pii.nuban`, `pii.nuban.log` |
+| `p2-location-nuban-log-shape-near-miss` | No finding |
+| `p2-location-nuban-log-validator-near-miss` | No finding |
+| `p2-location-nuban-migration` | `pii.nuban`, `pii.nuban.migration` |
+| `p2-location-nuban-migration-shape-near-miss` | No finding |
+| `p2-location-nuban-migration-validator-near-miss` | No finding |
+| `p2-location-phone-api-model` | `pii.phone`, `pii.phone.api` |
+| `p2-location-phone-api-model-shape-near-miss` | No finding |
+| `p2-location-phone-api-model-validator-near-miss` | No finding |
+| `p2-location-phone-configuration` | `pii.phone`, `pii.phone.configuration` |
+| `p2-location-phone-configuration-shape-near-miss` | No finding |
+| `p2-location-phone-configuration-validator-near-miss` | No finding |
+| `p2-location-phone-fixture` | `pii.phone`, `pii.phone.fixture` |
+| `p2-location-phone-fixture-shape-near-miss` | No finding |
+| `p2-location-phone-fixture-validator-near-miss` | No finding |
+| `p2-location-phone-log` | `pii.phone`, `pii.phone.log` |
+| `p2-location-phone-log-shape-near-miss` | No finding |
+| `p2-location-phone-log-validator-near-miss` | No finding |
+| `p2-location-phone-migration` | `pii.phone`, `pii.phone.migration` |
+| `p2-location-phone-migration-shape-near-miss` | No finding |
+| `p2-location-phone-migration-validator-near-miss` | No finding |
+
+<!-- generated-location-cases:end -->
+<!-- generated-detection-cases:start -->
+## Authored detection acceptance cases
+
+Regenerate this table with `node ci/rule-packs/build-detection.mjs --write`. Every case uses the documented synthetic generator or processor tokens without personal data.
+
+| Case | Expected rule |
+|---|---|
+| `p2-bvn-distant-label` | No finding |
+| `p2-bvn-label-after-value` | `pii.bvn` |
+| `p2-bvn-without-label` | No finding |
+| `p2-email-missing-at` | No finding |
+| `p2-email-missing-domain` | No finding |
+| `p2-email-missing-local-part` | No finding |
+| `p2-email-oversized-local-part` | No finding |
+| `p2-email-reserved-domain-0` | No finding |
+| `p2-email-reserved-domain-1` | No finding |
+| `p2-email-reserved-domain-2` | No finding |
+| `p2-email-reserved-domain-3` | No finding |
+| `p2-email-reserved-domain-4` | No finding |
+| `p2-email-reserved-domain-5` | No finding |
+| `p2-email-sentence-dot-tail` | `pii.email` |
+| `p2-email-trailing-label-tail` | No finding |
+| `p2-nin-distant-label` | No finding |
+| `p2-nin-incidental-keyword` | No finding |
+| `p2-nin-label-after-value` | `pii.nin` |
+| `p2-nin-without-label` | No finding |
+| `p2-phone-embedded-in-token` | No finding |
+| `p2-phone-international` | `pii.phone.international` |
+| `p2-phone-international-overlong` | No finding |
+| `p2-phone-international-plus` | `pii.phone.international` |
+| `p2-phone-international-truncated` | No finding |
+| `p2-phone-national-overlong` | No finding |
+| `p2-processor-aws-bucket-package-0` | `transfer.processor.aws.bucket` |
+| `p2-processor-aws-bucket-package-0-near-miss` | No finding |
+| `p2-processor-aws-bucket-package-1` | `transfer.processor.aws.bucket` |
+| `p2-processor-aws-bucket-package-1-near-miss` | No finding |
+| `p2-processor-aws-capetown-package-0` | `transfer.processor.aws.capetown` |
+| `p2-processor-aws-capetown-package-0-near-miss` | No finding |
+| `p2-processor-aws-hostname-0` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-0-near-miss` | No finding |
+| `p2-processor-aws-hostname-1` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-1-near-miss` | No finding |
+| `p2-processor-aws-hostname-2` | `transfer.processor.aws` |
+| `p2-processor-aws-hostname-2-near-miss` | No finding |
+| `p2-processor-aws-ireland-package-0` | `transfer.processor.aws.ireland` |
+| `p2-processor-aws-ireland-package-0-near-miss` | No finding |
+| `p2-processor-aws-package-0` | `transfer.processor.aws` |
+| `p2-processor-aws-package-0-near-miss` | No finding |
+| `p2-processor-aws-package-1` | `transfer.processor.aws` |
+| `p2-processor-aws-package-1-near-miss` | No finding |
+| `p2-processor-aws-package-2` | `transfer.processor.aws` |
+| `p2-processor-aws-package-2-near-miss` | No finding |
+| `p2-processor-aws-package-3` | `transfer.processor.aws` |
+| `p2-processor-aws-package-3-near-miss` | No finding |
+| `p2-processor-dojah-hostname-0` | `transfer.processor.dojah` |
+| `p2-processor-dojah-hostname-0-near-miss` | No finding |
+| `p2-processor-dotnet-manifest` | `transfer.processor.aws` |
+| `p2-processor-flutterwave-hostname-0` | `transfer.processor.flutterwave` |
+| `p2-processor-flutterwave-hostname-0-near-miss` | No finding |
+| `p2-processor-flutterwave-package-0` | `transfer.processor.flutterwave` |
+| `p2-processor-flutterwave-package-0-near-miss` | No finding |
+| `p2-processor-infrastructure` | `transfer.processor.aws.bucket` |
+| `p2-processor-interswitch-hostname-0` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-0-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-1` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-1-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-2` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-2-near-miss` | No finding |
+| `p2-processor-interswitch-hostname-3` | `transfer.processor.interswitch` |
+| `p2-processor-interswitch-hostname-3-near-miss` | No finding |
+| `p2-processor-jvm-manifest` | `transfer.processor.aws` |
+| `p2-processor-korapay-hostname-0` | `transfer.processor.korapay` |
+| `p2-processor-korapay-hostname-0-near-miss` | No finding |
+| `p2-processor-lock-file` | No finding |
+| `p2-processor-monnify-hostname-0` | `transfer.processor.monnify` |
+| `p2-processor-monnify-hostname-0-near-miss` | No finding |
+| `p2-processor-monnify-hostname-1` | `transfer.processor.monnify` |
+| `p2-processor-monnify-hostname-1-near-miss` | No finding |
+| `p2-processor-nibss-hostname-0` | `transfer.processor.nibss` |
+| `p2-processor-nibss-hostname-0-near-miss` | No finding |
+| `p2-processor-nibss-hostname-1` | `transfer.processor.nibss` |
+| `p2-processor-nibss-hostname-1-near-miss` | No finding |
+| `p2-processor-nibss-java-manifest` | `transfer.processor.nibss` |
+| `p2-processor-nibss-package-0` | `transfer.processor.nibss` |
+| `p2-processor-nibss-package-0-near-miss` | No finding |
+| `p2-processor-nibss-portal-only` | No finding |
+| `p2-processor-nibss-public-api` | `transfer.processor.nibss` |
+| `p2-processor-node-manifest` | `transfer.processor.flutterwave` |
+| `p2-processor-opay-hostname-0` | `transfer.processor.opay` |
+| `p2-processor-opay-hostname-0-near-miss` | No finding |
+| `p2-processor-palmpay-hostname-0` | `transfer.processor.palmpay` |
+| `p2-processor-palmpay-hostname-0-near-miss` | No finding |
+| `p2-processor-palmpay-hostname-1` | `transfer.processor.palmpay` |
+| `p2-processor-palmpay-hostname-1-near-miss` | No finding |
+| `p2-processor-paystack-hostname-0` | `transfer.processor.paystack` |
+| `p2-processor-paystack-hostname-0-near-miss` | No finding |
+| `p2-processor-python-manifest` | `transfer.processor.aws` |
+| `p2-processor-remita-hostname-0` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-0-near-miss` | No finding |
+| `p2-processor-remita-hostname-1` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-1-near-miss` | No finding |
+| `p2-processor-remita-hostname-2` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-2-near-miss` | No finding |
+| `p2-processor-remita-hostname-3` | `transfer.processor.remita` |
+| `p2-processor-remita-hostname-3-near-miss` | No finding |
+| `p2-processor-youverify-hostname-0` | `transfer.processor.youverify` |
+| `p2-processor-youverify-hostname-0-near-miss` | No finding |
+| `p2-processor-youverify-hostname-1` | `transfer.processor.youverify` |
+| `p2-processor-youverify-hostname-1-near-miss` | No finding |
+| `p2-processor-youverify-package-0` | `transfer.processor.youverify` |
+| `p2-processor-youverify-package-0-near-miss` | No finding |
+
+<!-- generated-detection-cases:end -->

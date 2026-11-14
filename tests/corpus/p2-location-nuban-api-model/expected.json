@@ -1,0 +1,16 @@
+[
+  {
+    "ruleId": "pii.nuban",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 51,
+    "triage": "true-positive"
+  },
+  {
+    "ruleId": "pii.nuban.api",
+    "path": "api/models/customer-response.ts",
+    "line": 1,
+    "column": 51,
+    "triage": "true-positive"
+  }
+]

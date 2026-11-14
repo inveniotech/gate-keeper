@@ -155,7 +155,8 @@ public sealed class CliModuleTests
 
         exitCode.Should().Be((int)ExitOutcome.Pass);
         var text = output.ToString();
-        text.Should().Contain("Nigeria Data Protection Act 2023");
+        text.Should().Contain("personal data that its rule packs describe");
+        text.Should().Contain("The bundled rule packs cover the Nigeria Data Protection Act 2023");
         text.Should().Contain("no arguments runs the scan");
         text.Should().Contain("--version");
         text.Should().Contain("-h");

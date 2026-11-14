@@ -42,7 +42,7 @@ public static class PolicyStore
     /// <summary>Creates an absent random key with exclusive creation and owner-only permissions, never replacing an existing key; ensures it is gitignored.</summary>
     public static async Task EnsureKeyAsync(string root, CancellationToken cancellationToken = default)
     {
-        var folder = Path.Combine(root, ".ndpa-check");
+        var folder = Path.Combine(root, ".gatekeeper");
         Directory.CreateDirectory(folder);
         var path = Path.Combine(folder, "fingerprint.key");
         if (!File.Exists(path))
@@ -100,7 +100,7 @@ public static class PolicyStore
         }
         bytes.WriteByte((byte)'\n');
         if (bytes.Length > 1_048_576) throw Error("baseline.json", "the new baseline exceeds the 1,048,576-byte limit; reduce the accepted findings");
-        var path = Path.Combine(root, ".ndpa-check", "baseline.json");
+        var path = Path.Combine(root, ".gatekeeper", "baseline.json");
         var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
@@ -212,10 +212,10 @@ public static class PolicyStore
         return string.Join('.', parts);
     }
     private static bool IsHex(string text) => text.Length == 64 && text.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
-    private static EngineToolException Error(string file, string reason) => new($"'.ndpa-check/{file}' cannot be used because {reason}.");
+    private static EngineToolException Error(string file, string reason) => new($"'.gatekeeper/{file}' cannot be used because {reason}.");
     private static async Task<string?> ReadAsync(string root, string file, CancellationToken cancellationToken)
     {
-        var path = Path.Combine(root, ".ndpa-check", file);
+        var path = Path.Combine(root, ".gatekeeper", file);
         try
         {
             await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);

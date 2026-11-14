@@ -1,0 +1,77 @@
+name: Docs data
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Generate and pack the docs-data artefact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+
+      - name: Set up Node.js for the reference generators
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Restore locked dependencies
+        run: dotnet restore --locked-mode
+
+      - name: Build the command line interface
+        run: dotnet build cli -c Release --no-restore --nologo
+
+      - name: Verify the generated reference data
+        run: node ci/docs-data/build.mjs --check
+
+      - name: Test the docs-data builders
+        run: node --test ci/docs-data/*.test.mjs
+
+      - name: Fail if the packed manifest has drifted
+        shell: pwsh
+        run: ./ci/docs-data/Test-DocsData.ps1
+
+      - name: Pack the artefact for review
+        shell: pwsh
+        run: ./ci/docs-data/Pack-DocsData.ps1 -Output artifacts/gate-keeper-docs-data.zip
+
+      - name: Upload the artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-keeper-docs-data
+          path: artifacts/gate-keeper-docs-data.zip
+          if-no-files-found: error
+
+  publish:
+    name: Attach the docs-data artefact to the release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the artefact
+        uses: actions/download-artifact@v4
+        with:
+          name: gate-keeper-docs-data
+          path: artifacts
+
+      - name: Attach the artefact to the published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" artifacts/gate-keeper-docs-data.zip --clobber

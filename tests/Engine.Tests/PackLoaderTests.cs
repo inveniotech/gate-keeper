@@ -174,7 +174,7 @@ public sealed class PackLoaderTests
 
         load.Should().Throw<EngineToolException>()
             .Which.Message.Should().Contain("100.0.0").And
-            .Contain("0.1.0").And.Contain("'newer-engine'");
+            .Contain(EngineProduct.EngineVersion).And.Contain("'newer-engine'");
     }
 
     [Fact]
@@ -374,6 +374,38 @@ public sealed class PackLoaderTests
         rule.Rule.SinceVersion.Should().Be("2");
         rule.Rule.Matcher.Should().NotBeNull();
         rule.Rule.Matcher!.Pattern.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void PackLoader_Should_ReadAnEmailBoundary_When_ARuleDeclaresOne()
+    {
+        const string matcher = """{ "pattern": { "shape": [ { "min": 11, "max": 11, "class": "digit", "emit": true } ], "boundary": "email" } }""";
+        var input = new LocalPackInput("local.email.json", PackTestSupport.LocalPack(
+            "local.example",
+            "2",
+            PackTestSupport.LocalRule("local.synthetic.email", matcher)));
+
+        var load = PackLoader.Load([], [input], PackTestSupport.Catalogue, BundledOnly);
+
+        var pattern = load.Rules.Should().ContainSingle().Which.Rule.Matcher!.Pattern;
+        pattern!.Boundary.Should().Be(MatchBoundary.Email);
+    }
+
+    [Fact]
+    public void PackLoader_Should_NameEveryAcceptedBoundary_When_ARuleDeclaresAnUnknownOne()
+    {
+        const string matcher = """{ "pattern": { "shape": [ { "min": 11, "max": 11, "class": "digit", "emit": true } ], "boundary": "token" } }""";
+        var input = new LocalPackInput("local.email.json", PackTestSupport.LocalPack(
+            "local.example",
+            "2",
+            PackTestSupport.LocalRule("local.synthetic.email", matcher)));
+
+        Action load = () => PackLoader.Load([], [input], PackTestSupport.Catalogue, BundledOnly);
+
+        load.Should().Throw<EngineToolException>()
+            .Which.Message.Should().Contain("local.synthetic.email").And
+            .Contain("'none'").And.Contain("'digit'").And.Contain("'alnum'").And.Contain("'email'").And
+            .Contain("(section 5.1)");
     }
 
     [Fact]

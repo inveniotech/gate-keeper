@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "pii.nin.field.api",
+    "path": "api/example.ts",
+    "line": 1,
+    "column": 12,
+    "triage": "true-positive"
+  }
+]

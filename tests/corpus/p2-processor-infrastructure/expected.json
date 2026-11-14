@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.aws.bucket",
+    "path": "infra/storage.tf",
+    "line": 1,
+    "column": 11,
+    "triage": "true-positive"
+  }
+]

@@ -201,6 +201,16 @@ foreach ($inputPath in $Path) {
                     }
 
                     $allowed = $false
+                    # The glossary explicitly permits this .NET namespace. In
+                    # Markdown inline code it is an identifier, not product prose.
+                    if ($context -eq 'prose' -and $rule.Kind -eq 'variant' -and $rule.Text -ceq 'GateKeeper') {
+                        foreach ($code in [regex]::Matches($line, '`InvenioTech\.GateKeeper(?:\.[A-Za-z0-9_*]+)+`')) {
+                            if ($index -ge $code.Index -and $index -lt $code.Index + $code.Length) {
+                                $allowed = $true
+                                break
+                            }
+                        }
+                    }
                     if ($rule.AllowedSuffixes.Count -gt 0) {
                         $after = $index + $rule.Text.Length
                         $tail = if ($after -lt $line.Length) { $line.Substring($after) } else { '' }
