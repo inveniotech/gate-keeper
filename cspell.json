@@ -190,6 +190,7 @@
     "destructures",
     "unconfigured",
     "javax",
-    "gkmsg"
+    "gkmsg",
+    "vars"
   ]
 }

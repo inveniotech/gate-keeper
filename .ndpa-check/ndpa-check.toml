@@ -1,0 +1,7 @@
+schemaVersion = 1
+
+[scan]
+history = false
+
+[packs]
+local = [".ndpa-check/dogfood.pack.json"]

@@ -1,0 +1,129 @@
+name: Repository dogfood
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      evaluated-on:
+        description: Explicit evaluation date (YYYY-MM-DD)
+        required: true
+        type: string
+      scanner-version:
+        description: Published CLI release tag (or set GATEKEEPER_DOGFOOD_VERSION)
+        required: false
+        type: string
+      scanner-sha256:
+        description: Pinned linux-x64 archive SHA-256 (or set GATEKEEPER_DOGFOOD_SHA256)
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      scanner-ref:
+        description: Full commit identifier of the public integration source
+        required: true
+        type: string
+      scanner-version:
+        description: Published CLI release tag
+        required: false
+        type: string
+      scanner-sha256:
+        description: Pinned linux-x64 archive SHA-256
+        required: false
+        type: string
+      evaluated-on:
+        description: Explicit evaluation date; otherwise use the caller commit date
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: repository-dogfood-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  dogfood:
+    name: Dogfood readiness and scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: target
+          persist-credentials: false
+      - name: Check detection-pack readiness
+        id: readiness
+        shell: bash
+        env:
+          DATE_INPUT: ${{ inputs.evaluated-on }}
+          SCANNER_VERSION: ${{ inputs.scanner-version || vars.GATEKEEPER_DOGFOOD_VERSION }}
+          SCANNER_SHA256: ${{ inputs.scanner-sha256 || vars.GATEKEEPER_DOGFOOD_SHA256 }}
+        run: |
+          if [[ -f target/.ndpa-check/dogfood.pack.json && -n "$SCANNER_VERSION" && -n "$SCANNER_SHA256" ]]; then
+            if [[ ! "$SCANNER_VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ || ! "$SCANNER_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+              echo 'Supply a release tag and its lowercase SHA-256 archive digest.' >&2
+              exit 2
+            fi
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Detection acceptance pending: supply an approved .ndpa-check/dogfood.pack.json and pin a published CLI release and archive digest. No scan ran.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          evaluated_on="$DATE_INPUT"
+          if [[ -z "$evaluated_on" ]]; then evaluated_on=$(git -C target show -s --format=%cs HEAD); fi
+          if [[ ! "$evaluated_on" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo 'Supply the evaluation date in YYYY-MM-DD form.' >&2
+            exit 2
+          fi
+          echo "evaluated_on=$evaluated_on" >> "$GITHUB_OUTPUT"
+      - name: Check out pinned scanner source
+        uses: actions/checkout@v4
+        with:
+          repository: inveniotech/gate-keeper
+          ref: ${{ inputs.scanner-ref || github.sha }}
+          path: scanner
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - name: Test dogfood harness
+        run: node --test scanner/ci/dogfood/scan.test.mjs
+      - name: Download and verify the pinned native CLI
+        if: steps.readiness.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCANNER_VERSION: ${{ inputs.scanner-version || vars.GATEKEEPER_DOGFOOD_VERSION }}
+          SCANNER_SHA256: ${{ inputs.scanner-sha256 || vars.GATEKEEPER_DOGFOOD_SHA256 }}
+        run: |
+          mkdir scanner-binary
+          gh release download "$SCANNER_VERSION" --repo inveniotech/gate-keeper --pattern gatekeeper-ndpa-check-linux-x64.tar.gz --dir scanner-binary
+          cd scanner-binary
+          printf '%s  gatekeeper-ndpa-check-linux-x64.tar.gz\n' "$SCANNER_SHA256" | sha256sum --check -
+          test "$(tar -tzf gatekeeper-ndpa-check-linux-x64.tar.gz)" = gatekeeper-ndpa-check
+          tar -xzf gatekeeper-ndpa-check-linux-x64.tar.gz --no-same-owner --no-same-permissions
+          test -f gatekeeper-ndpa-check && test ! -L gatekeeper-ndpa-check
+          chmod +x gatekeeper-ndpa-check
+      - name: Exercise the harness with the real scanner
+        if: steps.readiness.outputs.ready == 'true'
+        env:
+          GATEKEEPER_TEST_BINARY: scanner-binary/gatekeeper-ndpa-check
+        run: node --test scanner/ci/dogfood/scan.integration.test.mjs
+      - name: Run repeatable work-tree scan
+        id: scan
+        if: steps.readiness.outputs.ready == 'true'
+        env:
+          EVALUATED_ON: ${{ steps.readiness.outputs.evaluated_on }}
+        run: node scanner/ci/dogfood/scan.mjs scanner-binary/gatekeeper-ndpa-check target "$EVALUATED_ON" dogfood-output
+      - name: Validate evidence before retaining it
+        id: evidence
+        if: ${{ !cancelled() && steps.scan.outcome != 'skipped' && hashFiles('dogfood-output/evidence.json') != '' }}
+        shell: pwsh
+        run: |
+          $valid = Get-Content dogfood-output/evidence.json -Raw | Test-Json -SchemaFile scanner/schemas/gk-results.schema.json -ErrorAction SilentlyContinue
+          if (-not $valid) { throw 'Dogfood evidence is invalid. Reproduce locally with the supported scanner version.' }
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        with:
+          name: dogfood-evidence
+          path: dogfood-output/evidence.json
+          if-no-files-found: error
+          retention-days: 7
