@@ -8,6 +8,24 @@ namespace InvenioTech.GateKeeper.Tests;
 
 public sealed class ResultsWriterTests
 {
+    [Fact]
+    public void Writer_Should_ExposeProcessorMetadata_When_TheFindingCarriesCatalogueData()
+    {
+        var input = Input(true);
+        var processor = new ProcessorInfo(["synthetic category"], "Synthetic region caveat.");
+        input = input with { Policy = input.Policy with { Findings = input.Policy.Findings.Select(f => f with { Processor = processor }).ToArray() } };
+        var documents = ResultsWriter.Write(input);
+        ResultsTestSupport.ValidateEvidence(Encoding.UTF8.GetString(documents.Evidence)).IsValid.Should().BeTrue();
+        ResultsTestSupport.ValidateSarif(Encoding.UTF8.GetString(documents.Sarif)).IsValid.Should().BeTrue();
+        using var evidence = JsonDocument.Parse(documents.Evidence);
+        evidence.RootElement.GetProperty("findings")[0].GetProperty("processor").GetProperty("usualRegion").GetString().Should().Be(processor.UsualRegion);
+        using var sarif = JsonDocument.Parse(documents.Sarif);
+        var run = sarif.RootElement.GetProperty("runs")[0];
+        run.GetProperty("tool").GetProperty("driver").GetProperty("rules")[0].GetProperty("properties").GetProperty("processor").GetProperty("dataCategories")[0].GetString().Should().Be("synthetic category");
+        run.GetProperty("results")[0].TryGetProperty("properties", out _).Should().BeFalse();
+        ResultsWriter.Write(input).Evidence.Should().Equal(documents.Evidence);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

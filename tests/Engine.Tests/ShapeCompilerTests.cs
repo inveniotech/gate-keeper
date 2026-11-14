@@ -14,6 +14,10 @@ namespace InvenioTech.GateKeeper.Engine.Tests;
 /// </summary>
 public sealed class ShapeCompilerTests
 {
+    // Semantic tests must not depend on runner scheduling or lazy regex initialisation.
+    // Dedicated timeout tests below assert the finite production configuration.
+    private static readonly TimeSpan SemanticMatchTimeout = Timeout.InfiniteTimeSpan;
+
     private static RuleShapePart Part(
         int min,
         int max,
@@ -51,7 +55,7 @@ public sealed class ShapeCompilerTests
     {
         var shape = new[] { Part(1, 2, literal: "a.b(c)") };
 
-        var compiled = CompiledShape.Compile(shape, "local.escaped", ShapeRegexCache.DefaultMatchTimeout);
+        var compiled = CompiledShape.Compile(shape, "local.escaped", SemanticMatchTimeout);
 
         compiled.Regex.IsMatch("a.b(c)a.b(c)").Should().BeTrue();
         compiled.Regex.IsMatch("A.B(C)").Should().BeTrue();
@@ -66,7 +70,7 @@ public sealed class ShapeCompilerTests
         var compiled = CompiledShape.Compile(
             [Part(2, 2, literal: "ab")],
             "local.repeated-literal",
-            ShapeRegexCache.DefaultMatchTimeout);
+            SemanticMatchTimeout);
 
         compiled.Regex.IsMatch("abab").Should().BeTrue();
         compiled.Regex.IsMatch("abb").Should().BeFalse();
@@ -79,7 +83,7 @@ public sealed class ShapeCompilerTests
         var compiled = CompiledShape.Compile(
             [Part(1, 1, literal: "BVN ")],
             "local.folded",
-            ShapeRegexCache.DefaultMatchTimeout);
+            SemanticMatchTimeout);
 
         compiled.Regex.IsMatch("bvn ").Should().BeTrue();
         compiled.Regex.IsMatch("BVN ").Should().BeTrue();
@@ -108,7 +112,7 @@ public sealed class ShapeCompilerTests
         // the same position, whatever order the pack lists them in.
         var shape = new[] { Part(1, 1, oneOf: ["processor-a", "processor-alpha"]) };
 
-        var compiled = CompiledShape.Compile(shape, "local.alternation", ShapeRegexCache.DefaultMatchTimeout);
+        var compiled = CompiledShape.Compile(shape, "local.alternation", SemanticMatchTimeout);
         var match = compiled.Regex.Match("uses processor-alpha here");
 
         match.Value.Should().Be("processor-alpha");
@@ -137,7 +141,7 @@ public sealed class ShapeCompilerTests
             Part(11, 11, shapeClass: ShapeClass.Digit, emit: true),
         };
 
-        var compiled = CompiledShape.Compile(shape, "local.emit", ShapeRegexCache.DefaultMatchTimeout);
+        var compiled = CompiledShape.Compile(shape, "local.emit", SemanticMatchTimeout);
         var match = compiled.Regex.Match("bvn 32826314843 end");
         var emit = match.Groups[compiled.Regex.GroupNumberFromName("emit")];
 
@@ -267,6 +271,7 @@ public sealed class ShapeCompilerTests
     [Fact]
     public void Cache_Should_CarryTheDefaultTimeout_When_TheCallerNamesNone()
     {
+        ShapeRegexCache.DefaultMatchTimeout.Should().Be(TimeSpan.FromMilliseconds(100));
         var cache = new ShapeRegexCache();
         var compiled = cache.GetOrCompile([Part(1, 1, shapeClass: ShapeClass.Digit)], "local.timeout");
 

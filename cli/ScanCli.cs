@@ -35,13 +35,14 @@ internal static class ScanCli
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                await errors.WriteLineAsync("The scan could not read a repository file. Check .ndpa-check paths and access permissions, then run the scan again.").ConfigureAwait(false);
+                await errors.WriteLineAsync("The scan could not read a repository file. Check .gatekeeper paths and access permissions, then run the scan again.").ConfigureAwait(false);
                 return (int)ExitOutcome.ToolError;
             }
         });
     }
 
-    internal static async Task<PreparedScan> PrepareAsync(string root, string? date, CancellationToken token)
+    internal static async Task<PreparedScan> PrepareAsync(string root, string? date, CancellationToken token,
+        Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory = null)
     {
         var load = ConfigurationLoader.Load(root);
         if (load.Settings is not { } settings || load.Errors.Count > 0) throw new EngineToolException(string.Join(" ", load.Errors));
@@ -52,7 +53,7 @@ internal static class ScanCli
         var state = await PolicyStore.LoadAsync(root, rules, token).ConfigureAwait(false);
         var enabled = rules.Where(r => !settings.DisabledRules.Any(d => d.Id == r.Id)
             && (r.Profiles is null || r.Profiles.Count == 0 || r.Profiles.Contains(settings.Profile == ScanProfile.Deep ? "deep" : "default", StringComparer.Ordinal))).ToArray();
-        var scan = await new ScanOrchestrator(new MatcherEngine(enabled)).ScanAsync(new FileEnumerationOptions
+        var scan = await new ScanOrchestrator(matcherFactory is null ? new MatcherEngine(enabled) : matcherFactory(enabled)).ScanAsync(new FileEnumerationOptions
         {
             Root = root,
             ScanHistory = settings.ScanHistory,
@@ -67,7 +68,7 @@ internal static class ScanCli
         var policy = FindingPolicy.Apply(scan, settings, state, day, token);
         var metadata = await RepositoryMetadata.ReadAsync(root, settings.RepositoryId, token).ConfigureAwait(false);
         var warnings = policy.Warnings.Concat(PackAgeWarning.Evaluate(packs.Packs, day)).Concat(load.Warnings.Select(w => new ScanWarning("config.unknown-key", w))).ToList();
-        if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in ndpa-check.toml."));
+        if (metadata.Id.Length == 0) warnings.Add(new("repository.identity-empty", "No repository identity could be derived. Set repository.id in gatekeeper.toml."));
         policy = policy with { Warnings = warnings.OrderBy(w => w.Code, StringComparer.Ordinal).ThenBy(w => w.Message, StringComparer.Ordinal).ToArray() };
         return new(new ResultsInput(policy, settings, packs.Packs, metadata.Id, metadata.Revision,
             settings.ScanHistory && scan.Enumeration.IsInsideGitWorkTree, SeverityPolicy.Evaluate(policy, settings.FailOn)), packs);
@@ -102,13 +103,25 @@ internal static class ScanCli
                 if (finding.Citation.NdpaSection is { } ndpa) text.Append(" NDPA ").Append(ndpa);
                 if (finding.Citation.GaidSection is { } gaid) text.Append(" GAID ").Append(gaid);
                 text.Append('\n');
+                AppendProcessorDetail(text, finding.Processor);
             }
         }
         foreach (var finding in input.Policy.History)
+        {
             text.Append(CultureInfo.InvariantCulture, $"History {finding.CommitId} {finding.Match.Path}:{finding.Match.Line}:{finding.Match.Column} {finding.Match.Severity.ToString().ToLowerInvariant()} {finding.Match.RuleId}: {finding.Match.Citation.Title}\n");
+            AppendProcessorDetail(text, finding.Match.Processor);
+        }
         text.Append(CultureInfo.InvariantCulture, $"Findings: {input.Policy.Findings.Count} work tree, {input.Policy.History.Count} history. Exit code: {(int)input.Outcome}.\n");
         if (!input.HistoryScanned) text.Append("A clean result does not mean git history was scanned.\n");
         await output.WriteAsync(text.ToString()).ConfigureAwait(false);
+    }
+
+    private static void AppendProcessorDetail(StringBuilder text, ProcessorInfo? processor)
+    {
+        if (processor is null) return;
+        text.Append("    Data categories: ").AppendJoin(", ", processor.DataCategories.Distinct(StringComparer.Ordinal)).Append('\n');
+        text.Append("    ").Append(processor.UsualRegion).Append('\n');
+        text.Append("    Integration reference detected. Confirm the categories of data actually sent, the service region and the applicable transfer basis for your deployment.\n");
     }
 
     private sealed class NoEmbeddedKeys : IPackKeyCatalogue

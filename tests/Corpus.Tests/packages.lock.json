@@ -105,7 +105,7 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "gatekeeper-ndpa-check": {
+      "gatekeeper": {
         "type": "Project",
         "dependencies": {
           "InvenioTech.GateKeeper.Engine": "[1.0.0, )",
@@ -118,6 +118,12 @@
           "InvenioTech.GateKeeper.Signing": "[1.0.0, )",
           "SarifKit": "[1.0.0, )",
           "Tomlyn": "[2.10.1, )"
+        }
+      },
+      "inveniotech.gatekeeper.middleware": {
+        "type": "Project",
+        "dependencies": {
+          "InvenioTech.GateKeeper.Engine": "[1.0.0, )"
         }
       },
       "inveniotech.gatekeeper.signing": {

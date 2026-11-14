@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.aws.ireland",
+    "path": "src/integration.ts",
+    "line": 1,
+    "column": 20,
+    "triage": "true-positive"
+  }
+]

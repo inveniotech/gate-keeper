@@ -1,0 +1,92 @@
+{
+  "name": "gate-keeper-docs-data",
+  "version": "0.2.0",
+  "packVersion": "2026.11.0",
+  "schemasVersion": "2.1.0",
+  "files": [
+    {
+      "path": "citations.json",
+      "sha256": "73ab80632232d0ddd3cec59914888cb950d6f7906616d93a0070f619a1b3d6a5"
+    },
+    {
+      "path": "cli/baseline.md",
+      "sha256": "adf87f4d2f368330e6d99caf6c9e17894a5ec5cff38eca72ba398ab32e6ee165"
+    },
+    {
+      "path": "cli/doctor.md",
+      "sha256": "6af4f20c5c5f36c8e0d3587898736796177e8cd10489aa0a9c169bbadd8c1127"
+    },
+    {
+      "path": "cli/index.md",
+      "sha256": "646f5290b3e2124ff347b076a7b97b2bdd3a19c2686abb8dcfb894483780d6dc"
+    },
+    {
+      "path": "cli/init.md",
+      "sha256": "342412fd5d8fd5a26b69038512dbd53af564e768cccfb186556b1e13307cdba9"
+    },
+    {
+      "path": "cli/scaffold-consent.md",
+      "sha256": "06f58ea29724c8caf12f4d54426df90acff1c488346fca9dbaaf32bf0de81166"
+    },
+    {
+      "path": "cli/scaffold.md",
+      "sha256": "b0294dbd8a1115a7abeb096c55f8da867611cbc83c356eaf2c82f072f8d8667f"
+    },
+    {
+      "path": "cli/scan.md",
+      "sha256": "6901d899b2afd4a8141ad98249f205660b2894610cdbbc0061f576e0f2ea1642"
+    },
+    {
+      "path": "cli/support-bundle.md",
+      "sha256": "dd89decf205f81b9aa214e00dd46169d61e6747017ade19f62645c88a553aeda"
+    },
+    {
+      "path": "cli/version.md",
+      "sha256": "ff675ca4fd1436119080d8cd4027458a224220e353fb90106ba97dbc8ae8d1e9"
+    },
+    {
+      "path": "rules.json",
+      "sha256": "d2c9e2658f981cec609e12974ef851d36d21c599a2bc15a792a4d38738648bcc"
+    },
+    {
+      "path": "rules/bvn.md",
+      "sha256": "14d39c588a9b369964ee19191bb8781456f66a95a4336b9b7803100561890814"
+    },
+    {
+      "path": "rules/email.md",
+      "sha256": "91d8d96e8022d09a67695517257344684e6969156b57e2c02465ef09f4cba25d"
+    },
+    {
+      "path": "rules/locations.md",
+      "sha256": "55a79ea40de6978c38fbc13c7e2d0adc9c493af2a7da1e7127a8fa0b17e0ae53"
+    },
+    {
+      "path": "rules/nin.md",
+      "sha256": "047260033b86f309eb80cd1efc20d14915a7d586e7da4926cb5f4a1babaf3f12"
+    },
+    {
+      "path": "rules/phone.md",
+      "sha256": "c70fca2b557505141416596c2683b044ec8528d0b967eb9dc7264387da44f4d4"
+    },
+    {
+      "path": "rules/processors.md",
+      "sha256": "d6644e7c0824494f02876b842a862699714f0e5a8ad1988ba733015648fede0d"
+    },
+    {
+      "path": "schemas/VERSION",
+      "sha256": "c89b87c262e9d5ffd20e73aac74a1772adcc9f5a21682cc33adcf5086e5fef5c"
+    },
+    {
+      "path": "schemas/gk-results.schema.json",
+      "sha256": "86236c4afd5f77d789ab5971fd85afcb5e2f053357092f496bb9e973d012664b"
+    },
+    {
+      "path": "schemas/rulepack.schema.json",
+      "sha256": "c0bad0d297028acfc2b4767f5945a1fbc1a05007391b56d4f7af1cb14677cbc0"
+    },
+    {
+      "path": "schemas/sarif-profile.schema.json",
+      "sha256": "572df8a383d9aa03a5520dd43caaa2a1e79632956683ae7baa7828744eac298f"
+    }
+  ]
+}

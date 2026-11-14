@@ -1,0 +1,132 @@
+name: Cross-stack conformance
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Verify engine-generated vectors and pack digests
+        run: |
+          pwsh -NoProfile -File tests/conformance/Sync-RuntimeVersion.ps1 -Check
+          dotnet restore --locked-mode
+          dotnet test tests/Corpus.Tests -c Release --no-restore --filter FullyQualifiedName~ConformanceExportTests
+          dotnet test tests/Engine.Tests -c Release --no-restore --filter 'FullyQualifiedName~RuntimeMatcherTests|FullyQualifiedName~ConsentCheckTests|FullyQualifiedName~ResponseFilterTests'
+      - name: Publish and execute the real middleware core with NativeAOT
+        run: |
+          dotnet publish tests/conformance/NativeProbe -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/middleware-native
+          artifacts/middleware-native/MiddlewareNativeProbe
+  node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24, 26]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Verify regex candidates
+        run: node tests/conformance/check-patterns.mjs
+      - name: Verify native matcher, validators, redaction, consent and wildcard responses
+        run: node tests/conformance/check-runtime.mjs
+      - name: Verify signed packs, installation and framework hooks
+        run: node --test middleware/node/*.test.ts
+      - name: Verify ESM, CommonJS and declarations
+        working-directory: middleware/node
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          npm run test:package
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13', '3.14', '3.15']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install development tools and sample hosts
+        run: python -m pip install -r middleware/python/requirements-dev.txt
+      - name: Verify native conformance, consent, packs and framework hooks
+        run: |
+          python tests/conformance/check_patterns.py
+          python tests/conformance/check_runtime.py
+          python tests/conformance/check_python_behaviour.py
+          python tests/conformance/check_python_packs.py
+          python tests/conformance/check_python_hooks.py
+          python samples/django/app.py
+          python samples/fastapi/app.py
+      - name: Check strict types and formatting
+        working-directory: middleware/python
+        run: |
+          python -m mypy
+          python -m ruff check src
+          python -m ruff format --check src
+      - name: Build and check the source distribution and wheel
+        working-directory: middleware/python
+        run: |
+          python -m build
+          python -m twine check --strict dist/*
+          python -m pip install --no-deps dist/*.whl
+          python -I ../../tests/conformance/check_python_distribution.py
+  jvm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21, 25]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: ${{ matrix.java }}
+      - name: Verify regex candidates
+        run: java tests/conformance/CheckPatterns.java tests/conformance/patterns.tsv
+      - name: Compile the native core as Java 15 bytecode
+        run: |
+          mkdir -p artifacts/conformance-jvm
+          javac --release 15 -d artifacts/conformance-jvm middleware/jvm/src/africa/gatekeeper/*.java tests/conformance/VectorJson.java tests/conformance/ResponseFailureProbe.java tests/conformance/CheckRuntime.java tests/conformance/CheckPackLoad.java middleware/jvm/sample/CoreExample.java
+      - name: Verify native matcher, validators, redaction, consent and wildcard responses
+        run: java -cp artifacts/conformance-jvm CheckRuntime
+      - name: Verify signed loading, installation and RFC 8032 vectors
+        run: java -cp artifacts/conformance-jvm CheckPackLoad
+  jvm-adapters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21, 25]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: ${{ matrix.java }}
+      - name: Select the adapter test runtime
+        run: echo "GATEKEEPER_TEST_JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Build hooks, exercise bounded responses and compile Java samples
+        run: gradle -p middleware/jvm --no-daemon build verifyAdapters

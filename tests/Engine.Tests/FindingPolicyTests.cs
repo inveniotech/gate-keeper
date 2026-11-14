@@ -52,7 +52,7 @@ public sealed class FindingPolicyTests
     {
         using var repo = new PolicyRepository();
         repo.Exceptions();
-        var path = Path.Combine(repo.Root, ".ndpa-check", "exceptions.toml");
+        var path = Path.Combine(repo.Root, ".gatekeeper", "exceptions.toml");
         var text = await File.ReadAllTextAsync(path);
         await File.AppendAllTextAsync(path, text[(text.IndexOf("[[exception]]", StringComparison.Ordinal))..].Replace("exc-test", "exc-other", StringComparison.Ordinal));
         Func<Task> apply = async () => await Evaluate(repo, Day);
@@ -66,7 +66,7 @@ public sealed class FindingPolicyTests
         await PolicyStore.EnsureKeyAsync(repo.Root);
         var result = await Evaluate(repo, Day);
         await PolicyStore.WriteBaselineAsync(repo.Root, result);
-        var path = Path.Combine(repo.Root, ".ndpa-check", "baseline.json");
+        var path = Path.Combine(repo.Root, ".gatekeeper", "baseline.json");
         var first = await File.ReadAllBytesAsync(path);
         first.Should().NotContain((byte)'\r');
         var again = await Evaluate(repo, Day.AddDays(1));
@@ -75,7 +75,7 @@ public sealed class FindingPolicyTests
         await PolicyStore.WriteBaselineAsync(repo.Root, again);
         (await File.ReadAllBytesAsync(path)).Should().Equal(first);
         (await File.ReadAllTextAsync(path)).Should().NotContain("marker").And.NotContain("local.test");
-        (await File.ReadAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", ".gitignore"))).Should().Be("fingerprint.key\n");
+        (await File.ReadAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", ".gitignore"))).Should().Be("fingerprint.key\n");
     }
 
     [Theory]
@@ -100,7 +100,7 @@ public sealed class FindingPolicyTests
     public async Task Baseline_Should_RejectMalformedInput_When_TheFileExists(string json)
     {
         using var repo = new PolicyRepository();
-        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", "baseline.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", "baseline.json"), json);
         Func<Task> load = async () => await PolicyStore.LoadAsync(repo.Root, [PolicyRepository.Rule]);
         await load.Should().ThrowAsync<EngineToolException>().WithMessage("*baseline.json*");
     }
@@ -109,7 +109,7 @@ public sealed class FindingPolicyTests
     public async Task Policy_Should_KeepFindingsVisible_When_TheKeyIsMissing()
     {
         using var repo = new PolicyRepository();
-        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", "baseline.json"), "{\"schemaVersion\":1,\"entries\":[]}");
+        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", "baseline.json"), "{\"schemaVersion\":1,\"entries\":[]}");
         var result = await Evaluate(repo, Day);
         result.Findings[0].Fingerprint.Should().BeNull();
         result.Warnings.Select(w => w.Code).Should().Equal("baseline.not-applied", "fingerprint.missing");
@@ -146,7 +146,7 @@ public sealed class FindingPolicyTests
     {
         using var repo = new PolicyRepository();
         await PolicyStore.EnsureKeyAsync(repo.Root);
-        var path = Path.Combine(repo.Root, ".ndpa-check", "fingerprint.key");
+        var path = Path.Combine(repo.Root, ".gatekeeper", "fingerprint.key");
         var original = await File.ReadAllBytesAsync(path);
         await PolicyStore.EnsureKeyAsync(repo.Root);
         (await File.ReadAllBytesAsync(path)).Should().Equal(original);
@@ -157,7 +157,7 @@ public sealed class FindingPolicyTests
     {
         using var repo = new PolicyRepository();
         await PolicyStore.EnsureKeyAsync(repo.Root);
-        var path = Path.Combine(repo.Root, ".ndpa-check", "fingerprint.key");
+        var path = Path.Combine(repo.Root, ".gatekeeper", "fingerprint.key");
         if (OperatingSystem.IsWindows())
         {
             var security = System.IO.FileSystemAclExtensions.GetAccessControl(new FileInfo(path));
@@ -196,7 +196,7 @@ public sealed class FindingPolicyTests
     public async Task ExceptionHash_Should_AgreeWithThePublishedVector_When_FieldsAreTrimmed()
     {
         using var repo = new PolicyRepository();
-        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", "exceptions.toml"), """
+        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", "exceptions.toml"), """
             schemaVersion = 1
             [[exception]]
             id = "exc-fixture-bvn"
@@ -215,7 +215,7 @@ public sealed class FindingPolicyTests
     {
         using var repo = new PolicyRepository();
         repo.Exceptions("severity = \"note\"");
-        await File.AppendAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", "exceptions.toml"), """
+        await File.AppendAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", "exceptions.toml"), """
 
             [[exception]]
             id = "exc-category"
@@ -236,7 +236,7 @@ public sealed class FindingPolicyTests
     public async Task Key_Should_RejectInvalidContentWithoutDisclosingIt_When_Loaded(string content)
     {
         using var repo = new PolicyRepository();
-        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".ndpa-check", "fingerprint.key"), content);
+        await File.WriteAllTextAsync(Path.Combine(repo.Root, ".gatekeeper", "fingerprint.key"), content);
         Func<Task> load = async () => await PolicyStore.LoadAsync(repo.Root, [PolicyRepository.Rule]);
         var error = await load.Should().ThrowAsync<EngineToolException>();
         error.Which.Message.Should().Contain("fingerprint.key").And.NotContain(content.Trim());
@@ -252,7 +252,7 @@ internal sealed class PolicyRepository : IDisposable
     internal static readonly Rule Rule = new("local.test", Severity.Error, "synthetic", new Citation("Synthetic test citation.", null, null), "1", null, null, null, null,
         new RuleMatcher(null, new RuleListMatcher(["marker"], [])));
     internal string Root { get; } = Path.Combine(Path.GetTempPath(), "gate-keeper-policy", Guid.NewGuid().ToString("N"));
-    internal PolicyRepository() => Directory.CreateDirectory(Path.Combine(Root, ".ndpa-check"));
+    internal PolicyRepository() => Directory.CreateDirectory(Path.Combine(Root, ".gatekeeper"));
     internal void Exceptions(string replacement = "")
     {
         var lines = new List<string> { "id = \"exc-test\"", "rule = \"local.test\"", "paths = [\"src/**\"]", "justification = \"Synthetic test content.\"", "owner = \"test-team\"", "expires = \"2026-11-01\"" };
@@ -262,7 +262,7 @@ internal sealed class PolicyRepository : IDisposable
             lines.RemoveAll(line => line.StartsWith(key + " =", StringComparison.Ordinal));
             lines.Add(replacement);
         }
-        File.WriteAllText(Path.Combine(Root, ".ndpa-check", "exceptions.toml"), "schemaVersion = 1\n[[exception]]\n" + string.Join('\n', lines) + "\n");
+        File.WriteAllText(Path.Combine(Root, ".gatekeeper", "exceptions.toml"), "schemaVersion = 1\n[[exception]]\n" + string.Join('\n', lines) + "\n");
     }
     internal static ScanMatchResult Scan()
     {

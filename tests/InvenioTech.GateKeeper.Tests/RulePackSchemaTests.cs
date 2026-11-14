@@ -79,8 +79,30 @@ public sealed class RulePackSchemaTests
         summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
     }
 
-    /// <summary>Builds a minimal, otherwise-valid Invenio pack whose single rule uses the supplied shape.</summary>
-    private static string PackWithShape(string shapeJson)
+    [Fact]
+    public void Boundary_with_the_email_value_is_valid()
+    {
+        var summary = RulePackTestSupport.Validate(PackWithBoundary("email"));
+
+        summary.IsValid.Should().BeTrue(string.Join(Environment.NewLine, summary.Errors));
+    }
+
+    [Fact]
+    public void Boundary_with_an_unknown_value_is_rejected()
+    {
+        var summary = RulePackTestSupport.Validate(PackWithBoundary("token"));
+
+        summary.IsValid.Should().BeFalse();
+    }
+
+    /// <summary>Builds a minimal, otherwise-valid Invenio pack whose single rule shape and boundary are supplied.</summary>
+    private static string PackWithBoundary(string boundaryJson) => PackWithJsonBoundary($$"""
+
+        { "pattern": { "shape": [ { "min": 11, "max": 11, "class": "digit" } ], "boundary": "{{boundaryJson}}" } }
+        """);
+
+    /// <summary>Builds a minimal, otherwise-valid Invenio pack whose single rule uses the supplied matcher.</summary>
+    private static string PackWithJsonBoundary(string matcherJson)
     {
         return $$"""
         {
@@ -96,17 +118,22 @@ public sealed class RulePackSchemaTests
               "id": "pii.bvn",
               "severity": "error",
               "category": "bvn",
-              "citation": { "title": "Placeholder citation — approved NDPA wording arrives in P2-02" },
+              "citation": { "title": "Placeholder citation - approved NDPA wording arrives in P2-02" },
               "sinceVersion": "2027.1.0",
-              "matcher": {
-                "pattern": {
-                  "shape": {{shapeJson}},
-                  "boundary": "digit"
-                }
-              }
+              "matcher": {{matcherJson}}
             }
           ]
         }
         """;
+    }
+
+    /// <summary>Builds a minimal, otherwise-valid Invenio pack whose single rule uses the supplied shape.</summary>
+    private static string PackWithShape(string shapeJson)
+    {
+        var matcher = $$"""
+
+        { "pattern": { "shape": {{shapeJson}}, "boundary": "digit" } }
+        """;
+        return PackWithJsonBoundary(matcher);
     }
 }

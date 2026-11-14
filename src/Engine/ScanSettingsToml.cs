@@ -6,7 +6,7 @@ using Tomlyn.Serialization;
 namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
-/// The typed model of <c>.ndpa-check/ndpa-check.toml</c>, the settings file of
+/// The typed model of <c>.gatekeeper/gatekeeper.toml</c>, the settings file of
 /// the configuration specification (section 4). Every TOML key maps to a
 /// property here through the camelCase naming policy, so the property names
 /// follow the keys the specification fixes: a key such as

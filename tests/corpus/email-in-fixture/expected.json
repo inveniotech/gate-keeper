@@ -5,5 +5,12 @@
     "path": "tests/fixtures/digest-queues.json",
     "ruleId": "pii.email",
     "triage": "true-positive"
+  },
+  {
+    "column": 29,
+    "line": 5,
+    "path": "tests/fixtures/digest-queues.json",
+    "ruleId": "pii.email.fixture",
+    "triage": "true-positive"
   }
 ]

@@ -1,0 +1,2834 @@
+{
+  "contentIssuedAt": "2026-11-06",
+  "coverageDate": "2026-11-06",
+  "id": "invenio.locations",
+  "minEngineVersion": "0.1.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.bvn.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "bvn",
+            "bankVerification",
+            "bank_verification",
+            "bank verification"
+          ],
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.bvn.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "bvn",
+            "bankVerification",
+            "bank_verification",
+            "bank verification"
+          ],
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.bvn.field.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "api-model"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "return Results.Json(new { ",
+                "res.json({ ",
+                "return ResponseEntity.ok(mapOf(\""
+              ]
+            },
+            {
+              "emit": true,
+              "literal": "bvn",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                " = customer.",
+                ": customer.",
+                "\" to customer."
+              ]
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.bvn.field.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "console.log(",
+                "logger.info(\"{}\", ",
+                "Log.Information(\"{Bvn}\", ",
+                "print(",
+                "logger.info("
+              ]
+            },
+            {
+              "literal": "customer.",
+              "max": 1,
+              "min": 0
+            },
+            {
+              "emit": true,
+              "literal": "bvn",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "literal": ")",
+              "max": 1,
+              "min": 1
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.bvn.field.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "migrationBuilder.AddColumn<string>(name: \"",
+                "table.string(\"",
+                "varchar(\""
+              ]
+            },
+            {
+              "emit": true,
+              "literal": "bvn",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "literal": "\"",
+              "max": 1,
+              "min": 1
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.bvn.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "bvn",
+            "bankVerification",
+            "bank_verification",
+            "bank verification"
+          ],
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.bvn.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "bvn",
+                "bankVerificationNumber",
+                "bank_verification"
+              ]
+            },
+            {
+              "max": 32,
+              "min": 0,
+              "ranges": [
+                [
+                  " ",
+                  "/"
+                ],
+                [
+                  ":",
+                  "~"
+                ]
+              ]
+            },
+            {
+              "class": "digit",
+              "emit": true,
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.bvn.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "bvn",
+            "bankVerification",
+            "bank_verification",
+            "bank verification"
+          ],
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.email.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.email.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.email.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.email.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.email.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  ".",
+                  "."
+                ],
+                [
+                  "_",
+                  "_"
+                ],
+                [
+                  "+",
+                  "+"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": "@",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 64,
+              "min": 1,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  "0",
+                  "9"
+                ],
+                [
+                  "-",
+                  "-"
+                ]
+              ]
+            },
+            {
+              "literal": ".",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 24,
+              "min": 2,
+              "ranges": [
+                [
+                  "a",
+                  "z"
+                ],
+                [
+                  "A",
+                  "Z"
+                ],
+                [
+                  ".",
+                  "."
+                ]
+              ]
+            }
+          ],
+          "validator": {
+            "name": "email-not-example-domain"
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.nin.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "nin=",
+            "nin =",
+            "nin\"",
+            "nin'",
+            "nin ",
+            "nin:",
+            "nationalId",
+            "nationalIdentity",
+            "national_identity",
+            "national_id",
+            "national identity"
+          ],
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.nin.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "nin=",
+            "nin =",
+            "nin\"",
+            "nin'",
+            "nin ",
+            "nin:",
+            "nationalId",
+            "nationalIdentity",
+            "national_identity",
+            "national_id",
+            "national identity"
+          ],
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.nin.field.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "api-model"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "return Results.Json(new { ",
+                "res.json({ ",
+                "return ResponseEntity.ok(mapOf(\""
+              ]
+            },
+            {
+              "emit": true,
+              "literal": "nin",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                " = customer.",
+                ": customer.",
+                "\" to customer."
+              ]
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.nin.field.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "console.log(",
+                "logger.info(\"{}\", ",
+                "Log.Information(\"{Nin}\", ",
+                "print(",
+                "logger.info("
+              ]
+            },
+            {
+              "literal": "customer.",
+              "max": 1,
+              "min": 0
+            },
+            {
+              "emit": true,
+              "literal": "nin",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "literal": ")",
+              "max": 1,
+              "min": 1
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.nin.field.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "none",
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "migrationBuilder.AddColumn<string>(name: \"",
+                "table.string(\"",
+                "varchar(\""
+              ]
+            },
+            {
+              "emit": true,
+              "literal": "nin",
+              "max": 1,
+              "min": 1
+            },
+            {
+              "literal": "\"",
+              "max": 1,
+              "min": 1
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.nin.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "nin=",
+            "nin =",
+            "nin\"",
+            "nin'",
+            "nin ",
+            "nin:",
+            "nationalId",
+            "nationalIdentity",
+            "national_identity",
+            "national_id",
+            "national identity"
+          ],
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.nin.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "nin ",
+                "nin\"",
+                "nin'",
+                "nin=",
+                "nin:",
+                "nationalId",
+                "national_identity"
+              ]
+            },
+            {
+              "max": 32,
+              "min": 0,
+              "ranges": [
+                [
+                  " ",
+                  "/"
+                ],
+                [
+                  ":",
+                  "~"
+                ]
+              ]
+            },
+            {
+              "class": "digit",
+              "emit": true,
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.nin.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "12345678901"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "nin=",
+            "nin =",
+            "nin\"",
+            "nin'",
+            "nin ",
+            "nin:",
+            "nationalId",
+            "nationalIdentity",
+            "national_identity",
+            "national_id",
+            "national identity"
+          ],
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "length": 11,
+            "name": "digits-length"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.nuban.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "0000014579",
+            "0000000220"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "account",
+            "nuban"
+          ],
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 10,
+              "min": 10
+            }
+          ],
+          "validator": {
+            "name": "nuban"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.nuban.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "0000014579",
+            "0000000220"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "account",
+            "nuban"
+          ],
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 10,
+              "min": 10
+            }
+          ],
+          "validator": {
+            "name": "nuban"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.nuban.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "0000014579",
+            "0000000220"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "account",
+            "nuban"
+          ],
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 10,
+              "min": 10
+            }
+          ],
+          "validator": {
+            "name": "nuban"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.nuban.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "0000014579",
+            "0000000220"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "accountNumber",
+                "account_number",
+                "nuban"
+              ]
+            },
+            {
+              "max": 32,
+              "min": 0,
+              "ranges": [
+                [
+                  " ",
+                  "/"
+                ],
+                [
+                  ":",
+                  "~"
+                ]
+              ]
+            },
+            {
+              "class": "digit",
+              "emit": true,
+              "max": 10,
+              "min": 10
+            }
+          ],
+          "validator": {
+            "name": "nuban"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.nuban.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "digit",
+          "excludeValues": [
+            "0000014579",
+            "0000000220"
+          ],
+          "exclusions": [
+            "repeated-digits",
+            "sequential-digits",
+            "hex-fragment",
+            "uuid-fragment",
+            "version-string",
+            "date-or-timestamp"
+          ],
+          "keywords": [
+            "account",
+            "nuban"
+          ],
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 10,
+              "min": 10
+            }
+          ],
+          "validator": {
+            "name": "nuban"
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.phone.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.phone.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.phone.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-api-models",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal-data exposure in response models."
+      },
+      "id": "pii.phone.international.api",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "api-model",
+            "paths": [
+              "**/api/models/**",
+              "**/api/responses/**",
+              "**/Models/**",
+              "**/Responses/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-configuration",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers stored in configuration."
+      },
+      "id": "pii.phone.international.configuration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "configuration",
+            "paths": [
+              "**/config/**",
+              "**/.env",
+              "**/.env.*",
+              "**/appsettings*.json",
+              "**/application*.yml",
+              "**/application*.yaml",
+              "**/*.properties"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-fixtures",
+      "citation": {
+        "gaid": "Article 29(2)(h)",
+        "ndpa": "Sections 24(1)(b)-(c), 24(1)(f) and 39",
+        "title": "Review personal identifiers in fixtures and seed data."
+      },
+      "id": "pii.phone.international.fixture",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "fixture",
+            "paths": [
+              "**/fixtures/**",
+              "**/__tests__/**",
+              "**/*.spec.*",
+              "**/seeds/**",
+              "**/seed.*"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.phone.international.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ],
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.phone.international.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "max": 1,
+              "min": 1,
+              "oneOf": [
+                "234701",
+                "+234701",
+                "234703",
+                "+234703",
+                "234704",
+                "+234704",
+                "234705",
+                "+234705",
+                "234706",
+                "+234706",
+                "234707",
+                "+234707",
+                "234708",
+                "+234708",
+                "234802",
+                "+234802",
+                "234803",
+                "+234803",
+                "234805",
+                "+234805",
+                "234806",
+                "+234806",
+                "234807",
+                "+234807",
+                "234808",
+                "+234808",
+                "234809",
+                "+234809",
+                "234810",
+                "+234810",
+                "234811",
+                "+234811",
+                "234812",
+                "+234812",
+                "234813",
+                "+234813",
+                "234814",
+                "+234814",
+                "234815",
+                "+234815",
+                "234816",
+                "+234816",
+                "234817",
+                "+234817",
+                "234818",
+                "+234818",
+                "234901",
+                "+234901",
+                "234902",
+                "+234902",
+                "234903",
+                "+234903",
+                "234904",
+                "+234904",
+                "234905",
+                "+234905",
+                "234906",
+                "+234906",
+                "234907",
+                "+234907",
+                "234908",
+                "+234908",
+                "234909",
+                "+234909",
+                "234911",
+                "+234911",
+                "234912",
+                "+234912",
+                "234913",
+                "+234913",
+                "234915",
+                "+234915",
+                "234916",
+                "+234916"
+              ]
+            },
+            {
+              "class": "digit",
+              "max": 7,
+              "min": 7
+            }
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-logs",
+      "citation": {
+        "gaid": "Article 29(1)-(2)",
+        "ndpa": "Sections 24(1)(b)-(d), 24(1)(f) and 39",
+        "title": "Review personal identifiers exposed to logging."
+      },
+      "id": "pii.phone.log",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "keywords": [
+            "console.log(",
+            "logger.info(",
+            "logger.LogInformation(",
+            "logger.LogWarning(",
+            "logger.LogError(",
+            "logger.debug(",
+            "logger.warn(",
+            "logger.error(",
+            "Log.Information(",
+            "print("
+          ],
+          "location": {
+            "kind": "log"
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          },
+          "window": 128
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    },
+    {
+      "category": "pii.in-migrations",
+      "citation": {
+        "gaid": "Article 29(2)(g)-(h)",
+        "ndpa": "Sections 24(1)(f) and 39(1)-(2)",
+        "title": "Review safeguards for identifier storage."
+      },
+      "id": "pii.phone.migration",
+      "matcher": {
+        "pattern": {
+          "boundary": "alnum",
+          "location": {
+            "kind": "migration",
+            "paths": [
+              "**/migrations/**",
+              "**/Migrations/**"
+            ]
+          },
+          "shape": [
+            {
+              "class": "digit",
+              "max": 11,
+              "min": 11
+            }
+          ],
+          "validator": {
+            "name": "ng-phone-prefix",
+            "prefixes": [
+              "0701",
+              "0703",
+              "0704",
+              "0705",
+              "0706",
+              "0707",
+              "0708",
+              "0802",
+              "0803",
+              "0805",
+              "0806",
+              "0807",
+              "0808",
+              "0809",
+              "0810",
+              "0811",
+              "0812",
+              "0813",
+              "0814",
+              "0815",
+              "0816",
+              "0817",
+              "0818",
+              "0901",
+              "0902",
+              "0903",
+              "0904",
+              "0905",
+              "0906",
+              "0907",
+              "0908",
+              "0909",
+              "0911",
+              "0912",
+              "0913",
+              "0915",
+              "0916"
+            ]
+          }
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2026.11.0",
+      "suppressionHints": [
+        "Remove unnecessary personal data or mask it before use. Record a justified exception through the existing configuration if retention is necessary."
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2026.11.0"
+}

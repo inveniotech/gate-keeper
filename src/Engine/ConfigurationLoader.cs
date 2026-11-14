@@ -9,9 +9,9 @@ namespace InvenioTech.GateKeeper.Engine;
 
 /// <summary>
 /// Locates, reads, validates and resolves the settings file
-/// <c>.ndpa-check/ndpa-check.toml</c> (configuration specification, sections 2
+/// <c>.gatekeeper/gatekeeper.toml</c> (configuration specification, sections 2
 /// and 4). Everything read from a customer repository lives in
-/// <c>.ndpa-check/</c>; the loader never walks parent directories and never
+/// <c>.gatekeeper/</c>; the loader never walks parent directories and never
 /// reads a root-level configuration file (IQ-02).
 ///
 /// When the file is absent the section 4 defaults apply and nothing is warned
@@ -31,9 +31,9 @@ public static class ConfigurationLoader
     private const int MaxScanFileBytes = 104_857_600;
     private const int MaxDisabledReasonCharacters = 2_000;
     private const int MaxRepositoryIdentityCharacters = 200;
-    private const string SettingsFileRelativePath = ".ndpa-check/ndpa-check.toml";
-    private const string SettingsFileName = "ndpa-check.toml";
-    private const string CheckFolderName = ".ndpa-check";
+    private const string SettingsFileRelativePath = ".gatekeeper/gatekeeper.toml";
+    private const string SettingsFileName = "gatekeeper.toml";
+    private const string CheckFolderName = ".gatekeeper";
 
     private static readonly string[] KnownRootKeys =
     [

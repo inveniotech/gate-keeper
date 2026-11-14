@@ -58,7 +58,9 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage"
+        # The detection-quality job measures coverage with its pinned tool and enforces the floor.
+        # This matrix has no XPlat collector dependency; every test still runs on every platform.
+        run: dotnet test --configuration Release --no-restore
 
   aot:
     name: AOT and trim warnings as errors
@@ -100,6 +102,24 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for pack checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Verify rule authoring checks and generated corpus
+        run: node --test ci/rule-packs/*.test.mjs
+
+      - name: Test correction-release constraints
+        run: node --test ci/pack-release/corrections/check.test.mjs
+
+      - name: Test pack assembly and fixture reproducibility
+        run: node --test ci/pack-release/assembly/build.test.mjs
+
+      - name: Test full rule-pack schema validation
+        shell: pwsh
+        run: ./ci/guardrails/Test-PackSchemaLint.ps1
+
       - name: Validate rule packs
         shell: pwsh
         run: ./ci/guardrails/Invoke-PackSchemaLint.ps1
@@ -113,7 +133,7 @@ jobs:
 
       - name: Check glossary conformance
         shell: pwsh
-        run: ./ci/glossary/Invoke-GlossaryLint.ps1 -Path . -Exclude 'docs/glossary.json','ci/glossary/fixtures/','ci/glossary/README.md','ci/glossary/Test-Glossary.ps1','AGENTS.md','GateKeeper.slnx','.github/pull_request_template.md','docs/implementation/cards/p3-01/01-middleware-api-contract.md','middleware/dotnet/README.md','docs/specs/examples/rule-pack/README.md','.git','**/bin/**','**/obj/**','**/node_modules/**'
+        run: ./ci/glossary/Invoke-GlossaryLint.ps1 -Path . -Exclude 'docs/glossary.json','ci/glossary/fixtures/','ci/glossary/README.md','ci/glossary/Test-Glossary.ps1','AGENTS.md','GateKeeper.slnx','.github/pull_request_template.md','docs/implementation/cards/p3-01/01-middleware-api-contract.md','middleware/dotnet/README.md','middleware/jvm/README.md','middleware/jvm/log4j2/README.md','middleware/jvm/spring-boot/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports','docs/specs/examples/rule-pack/README.md','.git','**/bin/**','**/obj/**','**/node_modules/**'
 
   spelling:
     name: en-GB spelling lint

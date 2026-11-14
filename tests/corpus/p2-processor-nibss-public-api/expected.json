@@ -1,0 +1,9 @@
+[
+  {
+    "ruleId": "transfer.processor.nibss",
+    "path": "config/nibss.json",
+    "line": 1,
+    "column": 24,
+    "triage": "true-positive"
+  }
+]

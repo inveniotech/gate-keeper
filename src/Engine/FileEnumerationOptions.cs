@@ -7,7 +7,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// limit, the extra exclusion globs, the submodule policy, the
 /// <c>--changed-since</c> reference and whether history scanning is in scope
 /// (sections 6 to 8 of the configuration specification). The configuration
-/// loader (P1-08) fills them from <c>ndpa-check.toml</c>; until then callers
+/// loader (P1-08) fills them from <c>gatekeeper.toml</c>; until then callers
 /// set every field explicitly.
 /// </summary>
 /// <remarks>

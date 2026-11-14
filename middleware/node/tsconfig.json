@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "outDir": "dist/esm",
+    "rootDir": ".",
+    "noEmitOnError": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["*.ts"],
+  "exclude": ["*.test.ts", "test-fixtures.ts"]
+}

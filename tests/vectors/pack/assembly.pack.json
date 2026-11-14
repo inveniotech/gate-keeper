@@ -1,0 +1,43 @@
+{
+  "contentIssuedAt": "2027-01-01",
+  "coverageDate": "2027-01-01",
+  "id": "invenio.synthetic.assembly",
+  "minEngineVersion": "0.1.0",
+  "provenance": "bundled",
+  "rules": [
+    {
+      "category": "synthetic",
+      "citation": {
+        "title": "Synthetic assembly acceptance; no legal claim."
+      },
+      "id": "pii.synthetic.alpha",
+      "matcher": {
+        "list": {
+          "package": [
+            "gatekeeper-assembly-probe"
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2027.1.0"
+    },
+    {
+      "category": "synthetic",
+      "citation": {
+        "title": "Synthetic assembly acceptance; no legal claim."
+      },
+      "id": "pii.synthetic.zeta",
+      "matcher": {
+        "list": {
+          "package": [
+            "gatekeeper-assembly-probe"
+          ]
+        }
+      },
+      "severity": "error",
+      "sinceVersion": "2027.1.0"
+    }
+  ],
+  "schemaVersion": 1,
+  "version": "2027.1.0"
+}

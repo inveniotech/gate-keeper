@@ -138,6 +138,100 @@
       "expected": []
     },
     {
+      "name": "email-boundary-text-edges",
+      "path": "alerts/recipients.py",
+      "text": "ada@ledgerops.ng",
+      "rule": {
+        "id": "local.email",
+        "boundary": "email",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 16, "class": "alnum" }
+        ]
+      },
+      "expected": [{ "ruleId": "local.email", "line": 1, "column": 1 }]
+    },
+    {
+      "name": "email-boundary-sentence-dot-tail",
+      "path": "alerts/recipients.py",
+      "text": "to ada@ledgerops.ng.",
+      "rule": {
+        "id": "local.email",
+        "boundary": "email",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 16, "class": "alnum" }
+        ]
+      },
+      "expected": [{ "ruleId": "local.email", "line": 1, "column": 4 }]
+    },
+    {
+      "name": "email-boundary-dotted-local-part",
+      "path": "alerts/recipients.py",
+      "text": "to dipo.ada@ledgerops.ng",
+      "rule": {
+        "id": "local.email",
+        "boundary": "email",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 8, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 1, "max": 8, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 2, "max": 16, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 8, "class": "alnum" }
+        ]
+      },
+      "expected": [{ "ruleId": "local.email", "line": 1, "column": 4 }]
+    },
+    {
+      "name": "email-boundary-oversized-local-part",
+      "path": "alerts/recipients.py",
+      "text": "to dipo.ada.bola@ledgerops.ng",
+      "rule": {
+        "id": "local.email",
+        "boundary": "email",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 8, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 1, "max": 8, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 2, "max": 16, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 8, "class": "alnum" }
+        ]
+      },
+      "expected": []
+    },
+    {
+      "name": "email-boundary-trailing-label-tail",
+      "path": "alerts/recipients.py",
+      "text": "to ada@ledgerops.ng-uk",
+      "rule": {
+        "id": "local.email",
+        "boundary": "email",
+        "validator": "email-not-example-domain",
+        "shape": [
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "@" },
+          { "min": 1, "max": 32, "class": "alnum" },
+          { "min": 1, "max": 1, "literal": "." },
+          { "min": 2, "max": 16, "class": "alnum" }
+        ]
+      },
+      "expected": []
+    },
+    {
       "name": "location-path",
       "path": "config/app.env",
       "text": "BVN 32826314843",

@@ -1,0 +1,7 @@
+build==1.6.1
+mypy==1.18.2
+ruff==0.14.4
+twine==6.2.0
+Django==5.2.8
+fastapi==0.121.0
+httpx==0.28.1

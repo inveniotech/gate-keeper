@@ -9,7 +9,9 @@
     "Rebex.Elliptic.Ed25519": "Public domain",
     "SarifKit": "MIT",
     "System.CommandLine": "MIT",
-    "Tomlyn": "MIT"
+    "Tomlyn": "MIT",
+    "Microsoft.Extensions.Compliance.Redaction": "MIT",
+    "Serilog": "Apache-2.0"
   },
   "deniedLicences": [
     "AGPL-1.0",

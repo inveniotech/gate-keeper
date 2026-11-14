@@ -61,14 +61,14 @@ try {
     $tree = Join-Path $root "tree-$files"
     & node "$PSScriptRoot/../../tests/corpus/New-CorpusValues.mjs" --benchmark $tree --files $files
     if ($LASTEXITCODE -ne 0) { throw 'The deterministic benchmark repository could not be generated.' }
-    $folder = Join-Path $tree '.ndpa-check'
+    $folder = Join-Path $tree '.gatekeeper'
     New-Item -ItemType Directory -Path $folder | Out-Null
     $configuration = (@('schemaVersion = 1', 'profile = "default"', '[scan]', 'history = false', '[repository]', 'id = "synthetic/benchmark"', '') -join [char]10)
     if ($ReferencePack) {
       Copy-Item -LiteralPath $ReferencePack -Destination (Join-Path $folder 'reference.json')
-      $configuration += (@('[packs]', 'local = [".ndpa-check/reference.json"]', '') -join [char]10)
+      $configuration += (@('[packs]', 'local = [".gatekeeper/reference.json"]', '') -join [char]10)
     }
-    [IO.File]::WriteAllText((Join-Path $folder 'ndpa-check.toml'), $configuration)
+    [IO.File]::WriteAllText((Join-Path $folder 'gatekeeper.toml'), $configuration)
     $trees[$files] = $tree
     $manifests[$files] = Get-Content -LiteralPath "$tree.manifest.json" -Raw | ConvertFrom-Json
   }

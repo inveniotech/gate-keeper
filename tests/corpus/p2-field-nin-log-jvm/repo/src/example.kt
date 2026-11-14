@@ -1,0 +1,1 @@
+logger.info("{}", customer.nin);

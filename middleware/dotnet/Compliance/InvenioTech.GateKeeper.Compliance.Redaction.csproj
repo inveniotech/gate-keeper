@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>InvenioTech.GateKeeper.Compliance.Redaction</RootNamespace>
+    <AssemblyName>InvenioTech.GateKeeper.Compliance.Redaction</AssemblyName>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../version.txt').Trim())</Version>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../InvenioTech.GateKeeper.Middleware.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Approved under AGENTS.md rule 8 on 10 November 2026 for card P3-02; the redactor subclasses its Redactor type. -->
+    <PackageReference Include="Microsoft.Extensions.Compliance.Redaction" />
+  </ItemGroup>
+</Project>

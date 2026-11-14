@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\middleware\dotnet\AspNetCore\InvenioTech.GateKeeper.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\Compliance\InvenioTech.GateKeeper.Compliance.Redaction.csproj" />
+    <ProjectReference Include="..\..\middleware\dotnet\Serilog\InvenioTech.GateKeeper.Serilog.csproj" />
+  </ItemGroup>
+</Project>

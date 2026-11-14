@@ -10,7 +10,7 @@ namespace InvenioTech.GateKeeper.Engine;
 /// </summary>
 internal static class ScanExclusions
 {
-    private static readonly string[] ExcludedSegments = [".git", "node_modules", "bin", "obj", "dist", "build", "vendor", ".ndpa-check"];
+    private static readonly string[] ExcludedSegments = [".git", "node_modules", "bin", "obj", "dist", "build", "vendor", ".gatekeeper"];
 
     private static readonly string[] LockFileNames =
     [
