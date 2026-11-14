@@ -22,4 +22,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\cli\InvenioTech.GateKeeper.Cli.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../../samples/aspnetcore/SampleApplication.cs" Link="samples/aspnetcore.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../samples/express/app.mjs" Link="samples/express.mjs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../samples/nestjs/app.mjs" Link="samples/nestjs.mjs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../samples/spring-boot/src/main/java/sample/SampleApplication.java" Link="samples/spring-boot.java" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../rule-packs/bvn.pack.json" Link="samples/bvn.pack.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

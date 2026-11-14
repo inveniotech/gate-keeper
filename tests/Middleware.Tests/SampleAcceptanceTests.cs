@@ -1,12 +1,40 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using InvenioTech.GateKeeper.Sample.AspNetCore;
+using InvenioTech.GateKeeper.Middleware;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace InvenioTech.GateKeeper.Middleware.Tests;
 
 public sealed class SampleAcceptanceTests
 {
     private const string CommittedSyntheticValue = "32826314843";
+
+    [Theory]
+    [InlineData("synthetic-subject", true)]
+    [InlineData("other-subject", false)]
+    public async Task Sample_Should_FilterARealResponseAndCheckConsent_When_TheApplicationHandlesARequest(string subject, bool granted)
+    {
+        var content = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "packs", "bvn.pack.json"));
+        var verified = RuntimePacks.Load([TestPacks.SignInMemory(content, "bvn")], TestPacks.Catalogue);
+        var output = new StringWriter();
+        await using var app = SampleApplication.Create(verified, output);
+        var request = ((IApplicationBuilder)app).Build();
+        var context = new DefaultHttpContext { RequestServices = app.Services };
+        context.Request.Path = "/customer";
+        context.Request.QueryString = new QueryString($"?subject={subject}");
+        using var body = new MemoryStream();
+        context.Response.Body = body;
+
+        await request(context);
+
+        using var result = JsonDocument.Parse(body.ToArray());
+        result.RootElement.GetProperty("customer").GetProperty("bvn").GetString().Should().Be("bankVerificationNumber [REDACTED:pii.bvn]");
+        result.RootElement.GetProperty("granted").GetBoolean().Should().Be(granted);
+        output.ToString().Should().Contain("[REDACTED:pii.bvn]").And.NotContain(CommittedSyntheticValue).And.NotContain(subject);
+    }
 
     [Fact]
     public void Sample_Should_RedactBothLoggingPaths_When_ItStartsWithTheSignedPack()

@@ -47,6 +47,13 @@ jobs:
           npm ci --ignore-scripts
           npm run build
           npm run test:package
+      - name: Run the real Express and NestJS sample applications
+        run: |
+          npm ci --prefix samples --ignore-scripts
+          npm test --prefix samples
+          node samples/prepare-test-media.mjs
+          node samples/express/app.mjs artifacts/sample-media artifacts/sample-media/public-keys.json
+          node samples/nestjs/app.mjs artifacts/sample-media artifacts/sample-media/public-keys.json
   python:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -128,5 +135,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.14.3'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - name: Prepare public-only development media for the Spring Boot sample
+        run: node samples/prepare-test-media.mjs
       - name: Build hooks, exercise bounded responses and compile Java samples
         run: gradle -p middleware/jvm --no-daemon build verifyAdapters

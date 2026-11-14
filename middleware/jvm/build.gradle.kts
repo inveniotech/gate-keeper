@@ -30,7 +30,7 @@ subprojects {
         compilerOptions { jvmTarget.set(if (project.name == "spring-boot") JvmTarget.JVM_17 else JvmTarget.JVM_15) }
     }
 }
-tasks.register("verifyAdapters") { dependsOn(":logback:check", ":log4j2:check", ":spring-boot:check", ":spring-boot:compileBoot4Kotlin", "compileJavaSamples") }
+tasks.register("verifyAdapters") { dependsOn(":logback:check", ":log4j2:check", ":spring-boot:check", ":spring-boot:compileBoot4Kotlin", "compileJavaSamples", ":sample-spring-boot:check") }
 tasks.register<JavaCompile>("compileCoreSample") {
     dependsOn(":core:classes")
     source("sample/CoreExample.java")

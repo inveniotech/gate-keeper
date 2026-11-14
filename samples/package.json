@@ -1,0 +1,22 @@
+{
+  "name": "gate-keeper-samples",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=26" },
+  "scripts": {
+    "test": "node --test node.test.mjs",
+    "express": "node express/app.mjs",
+    "nestjs": "node nestjs/app.mjs"
+  },
+  "dependencies": {
+    "@inveniotech/gate-keeper": "file:../middleware/node",
+    "@nestjs/common": "12.5.0",
+    "@nestjs/core": "12.5.0",
+    "@nestjs/platform-express": "12.5.0",
+    "express": "5.3.0",
+    "pino": "10.4.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  }
+}
