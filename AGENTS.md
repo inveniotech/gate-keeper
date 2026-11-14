@@ -122,14 +122,6 @@
 - If the work only partly addresses the issue, reference the issue with `Refs #37` instead, so that the issue stays open.
 - In a stack, place the closing keyword on the pull request that merges into the default branch. GitHub closes an issue only when a pull request that targets the default branch is merged.
 
-### A9. Model routing
-
-37. **Route models by phase.** When the task is to implement a ticket, a task card, a work package or an issue, or to research one, you must split the work into three phases. Start that split yourself: the conversation does not need to mention models. Each phase runs in its own session. Where the harness can set a phase's model, this rule is the instruction to set it.
-    - **Plan** on a tier 1 model, the strongest model the harness offers from an allowed provider. Produce the plan and stop. This phase must not change production code.
-    - **Carry out the plan** on a tier 2 model, a faster and cheaper model. Implementation and research both use a tier 2 model for this phase.
-    - **Check** on a tier 1 model from a different model family than the model that carried out the plan. Use a fresh session that has the ticket and the result, and does not have the earlier phases' reasoning. An implementation check walks the review checklist in the execution model. A research check confirms that the notes answer the ticket, cite their sources, and keep findings separate from guesses.
-    A session that is already one of these phases, on the right tier, does that phase only and then hands the result to the next phase.
-
 ---
 
 ## Part B — Stack rules
