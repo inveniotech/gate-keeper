@@ -10,7 +10,7 @@ The `gatekeeper` command line. Work package P1-01 (issue #11) built the command 
 - `baseline [--evaluated-on YYYY-MM-DD]` scans the current repository using its configured local packs, applies exceptions, creates a missing fingerprint key and writes `.gatekeeper/baseline.json`. With no bundled pack in this build, an absent local pack is a tool error. Supply the key to continuous integration as a secret file; it never appears in output.
 - `CliModule.RunAsync` is the asynchronous entry point, with an optional repository root and cancellation token for hosts and tests.
 - `scan [--json] [--evaluated-on YYYY-MM-DD]` and the bare invocation load configured local packs, apply the effective profile, exceptions, baseline and severity threshold, then print findings grouped by ordinal file path, line, column and rule identifier. The plain summary always uses uncoloured text, including when `NO_COLOR` is present, and includes the history-scan caveat. `--json` writes the existing version-stamped Gate-Keeper evidence document, including rule identifiers, severities, paths, lines and citations. Diagnostics remain on standard error. A failed scan prints no partial result. No bundled pack is present yet; configure `packs.local`.
-- `init` and `scaffold consent` exit 2 with a message saying they are not in this build yet. The command line never pretends a scan ran.
+- `init` exits 2 with a message saying it is not in this build yet. The command line never pretends a scan ran.
 - Results go to the output writer, diagnostics to the error-writer (rule 31).
 
 Processor findings (P2-12, #64) also show the effective rule's categories in
@@ -22,6 +22,34 @@ citation, including history; ordinary rules omit it. The catalogue describes an
 integration reference and does not establish actual processing or a transfer.
 Matched values and source lines remain omitted. Default note severity does not
 fail the default error threshold.
+
+## Consent scaffolding (P3-06, issue #43)
+
+Run `gatekeeper scaffold consent --stack dotnet|node|jvm|python` from the
+application root, selecting one stack. It creates `consent/` with an
+application-owned consent provider and instructions for ASP.NET Core, Express,
+Spring Boot or FastAPI respectively. It performs no scan or network access and
+installs no dependencies. A successful invocation returns 0; a missing or invalid
+stack, inaccessible directory or existing `consent` path returns 2. Existing
+files are never overwritten, including on a second invocation. Generation stages
+both files before publishing the directory, so a failed write leaves no partial
+scaffold. Templates are embedded data; output is version-stamped UTF-8 without a
+byte-order mark, with LF endings and no generation timestamp.
+
+The provider implements the existing consent contract (F-005, UC-003). Its
+append-only `granted` and `withdrawn` events retain the subject identifier,
+namespaced purpose, UTC time from an injected clock, channel and notice version.
+The latest appended event for that subject and purpose supplies current state;
+no event means denied. Granting and withdrawal use the same record operation.
+The generated instructions show framework registration and explain how to wire
+the helper into the application's existing authenticated flow. This helper
+applies only to processing whose lawful basis is consent.
+
+The in-memory store is a starting point. Applications must replace it with
+durable storage before deployment and authorise access to each subject's events.
+The generator does not create endpoints, a user interface or a database.
+Run the acceptance checks in [tests/scaffold](../tests/scaffold/README.md) to
+verify the templates against the real adapters.
 
 ## Dependencies
 

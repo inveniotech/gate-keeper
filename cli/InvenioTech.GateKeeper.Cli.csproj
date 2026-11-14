@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ConsentTemplates/**/*.cs" />
+    <EmbeddedResource Include="ConsentTemplates/dotnet/*" LogicalName="ConsentTemplates/dotnet/%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="ConsentTemplates/node/*" LogicalName="ConsentTemplates/node/%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="ConsentTemplates/jvm/*" LogicalName="ConsentTemplates/jvm/%(Filename)%(Extension)" WithCulture="false" />
+    <EmbeddedResource Include="ConsentTemplates/python/*" LogicalName="ConsentTemplates/python/%(Filename)%(Extension)" WithCulture="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Already approved in AGENTS.md rule 8; the owner confirmed the approval for the hand-rolled parser's replacement on 3 November 2026. -->
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>

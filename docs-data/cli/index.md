@@ -24,6 +24,6 @@ Commands:
   doctor          Checks configuration, rule packs, Git and output access without scanning source
   support-bundle  Writes a local ZIP of masked configuration, versions and finding counts
   version         Prints the product version and the bundled pack version
-  scaffold        Scaffolds a helper into an application. This build carries the 'consent' subcommand; the scaffolds for the other helpers arrive in Phase 3.
+  scaffold        Scaffolds a helper into an application. This build carries the 'consent' subcommand.
 
 ```

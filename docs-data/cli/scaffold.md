@@ -6,7 +6,7 @@ The exact help text of this build follows, captured from the command line itself
 
 ```text
 Description:
-  Scaffolds a helper into an application. This build carries the 'consent' subcommand; the scaffolds for the other helpers arrive in Phase 3.
+  Scaffolds a helper into an application. This build carries the 'consent' subcommand.
 
 Usage:
   gatekeeper scaffold [command] [options]
@@ -15,6 +15,6 @@ Options:
   -?, -h, --help  Show help and usage information
 
 Commands:
-  consent  Scaffolds the consent helper into an application; built in a Phase 3 release
+  consent  Creates an append-only consent provider and framework instructions in a new consent/ directory
 
 ```

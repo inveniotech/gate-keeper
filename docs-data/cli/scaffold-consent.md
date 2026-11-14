@@ -6,12 +6,13 @@ The exact help text of this build follows, captured from the command line itself
 
 ```text
 Description:
-  Scaffolds the consent helper into an application; built in a Phase 3 release
+  Creates an append-only consent provider and framework instructions in a new consent/ directory
 
 Usage:
   gatekeeper scaffold consent [options]
 
 Options:
-  -?, -h, --help  Show help and usage information
+  --stack <dotnet|jvm|node|python> (REQUIRED)  The application stack: dotnet (ASP.NET Core), node (Express), jvm (Spring Boot) or python (FastAPI)
+  -?, -h, --help                               Show help and usage information
 
 ```

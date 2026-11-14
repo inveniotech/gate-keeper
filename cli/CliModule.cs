@@ -60,6 +60,7 @@ public static class CliModule
     private static async Task<int> RunCoreAsync(string[] args, TextWriter? output, TextWriter? errors,
         string? rootPath, Func<IReadOnlyList<Rule>, MatcherEngine>? matcherFactory, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         output ??= Console.Out;
         errors ??= Console.Error;
         var parsed = PrepareInvocation(args, output, errors, rootPath, matcherFactory);
@@ -112,11 +113,10 @@ public static class CliModule
 
         var scaffold = new Command(
             "scaffold",
-            "Scaffolds a helper into an application. This build carries the 'consent' subcommand; the scaffolds for the other helpers arrive in Phase 3.");
-        scaffold.Subcommands.Add(NotImplementedCommand("consent", "Scaffolds the consent helper into an application; built in a Phase 3 release", errors));
+            "Scaffolds a helper into an application. This build carries the 'consent' subcommand.");
+        scaffold.Subcommands.Add(ConsentScaffoldCli.Create(output, errors, rootPath ?? Directory.GetCurrentDirectory()));
 
-        // The scaffold need not run unimplemented sub-commands: the root law for
-        // the unimplemented scaffold prints what build carries.
+        // A bare scaffold invocation must explain the required subcommand without writing files.
         scaffold.SetAction(_ =>
         {
             errors.WriteLine(
@@ -207,6 +207,9 @@ public static class CliModule
                 $"The '{matchedCommand.Name}' command does not know '{first}'. This build carries 'scaffold consent'. " +
                 $"Run the binary with {HelpFlag} to see what it carries.";
         }
+
+        if (matchedCommand.Name == "consent")
+            return ConsentScaffoldCli.Usage;
 
         return
             $"The '{matchedCommand.Name}' command takes no other argument in this build. '{first}' was passed with it. " +
