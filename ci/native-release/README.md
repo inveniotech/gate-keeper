@@ -4,6 +4,31 @@ P1-15 builds the real CLI for Windows, Linux and macOS on x64 and arm64, includi
 
 macOS binaries are unsigned and are not notarised. macOS may display an operating-system warning when a downloaded binary is opened. Windows signing and the fresh Windows 11 Smart App Control test remain owner release checks; this workflow does not claim either has been completed (IQ-18).
 
+## Publish an alpha for code-signing review (P4-01, #46)
+
+The `Publish CLI alpha` workflow runs when an owner pushes a tag of the form `cli-v0.2.0-alpha.1`. It calls the existing native workflow at that same tagged commit, including all eight runtime identifiers, corpus smoke tests, size checks and paired benchmark gates. No production key or SignPath account is needed for this unsigned alpha. Release signing and signature-verifying installers remain outstanding under #46; this workflow cannot publish stable or beta releases.
+
+After merging the workflow, an owner runs these commands from an up-to-date checkout of the intended release commit. The numeric version must match `EngineProduct.EngineVersion` in that commit. Choose a new positive alpha number for each release; never move a published tag.
+
+```sh
+git tag -a cli-v0.2.0-alpha.1 -m "Gate-Keeper 0.2.0 alpha 1 for code-signing review"
+git push origin cli-v0.2.0-alpha.1
+```
+
+Watch `Publish CLI alpha` in GitHub Actions. It validates the tag before starting native builds. Once the builds and benchmarks succeed, it verifies every archive against both its metadata and checksum sidecar, and rejects missing platforms, unexpected files, mismatched engine versions and damaged archives. It creates a fresh `SHA256SUMS` with ordinally sorted filenames, generates GitHub build attestations for the eight archives and manifest, creates a draft containing all nine assets and the measured release notes, then publishes it as a prerelease without making it the latest release. The owner pushing the tag authorises that publication. Repository Actions policy must permit the job's `contents: write`, `id-token: write` and `attestations: write` permissions; no personal access token is required.
+
+The public review link is `https://github.com/inveniotech/gate-keeper/releases/tag/cli-v0.2.0-alpha.1`. Send that link to the signing provider after the workflow finishes. Windows executables are unsigned; SmartScreen may warn and Smart App Control may block them. macOS executables are unsigned and are not notarised. The release notes explicitly state that `SHA256SUMS` has no detached Ed25519 signature. The archive checksums detect changed bytes; they do not authenticate the publisher. Customers can verify the workflow provenance separately:
+
+```sh
+gh attestation verify gatekeeper-win-x64.zip --repo inveniotech/gate-keeper
+```
+
+The alpha suffix identifies the release; the CLI and evidence retain their existing numeric engine version. The CLI does not yet bundle a rule pack. Use configured local rule packs for evaluation. This alpha does not claim completed clean-machine installation checks or production readiness.
+
+If any build, validation or attestation fails, the workflow does not publish a release. If asset upload or publication fails after draft creation, inspect the draft and run logs before retrying. The workflow never overwrites an existing release or its assets. A complete draft can be reviewed and published manually; an incomplete draft needs owner recovery. Releases created with the workflow token do not trigger other release-event workflows, so the separate docs-data attachment workflow will not run automatically.
+
+Run the deterministic assembly and rejection tests with `node --test ci/native-release/alpha-release.test.mjs`. They run in the native workflow on pull requests and before an alpha build. They use synthetic archive bytes and do not publish anything. Existing native archive-integrity tests separately check real ZIP packaging.
+
 ## Reproduce native validation
 
 ```powershell

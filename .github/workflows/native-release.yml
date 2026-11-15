@@ -1,5 +1,6 @@
 name: Native release candidates
 on:
+  workflow_call:
   workflow_dispatch:
   pull_request:
     paths:
@@ -87,6 +88,7 @@ jobs:
       - name: Test the deterministic generator and regression arithmetic
         run: |
           node --test candidate/ci/native-release/benchmark-generator.test.mjs
+          node --test candidate/ci/native-release/alpha-release.test.mjs
           pwsh -File candidate/ci/native-release/Test-BenchmarkMath.ps1
           pwsh -File candidate/ci/native-release/Test-PackNative.ps1
           dotnet test candidate/tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests --verbosity quiet
