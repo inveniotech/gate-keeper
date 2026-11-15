@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: Apache-2.0
+name: Publish CLI alpha
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/alpha-release.yml'
+      - 'ci/native-release/alpha-release*.mjs'
+  push:
+    tags:
+      - 'cli-v*-alpha.*'
+permissions:
+  contents: read
+concurrency:
+  group: cli-alpha-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - name: Test release assembly
+        run: node --test ci/native-release/alpha-release.test.mjs
+      - name: Validate the alpha tag
+        if: github.event_name == 'push'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node ci/native-release/alpha-release.mjs --validate-tag
+  build:
+    if: github.event_name == 'push'
+    needs: validate
+    uses: ./.github/workflows/native-release.yml
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: artifacts
+      - name: Verify and assemble all eight native archives
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node ci/native-release/alpha-release.mjs
+      - name: Attest the release archives and checksum manifest
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            release/*.zip
+            release/*.tar.gz
+            release/SHA256SUMS
+      - name: Create a draft with every asset, then publish the alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" release/*.zip release/*.tar.gz release/SHA256SUMS \
+            --verify-tag --draft --prerelease --latest=false \
+            --title "Gate-Keeper ${RELEASE_TAG#cli-v}" --notes-file release/release-notes.md
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease --latest=false
