@@ -9,7 +9,7 @@ namespace InvenioTech.GateKeeper.Sample.AspNetCore;
 /// </summary>
 public static class Program
 {
-    public static int Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         if (args.Length < 2)
         {
@@ -21,6 +21,6 @@ public static class Program
             return 1;
         }
 
-        return SampleApplication.Run(args[0], args[1], Console.Out, Console.Error);
+        return await SampleApplication.RunAsync(args[0], args[1], Console.Out, Console.Error);
     }
 }
