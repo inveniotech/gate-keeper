@@ -29,6 +29,30 @@ If any build, validation or attestation fails, the workflow does not publish a r
 
 Run the deterministic assembly and rejection tests with `node --test ci/native-release/alpha-release.test.mjs`. They run in the native workflow on pull requests and before an alpha build. They use synthetic archive bytes and do not publish anything. Existing native archive-integrity tests separately check real ZIP packaging.
 
+## Verified installers (P4-01, #46)
+
+The owner approved Node.js 26 or later as an installation prerequisite on 16 November 2026. `install.ps1` and `install.sh` use its built-in Ed25519 and SHA-256 operations with no third-party packages. They also require `tar`, supplied by Windows 11 and ordinarily installed on Linux and macOS. Use these scripts from a reviewed repository checkout; retain `ci/native-release/install.mjs` beside them in its repository location. They download only the explicitly requested CLI version, with no latest-version lookup. The installed native CLI itself does not require Node.js.
+
+The release signer is not configured yet. The current unsigned alpha deliberately cannot pass these installers. Before a production installation can succeed, the release must include `SHA256SUMS.sig`: a raw 64-byte pure Ed25519 signature over the exact UTF-8 bytes of `SHA256SUMS`, including its LF line endings and final newline. It is not a signature of the hexadecimal checksum or of a re-serialised document. The installer requires an independently obtained, public-only PEM SubjectPublicKeyInfo verification key. It never downloads a public key from the release, requests a private key, or permits unsigned installation. Provisioning the production signer and distributing its trusted public key remain owner work. SignPath Windows code signing is separate from this detached manifest signature.
+
+From the repository root, use a future release that actually has the detached signature:
+
+```powershell
+./install.ps1 -Version 0.2.0-alpha.3 -PublicKey C:/trusted/release-public.pem -Destination C:/tools/gatekeeper-alpha3
+```
+
+```sh
+sh ./install.sh --version 0.2.0-alpha.3 --public-key /trusted/release-public.pem --destination "$HOME/.local/gatekeeper-alpha3"
+```
+
+The example version is illustrative, not a claim that alpha.3 exists. Linux defaults to the glibc archive; use `--musl` only on a musl-based Linux distribution. x64 and arm64 are selected from the running Node process architecture. Use native Node.js on the target operating system and architecture. To verify a previously downloaded release without network access, add `-SourceDirectory DIRECTORY` on PowerShell or `--source-directory DIRECTORY` on the shell. That directory must contain the archive, manifest and detached signature; all checks still apply.
+
+The installer verifies the signature before reading manifest entries, rejects duplicate or malformed checksum entries, verifies the selected archive hash, checks that the archive contains exactly one regular executable within the 10 MiB size budget, and installs without replacing an existing executable. Downloads and extraction have size and time bounds. No executable from the archive is run during installation. There is no PATH or security-setting change. Add the chosen directory to PATH yourself, or invoke the installed executable by its full path and check `--version`.
+
+To uninstall, remove only the installed `gatekeeper.exe` or `gatekeeper` file from the directory you selected, remove that directory if it is empty, and remove any PATH entry you added. No service or background process is installed. Windows binaries still need Windows code signing and macOS binaries are not notarised; manifest verification does not bypass operating-system security policies.
+
+Run `node --test ci/native-release/install.test.mjs` to test signed development-only packages, exact extraction and rejection of missing signatures, tampering, wrong keys, duplicate entries, unpinned versions, unexpected archive contents and existing executables. These tests run in each native operating-system job. Production-key use, a production-signed release and clean-machine Windows, Linux and macOS acceptance are not claimed by these tests.
+
 ## Reproduce native validation
 
 ```powershell
