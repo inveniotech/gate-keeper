@@ -29,6 +29,7 @@
     "tests/conformance/vectors.json"
   ],
   "words": [
+    "GNUPGHOME",
     "ASGI",
     "fastapi",
     "httpx",

@@ -10,6 +10,15 @@ subprojects { module ->
         publications {
             library(MavenPublication) {
                 from components.java
+                if (module.name != 'core') {
+                    artifact(tasks.register('releaseSourcesJar', Jar) {
+                        archiveClassifier = 'sources'
+                        from(module.file('src/main/kotlin'))
+                        from(module.file('src/main/java'))
+                        preserveFileTimestamps = false
+                        reproducibleFileOrder = true
+                    })
+                }
                 artifactId = "gate-keeper-${module.name}"
                 pom {
                     name = "Gate-Keeper ${module.name}"
@@ -28,7 +37,7 @@ subprojects { module ->
         repositories { maven { name = 'dryRun'; url = rootProject.layout.buildDirectory.dir('publication').get().asFile.toURI() } }
     }
     // Signing is opt-in and consumes an externally configured Gradle signatory.
-    // The dry run never reads a signing key or contacts a remote registry.
+    // The signed dry run uses only an isolated disposable development key.
     signing {
         required { providers.gradleProperty('signRelease').orNull == 'true' }
         if (providers.gradleProperty('signRelease').orNull == 'true') {

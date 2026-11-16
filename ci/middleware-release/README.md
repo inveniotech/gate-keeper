@@ -7,7 +7,7 @@ built-in plugins. Existing conformance and NativeAOT checks remain in place.
 
 ## Reproduce
 
-Use the repository's pinned .NET SDK, Node.js 26, JDK 21 and Gradle 8.14.3:
+Use the repository's pinned .NET SDK, Node.js 26, JDK 21, Gradle 8.14.3 and GnuPG:
 
 ```powershell
 ./tests/conformance/Sync-RuntimeVersion.ps1 -Check
@@ -17,8 +17,7 @@ npm run build --prefix middleware/node
 npm run test:package --prefix middleware/node
 node --test ci/middleware-release/release.test.mjs
 node ci/middleware-release/npm.mjs
-gradle -p middleware/jvm --no-daemon publishAllPublicationsToDryRunRepository
-gradle -p ci/middleware-release/maven-consumer --no-daemon run
+./ci/middleware-release/maven-signed.ps1
 ```
 
 The workflow retains NuGet and npm archives and a local Maven repository for
@@ -28,8 +27,19 @@ four middleware libraries, without project references. npm installs the real
 archive in a temporary project and checks every ESM and CommonJS entry point;
 the existing package test checks declarations. Maven resolves all four modules
 from the local repository and executes the core consent helper. Sources and
-Javadoc jars accompany each Maven module. The Java documentation tool documents
+Javadoc jars accompany each Maven module. The signed Maven runner generates an
+isolated, unprotected development key that expires after one day, signs the local
+publication, verifies all 16 required POM and jar signatures and proves that
+changed bytes fail verification. It then executes the independent consumer and
+removes the temporary keyring. Only its labelled development public key and
+signed development artefacts are retained; no private key enters the repository
+or workflow artefacts. These signatures are test evidence, not release signatures.
+The Java documentation tool documents
 Java sources; Kotlin hook documentation remains in the source jar and READMEs.
+
+If tools are outside `PATH`, pass `-GradleCommand` and `-GpgCommand` with their
+absolute executable paths. Git for Windows GPG paths are converted for its
+Unix compatibility layer. The keyring uses a short path for agent sockets.
 
 ## Versions and release handoff
 
@@ -50,13 +60,14 @@ has been submitted; approval has not been confirmed. PyPI publication remains
 outside the three-ecosystem MVP dry run described here.
 
 Actual registry publication belongs to P4-09 and requires human review. Before
-publication, confirm the npm scope and trusted publisher for `publish-node.yml`,
-any adopted NuGet package-signing policy. The local dry run
+publication, confirm the npm scope and trusted publisher for `publish-node.yml`
+and any adopted NuGet package-signing policy. The local dry run
 does not prove that these other accounts are configured. npm's existing human-triggered
 workflow publishes with provenance; this workflow does not dispatch it.
 
 Maven publication emits Central metadata, dependency POMs, sources and Javadoc
-jars. A human can enable Gradle's external GPG signatory with `-P signRelease=true`
+jars. The signed dry run exercises Gradle's external GPG signatory with a
+disposable development key. A human can enable the approved release signatory with `-P signRelease=true`
 in the approved release environment; it then requires signatures and fails if
 the signatory is unavailable. Never place production keys in the repository or
 pass them to this dry run. The reviewed local repository must be signed and

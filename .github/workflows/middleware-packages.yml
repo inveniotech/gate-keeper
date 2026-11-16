@@ -54,10 +54,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.14.3'
-      - name: Publish all four modules to a local Maven repository
-        run: gradle -p middleware/jvm --no-daemon publishAllPublicationsToDryRunRepository
-      - name: Resolve and execute an independent consumer
-        run: gradle -p ci/middleware-release/maven-consumer --no-daemon run
+      - name: Sign locally with a disposable development key and verify every required artefact
+        shell: pwsh
+        run: ./ci/middleware-release/maven-signed.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: middleware-maven
