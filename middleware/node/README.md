@@ -177,3 +177,8 @@ A person configures npm trusted publishing for `.github/workflows/publish-node.y
 and manually dispatches it for a reviewed release. That workflow validates the
 package and uses `npm publish --provenance` with OpenID Connect identity; it has
 no pull-request or scheduled trigger. This implementation does not publish.
+
+P3-08 also installs the generated archive in an independent consumer project.
+Run `node ci/middleware-release/npm.mjs` from the repository root after building.
+See [the package dry-run guide](../../ci/middleware-release/README.md) for the
+three ecosystems, version source and human publication prerequisites.

@@ -13,4 +13,5 @@
     <!-- Approved under AGENTS.md rule 8 on 10 November 2026 for card P3-02; the redactor subclasses its Redactor type. -->
     <PackageReference Include="Microsoft.Extensions.Compliance.Redaction" />
   </ItemGroup>
+  <Import Project="../../../ci/middleware-release/Package.props" />
 </Project>
