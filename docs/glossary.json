@@ -81,8 +81,12 @@
     {
       "variant": "gatekeeper-ndpa",
       "appliesTo": "both",
-      "caseSensitive": true,
-      "allowedSuffixes": [ "-check" ]
+      "caseSensitive": true
+    },
+    {
+      "variant": "ndpa-check",
+      "appliesTo": "both",
+      "caseSensitive": true
     }
   ]
 }
