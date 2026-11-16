@@ -40,11 +40,14 @@ package version. IQ-50 permits independent versions and requires Semantic
 Versioning for middleware. This card does not introduce release-please or change
 the version policy; separate version streams need matching runtime stamps.
 
+The owner confirmed on 16 November 2026 that Maven Central verification of the
+`africa.gatekeeper` namespace completed successfully. This records the owner's
+confirmation; the package dry run does not independently inspect the portal.
+
 Actual registry publication belongs to P4-09 and requires human review. Before
 publication, confirm the npm scope and trusted publisher for `publish-node.yml`,
-NuGet ownership and any adopted package-signing policy, and ownership of the
-`africa.gatekeeper` namespace in the Maven Central portal. The local dry run
-does not prove that these accounts are configured. npm's existing human-triggered
+NuGet ownership and any adopted package-signing policy. The local dry run
+does not prove that these other accounts are configured. npm's existing human-triggered
 workflow publishes with provenance; this workflow does not dispatch it.
 
 Maven publication emits Central metadata, dependency POMs, sources and Javadoc
