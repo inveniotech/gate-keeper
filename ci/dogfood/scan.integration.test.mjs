@@ -10,14 +10,14 @@ import { fileURLToPath } from 'node:url';
 test('dogfood runs the real CLI and retains evidence for findings while rejecting tool failures', () => {
   const runner = fileURLToPath(new URL('./scan.mjs', import.meta.url));
   const cli = process.env.GATEKEEPER_TEST_BINARY ? resolve(process.env.GATEKEEPER_TEST_BINARY)
-    : fileURLToPath(new URL('../../cli/bin/Release/net10.0/gatekeeper-ndpa-check.dll', import.meta.url));
+    : fileURLToPath(new URL('../../cli/bin/Release/net10.0/gatekeeper.dll', import.meta.url));
   assert.ok(existsSync(cli), 'Build cli in Release before running this integration test.');
   const work = mkdtempSync(join(tmpdir(), 'gate-keeper-dogfood-'));
   try {
     const root = join(work, 'repo');
-    const config = join(root, '.ndpa-check');
+    const config = join(root, '.gatekeeper');
     mkdirSync(config, { recursive: true });
-    writeFileSync(join(config, 'ndpa-check.toml'), 'schemaVersion = 1\n[scan]\nhistory = false\n[packs]\nlocal = [".ndpa-check/probe.json"]\n');
+    writeFileSync(join(config, 'gatekeeper.toml'), 'schemaVersion = 1\n[scan]\nhistory = false\n[packs]\nlocal = [".gatekeeper/probe.json"]\n');
     copyFileSync(new URL('../zero-egress/probe.pack.json', import.meta.url), join(config, 'probe.json'));
     const invoke = (out, date = '2026-11-05') => spawnSync(process.execPath, [runner, cli, root, date, out], { encoding: 'utf8' });
     const clean = invoke(join(work, 'clean'));
@@ -34,7 +34,7 @@ test('dogfood runs the real CLI and retains evidence for findings while rejectin
     assert.equal(readFileSync(join(work, 'findings/evidence.json'), 'utf8'), evidence);
     assert.equal(invoke(join(root, 'nested-output')).status, 2, 'Output cannot affect the scanned tree.');
     assert.equal(invoke(join(work, 'invalid-date'), '2026-02-30').status, 2);
-    writeFileSync(join(config, 'ndpa-check.toml'), 'schemaVersion = 999\n');
+    writeFileSync(join(config, 'gatekeeper.toml'), 'schemaVersion = 999\n');
     const invalid = invoke(join(work, 'invalid-config'));
     assert.equal(invalid.status, 2);
     assert.equal(existsSync(join(work, 'invalid-config/evidence.json')), false);

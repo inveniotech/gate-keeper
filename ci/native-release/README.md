@@ -63,6 +63,4 @@ $paths = @('Directory.Build.props', 'cli/ScanCli.cs', 'src/Engine/MatcherEngine.
 $paths | ForEach-Object { "$(git rev-parse "707df6d:$_") $_" } > ci/native-release/baseline-instrumentation-base.txt
 ```
 
-A baseline that predates the jurisdiction-neutral names (IQ-92) still builds `gatekeeper-ndpa-check` and reads `.ndpa-check/`. `Rename-BaselineNames.ps1` renames those string constants in the baseline's `cli/` and `src/` sources, so both arms scan the same generated tree. It changes no matching or scanning code, and it does nothing to a baseline that already uses `gatekeeper`, `.gatekeeper/` and `gatekeeper.toml`.
-
 The synthetic reference pack drives repeated shape matching and named-validator rejection over the generated alphabetic text, with no findings or matched values emitted. This provides measurable per-file work and live regex counters without changing either comparison arm's input. Counter tests assert exact search counts and input-byte sums and prove that findings are unchanged. Run them with `dotnet test tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests`.

@@ -52,6 +52,7 @@ Assert-Contains $proseText 'Gatekeeper' 'The prose fixture should flag the banne
 Assert-Contains $proseText 'Gate Keeper' 'The prose fixture should flag the banned name variant "Gate Keeper".'
 Assert-Contains $proseText 'gate_keeper' 'The prose fixture should flag the banned name variant "gate_keeper".'
 Assert-Contains $proseText 'GateKeeper' 'The prose fixture should flag the Pascal name form "GateKeeper", which is reserved for identifiers.'
+Assert-Contains $proseText 'ndpa-check' 'The prose fixture should flag the retired name "ndpa-check" in any form.'
 Assert-Contains $proseText 'use "rule pack"' 'The prose finding should name the approved term "rule pack".'
 
 # Banned vocabulary and name variants in identifiers.

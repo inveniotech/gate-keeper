@@ -93,7 +93,6 @@ jobs:
           pwsh -File candidate/ci/native-release/Test-PackNative.ps1
           dotnet test candidate/tests/Engine.Tests -p:BenchmarkInstrumentation=true --filter FullyQualifiedName~BenchmarkInstrumentationTests --verbosity quiet
           pwsh -File candidate/ci/native-release/Enable-BaselineInstrumentation.ps1 -BaselineRoot baseline
-          pwsh -File candidate/ci/native-release/Rename-BaselineNames.ps1 -BaselineRoot baseline
       - name: Publish both comparison arms on the same runner
         run: |
           dotnet publish baseline/cli -p:BenchmarkInstrumentation=true -c Release -r linux-x64 -p:PublishAot=true -p:PublishTrimmed=true -p:OptimizationPreference=Size -p:StackTraceSupport=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true -p:NuGetLockFilePath=obj/packages.native.lock.json -o artifacts/baseline
