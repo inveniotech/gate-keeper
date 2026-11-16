@@ -7,6 +7,8 @@ on:
       - 'cli/**'
       - 'src/**'
       - 'ci/native-release/**'
+      - 'install.sh'
+      - 'install.ps1'
       - 'tests/corpus/New-CorpusValues.mjs'
       - '.github/workflows/native-release.yml'
       - 'Directory.*.props'
@@ -31,6 +33,11 @@ jobs:
           - { rid: osx-x64, os: macos-26-intel, musl: false }
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - name: Test verified installation on the native operating system
+        run: node --test ci/native-release/install.test.mjs
       - uses: actions/setup-dotnet@v4
         if: matrix.musl == false
         with:
