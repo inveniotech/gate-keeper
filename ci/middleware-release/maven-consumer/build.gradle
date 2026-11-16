@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
+plugins { id 'application' }
+repositories {
+    maven {
+        url = file('../../../middleware/jvm/build/publication')
+        content { includeGroup 'africa.gatekeeper' }
+    }
+    mavenCentral { content { excludeGroup 'africa.gatekeeper' } }
+}
+def adapterVersion = file('../../../middleware/version.txt').text.trim()
+dependencies {
+    ['core', 'logback', 'log4j2', 'spring-boot'].each {
+        implementation "africa.gatekeeper:gate-keeper-${it}:${adapterVersion}"
+    }
+}
+application { mainClass = 'Consumer' }
+layout.buildDirectory = file('../../../artifacts/middleware/maven-consumer')

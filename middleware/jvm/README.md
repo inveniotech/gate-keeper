@@ -142,3 +142,13 @@ application-provided). These established upstream projects provide the named
 hooks; no framework is bundled. The only shipped additional runtime library
 is the Kotlin standard library in integration dependency metadata. The core
 has no third-party dependency; native ahead-of-time .NET concerns do not apply.
+
+## Package validation
+
+Run `gradle -p middleware/jvm publishAllPublicationsToDryRunRepository` from the
+repository root, followed by
+`gradle -p ci/middleware-release/maven-consumer run`. These commands publish the
+four modules to a local file repository and execute an independent consumer.
+The sample application is excluded from publication. See
+[the package dry-run guide](../../ci/middleware-release/README.md) for metadata,
+versioning, signing and Maven Central namespace prerequisites.

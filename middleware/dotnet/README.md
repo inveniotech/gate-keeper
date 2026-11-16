@@ -145,3 +145,11 @@ lines without a warning.
 | Web framework | ASP.NET Core: one middleware, an endpoint filter for minimal APIs, and a result filter for MVC controllers |
 | Package | `InvenioTech.GateKeeper.*` on NuGet |
 | Logging | `Microsoft.Extensions.Logging` through the `Microsoft.Extensions.Compliance.Redaction` abstractions, and Serilog |
+
+## Package validation
+
+Run `./ci/middleware-release/nuget.ps1` from the repository root. It packs all four
+middleware libraries and their Engine and Signing dependencies, then restores,
+compiles and executes an independent consumer using the local feed. Package
+versions follow `middleware/version.txt`. No registry upload or package signing
+occurs. See [the package dry-run guide](../../ci/middleware-release/README.md).

@@ -17,7 +17,7 @@ subprojects {
     extensions.configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.toVersion(if (name == "spring-boot") 17 else 15)
         targetCompatibility = sourceCompatibility
-        withSourcesJar()
+        if (project.name == "core") withSourcesJar()
     }
     tasks.withType<JavaCompile>().configureEach { options.release.set(if (project.name == "spring-boot") 17 else 15) }
     tasks.withType<Jar>().configureEach { archiveBaseName.set("gate-keeper-${project.name}"); isPreserveFileTimestamps = false; isReproducibleFileOrder = true }
@@ -47,3 +47,5 @@ tasks.register<JavaCompile>("compileJavaSamples") {
     destinationDirectory.set(layout.buildDirectory.dir("sample/hooks")); options.release.set(17)
     sourceCompatibility = "17"; targetCompatibility = "17"
 }
+
+apply(from = "../../ci/middleware-release/maven.gradle")

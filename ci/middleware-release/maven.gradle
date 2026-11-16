@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+// Gradle's built-in plugins add no shipped runtime dependency.
+subprojects { module ->
+    if (module.name == 'sample-spring-boot') return
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+    java { withJavadocJar() }
+    tasks.named('javadocJar', Jar) { from(module.file('README.md')) { into 'guide' } }
+    publishing {
+        publications {
+            library(MavenPublication) {
+                from components.java
+                artifactId = "gate-keeper-${module.name}"
+                pom {
+                    name = "Gate-Keeper ${module.name}"
+                    description = 'Offline verified rule-pack loading, redaction and consent helpers.'
+                    url = 'https://github.com/inveniotech/gate-keeper'
+                    licenses { license { name = 'Apache License, Version 2.0'; url = 'https://www.apache.org/licenses/LICENSE-2.0.txt' } }
+                    developers { developer { id = 'inveniotech'; name = 'InvenioTech'; url = 'https://gatekeeper.africa' } }
+                    scm {
+                        connection = 'scm:git:https://github.com/inveniotech/gate-keeper.git'
+                        developerConnection = 'scm:git:ssh://git@github.com/inveniotech/gate-keeper.git'
+                        url = 'https://github.com/inveniotech/gate-keeper'
+                    }
+                }
+            }
+        }
+        repositories { maven { name = 'dryRun'; url = rootProject.layout.buildDirectory.dir('publication').get().asFile.toURI() } }
+    }
+    // Signing is opt-in and consumes an externally configured Gradle signatory.
+    // The dry run never reads a signing key or contacts a remote registry.
+    signing {
+        required { providers.gradleProperty('signRelease').orNull == 'true' }
+        if (providers.gradleProperty('signRelease').orNull == 'true') {
+            useGpgCmd()
+            sign publishing.publications.library
+        }
+    }
+}

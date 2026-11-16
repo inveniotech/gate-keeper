@@ -8,4 +8,5 @@
     <InternalsVisibleTo Include="InvenioTech.GateKeeper.Engine.Tests" />
     <ProjectReference Include="../../src/Engine/InvenioTech.GateKeeper.Engine.csproj" />
   </ItemGroup>
+  <Import Project="../../ci/middleware-release/Package.props" />
 </Project>

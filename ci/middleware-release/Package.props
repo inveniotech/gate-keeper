@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../middleware/version.txt').Trim())</Version>
+    <PackageId>$(MSBuildProjectName)</PackageId>
+    <Authors>InvenioTech</Authors>
+    <Description>Offline Gate-Keeper rule matching, verified pack loading and middleware integration.</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/inveniotech/gate-keeper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/inveniotech/gate-keeper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+</Project>

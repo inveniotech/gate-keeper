@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: Apache-2.0
+name: Middleware package dry runs
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  nuget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Restore, pack and consume the NuGet dependency graph
+        shell: pwsh
+        run: ./ci/middleware-release/nuget.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: middleware-nuget
+          path: artifacts/middleware/nuget/*nupkg
+          if-no-files-found: error
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - name: Check versions and archive validation
+        shell: pwsh
+        run: ./tests/conformance/Sync-RuntimeVersion.ps1 -Check
+      - name: Build, pack and consume both module formats
+        run: |
+          node --test ci/middleware-release/release.test.mjs
+          npm ci --prefix middleware/node --ignore-scripts
+          npm run build --prefix middleware/node
+          npm run test:package --prefix middleware/node
+          node ci/middleware-release/npm.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: middleware-npm
+          path: artifacts/middleware/npm/*.tgz
+          if-no-files-found: error
+  maven:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Publish all four modules to a local Maven repository
+        run: gradle -p middleware/jvm --no-daemon publishAllPublicationsToDryRunRepository
+      - name: Resolve and execute an independent consumer
+        run: gradle -p ci/middleware-release/maven-consumer --no-daemon run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: middleware-maven
+          path: middleware/jvm/build/publication/
+          if-no-files-found: error
