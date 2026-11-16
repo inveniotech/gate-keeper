@@ -44,9 +44,14 @@ The owner confirmed on 16 November 2026 that Maven Central verification of the
 `africa.gatekeeper` namespace completed successfully. This records the owner's
 confirmation; the package dry run does not independently inspect the portal.
 
+The owner also confirmed on 16 November 2026 that the NuGet namespace reservation
+is approved and PyPI registration is complete. The PyPI organisation application
+has been submitted; approval has not been confirmed. PyPI publication remains
+outside the three-ecosystem MVP dry run described here.
+
 Actual registry publication belongs to P4-09 and requires human review. Before
 publication, confirm the npm scope and trusted publisher for `publish-node.yml`,
-NuGet ownership and any adopted package-signing policy. The local dry run
+any adopted NuGet package-signing policy. The local dry run
 does not prove that these other accounts are configured. npm's existing human-triggered
 workflow publishes with provenance; this workflow does not dispatch it.
 
