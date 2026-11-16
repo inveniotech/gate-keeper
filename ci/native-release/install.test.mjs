@@ -12,7 +12,7 @@ import { installRelease } from './install.mjs';
 // This RFC 8032 seed is public development-only material, never a production key.
 const developmentKey = createPrivateKey({ key: Buffer.from('302e020100300506032b6570042204209d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60', 'hex'), format: 'der', type: 'pkcs8' });
 const publicKey = createPublicKey(developmentKey).export({ format: 'pem', type: 'spki' });
-const archiveName = process.platform === 'win32' ? 'gatekeeper-win-x64.zip' : `gatekeeper-${process.platform === 'darwin' ? 'osx' : 'linux'}-x64.tar.gz`;
+const archiveName = process.platform === 'win32' ? `gatekeeper-win-${process.arch}.zip` : `gatekeeper-${process.platform === 'darwin' ? 'osx' : 'linux'}-${process.arch}.tar.gz`;
 const executableName = process.platform === 'win32' ? 'gatekeeper.exe' : 'gatekeeper';
 
 async function fixture(t) {
@@ -31,7 +31,7 @@ async function fixture(t) {
   const manifest = Buffer.from(`${createHash('sha256').update(bytes).digest('hex')}  ${archiveName}\n`);
   const assets = new Map([[archiveName, bytes], ['SHA256SUMS', manifest], ['SHA256SUMS.sig', sign(null, manifest, developmentKey)]]);
   const downloads = [];
-  const options = { version: '0.2.0-alpha.3', publicKey, destination: join(root, 'installed'), platform: process.platform, architecture: 'x64',
+  const options = { version: '0.2.0-alpha.3', publicKey, destination: join(root, 'installed'), platform: process.platform, architecture: process.arch,
     fetchAsset: async name => { downloads.push(name); if (!assets.has(name)) throw new Error('Missing signature or asset'); return assets.get(name); } };
   return { root, options, assets, downloads };
 }
