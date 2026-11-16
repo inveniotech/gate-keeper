@@ -10,39 +10,39 @@
     },
     {
       "path": "cli/baseline.md",
-      "sha256": "adf87f4d2f368330e6d99caf6c9e17894a5ec5cff38eca72ba398ab32e6ee165"
+      "sha256": "570ec2d3d3faee674582df38f68d1461f91f935e4bc1cb54a885eb82e5b0835a"
     },
     {
       "path": "cli/doctor.md",
-      "sha256": "6af4f20c5c5f36c8e0d3587898736796177e8cd10489aa0a9c169bbadd8c1127"
+      "sha256": "9243a0063e108696b17e4f991390219a43ec51c4a6fb7a47120206d92442104d"
     },
     {
       "path": "cli/index.md",
-      "sha256": "646f5290b3e2124ff347b076a7b97b2bdd3a19c2686abb8dcfb894483780d6dc"
+      "sha256": "7bf400f089928655c9462d167b4c03885f4ea14bc7dcc83e75042bfe6f4620b3"
     },
     {
       "path": "cli/init.md",
-      "sha256": "342412fd5d8fd5a26b69038512dbd53af564e768cccfb186556b1e13307cdba9"
+      "sha256": "48479449979c40a126748d11c1928d408f9ec3c9db27cf5fbb2ad07adb130929"
     },
     {
       "path": "cli/scaffold-consent.md",
-      "sha256": "06f58ea29724c8caf12f4d54426df90acff1c488346fca9dbaaf32bf0de81166"
+      "sha256": "8262c34c570f951614fb34b616f9de097fc1e7fa0216fe932102e0c2f49039b8"
     },
     {
       "path": "cli/scaffold.md",
-      "sha256": "b0294dbd8a1115a7abeb096c55f8da867611cbc83c356eaf2c82f072f8d8667f"
+      "sha256": "afd9fe75bc7d369f72092496556866ddef986fabd62d74d614b0e5811ca54474"
     },
     {
       "path": "cli/scan.md",
-      "sha256": "6901d899b2afd4a8141ad98249f205660b2894610cdbbc0061f576e0f2ea1642"
+      "sha256": "95559166228b54b1166a5edd39b0f60efb04edf902ac0da7b956718d4a22dd71"
     },
     {
       "path": "cli/support-bundle.md",
-      "sha256": "dd89decf205f81b9aa214e00dd46169d61e6747017ade19f62645c88a553aeda"
+      "sha256": "32eeca642eef278f8efd50e3cc9053a4cc301c1db1c4e1787c0d10caecc1e3ea"
     },
     {
       "path": "cli/version.md",
-      "sha256": "ff675ca4fd1436119080d8cd4027458a224220e353fb90106ba97dbc8ae8d1e9"
+      "sha256": "7bb935d587a2bf31fcf788c9d6f2dde19b758b34af5fda9964c628de7d27f9b2"
     },
     {
       "path": "rules.json",
