@@ -4,4 +4,4 @@ schemaVersion = 1
 history = false
 
 [packs]
-local = [".ndpa-check/dogfood.pack.json"]
+local = [".gatekeeper/dogfood.pack.json"]
